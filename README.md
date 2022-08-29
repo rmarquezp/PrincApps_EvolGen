@@ -1,2 +1,3 @@
-# PrincApps_EvolGen
-Practicals for the Principles and Applications of Evolutionary Genetics course at the University of Michigan
+# Principles and Applications of Evolutionary Genetics
+
+Welcome to the Github repository for EEB401-2
