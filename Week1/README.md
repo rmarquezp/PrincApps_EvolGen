@@ -1,9 +1,8 @@
 Simulating Genetic Drift under the Wright-Fisher Model
 ======================================================
 
-The Wright-Fisher (WF) model is arguably the most comonly used framework for modelling genetic drift. ALthough we didn't explicitly name it in class, all of our excercises durring lecture were based on this model. Briefly, this model considers a bi-allelic locus within a population of haploid, randomly-mating individuals with non-overlapping generations. This means that after each generation, the entire population is replaced by its offspring. In its simplest form, this model also assumes a constant population size across generations and no selection. Note that, although the WF model assumes a group of *haploid* individuals, it turns out that the dynamics predicted by models for diploid populations with two sexes are remarkably similar to those under Wright-Fisher. Since the haploid model is simpler mathematically, it is often useful as a close approximation of diploid models. 
-
-
+The Wright-Fisher (WF) model is arguably the most comonly used framework for modelling genetic drift. Although we didn't explicitly name it in class, all of our excercises durring lecture were based on this model. Briefly, this model considers a bi-allelic locus within a population of haploid, randomly-mating individuals with non-overlapping generations. This means that after each generation, the entire population is replaced by its offspring. In its simplest form, this model also assumes a constant population size across generations and no selection. Note that, although the WF model assumes a group of *haploid* individuals, it turns out that the dynamics predicted by models for diploid populations with two sexes are remarkably similar to those under Wright-Fisher. Since the haploid model is simpler mathematically, it is often used as a more practical yet very close approximation of diploid models. 
+<br><br>
 In today's practical we will simulate the evolution of allele frequencies under the WF model and explore what such simulations can tell us about the evolutionary process.
 
 ## The Basic Model
@@ -76,7 +75,7 @@ drift_traj<-function(N,p0,ngen){
 	return(p_vec)
 }
 ```
-Note tha instead of sampling all alleles and counting them, this time we sampled directly from the binomial distribution. This approach is exactly equivalent to what we used previously, but involves less lines of code. 
+Note that instead of sampling all alleles and counting them, this time we sampled directly from the binomial distribution. This approach is exactly equivalent to what we used previously, but involves less coding, which. 
 <br><br>
 
 Lets test out our function
