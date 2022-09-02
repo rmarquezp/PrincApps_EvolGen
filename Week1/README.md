@@ -201,4 +201,4 @@ p_vec[1] <- p0
 	return(p_vec)
 	}
 ```
-Run a few simulations using similar parameters as in the previous point (perhaps with 200 instead of 50 generations). What do you notice? 
+Run a few simulations using similar parameters as in the previous point (perhaps with 200 instead of 50 generations) and mutation rates *u* = 0.005 and *v* = 0.007 mutations per generation. What do you notice? 
