@@ -1,9 +1,8 @@
 Simulating Genetic Drift under the Wright-Fisher Model
 ======================================================
 
-The Wright-Fisher (WF) model is arguably the most comonly used framework for modelling genetic drift. ALthough we didn't explicitly name it in class, all of our excercises durring lecture were based on this model. Briefly, this model considers a bi-allelic locus within a population of haploid, randomly-mating individuals with non-overlapping generations. This means that after each generation, the entire population is replaced by its offspring. In its simplest form, this model also assumes a constant population size across generations and no selection. Note that, although the WF model assumes a group of *haploid* individuals, we can apply it to diploids 
+The Wright-Fisher (WF) model is arguably the most comonly used framework for modelling genetic drift. ALthough we didn't explicitly name it in class, all of our excercises durring lecture were based on this model. Briefly, this model considers a bi-allelic locus within a population of haploid, randomly-mating individuals with non-overlapping generations. This means that after each generation, the entire population is replaced by its offspring. In its simplest form, this model also assumes a constant population size across generations and no selection. Note that, although the WF model assumes a group of *haploid* individuals, it turns out that the dynamics predicted by models for diploid populations with two sexes are remarkably similar to those under Wright-Fisher. Since the haploid model is simpler mathematically, it is often useful as a close approximation of diploid models. 
 
-**XXX Add stuff on how WF is applicable to diploids. 
 
 In today's practical we will simulate the evolution of allele frequencies under the WF model and explore what such simulations can tell us about the evolutionary process.
 
@@ -181,7 +180,7 @@ Calculate expected heterozygocity at t = 25 and 50
 
 ## Wright Fisher with Mutation
   
-As we've discussed in the past under the model studied in the previous section one allele is expected to become fixed eventually, at which point there <b>XXXXXXX<b>. To incorporate mutation into our model we can add two parameters, *u* and *v*, which represent the mutation rate from red to yellow and yellow to red, respecively.
+As we've discussed in the past under the model studied in the previous section one allele is always expected to become fixed at some point. This would predict that most natural populations should be genetically invariant, which is clearly not the case. In reality, as genetic drift eliminates genetic variants, mutation adds new ones to the population. To incorporate mutation into our model we can add two parameters, *u* and *v*, which represent the mutation rate from red to yellow and yellow to red, respecively.
 
 ![WF_Mut](../Images/WF_Mutation.png)
   
