@@ -1,1 +1,1 @@
-Simulating under the Wright-Fisher model of genetic drift
+SIMULATING GENETIC DRIFT UNDER THE WRIGHT-FISHER MODEL
