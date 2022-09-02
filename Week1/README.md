@@ -191,12 +191,12 @@ The first term of the sum represents the probability of a red allele *not* mutat
   
   ```R
 driftMut_traj <-function(N,u,v,p0,ngen){
-p_vec= numeric(ngen)
+p_vec<-c()
 p_vec[1] <- p0 	 
 
 	for( i in 2:ngen){
-		p_exp = p_vec[i-1]*(1-u) + (1-p_vec[i-1])*v 
-		p_vec[i] = rbinom(1,2*N,p_exp)/(2*N)
+		p_exp<-p_vec[i-1]*(1-u) + (1-p_vec[i-1])*v 
+		p_vec[i]<-rbinom(1,2*N,p_exp)/(2*N)
 		}
 	return(p_vec)
 	}
