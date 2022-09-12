@@ -258,5 +258,5 @@ densiTree(trees, alpha=0.1, col="black", direction="downwards")
 ```
 What do you see? Do you notice any general pattenrs about the topologies or coalescence times? 
 
-![Densitree](../Images/Densitree.png | width=100)
 
+<img src="../Images/Densitree.png" width="500">
