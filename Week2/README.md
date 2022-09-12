@@ -183,7 +183,7 @@ Lets now run the function on our results and plot the tree:
 
 ```R
 tree=sim2Tree(results)
-plot(tree, direction="downwards", cex=0.75)
+plot(tree, direction="downwards", show.node.label=T)
 ```
 
 Look at the results table from our simulation. Can you match the events described on each row with the tree you've plotted?
