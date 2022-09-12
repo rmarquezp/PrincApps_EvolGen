@@ -74,7 +74,7 @@ As the simulation runs it will populate the table with the genealogy's coalescen
 
 Now lets run the simulation. 
 ```R
-for(i in 1:(n-1)){ 	## For n lineages there are n-1 coalescence vevents.
+for(i in 1:(n-1)){ 	## For n lineages there are n-1 coalescence events.
 	
 	nl=results$nlineages[i] 
 	rate=nl*(nl-1)/2
