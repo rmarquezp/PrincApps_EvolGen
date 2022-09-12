@@ -234,8 +234,8 @@ ttots=lapply(res_list,function(x){sum(x$nlineages*x$Tcoal)})
 ttots=unlist(ttots)
 
 # Plot histograms of both parameters
-hist(ttots, main="100 samples", xlab=expression("T"["MRCA"]))
-hist(tmrcas, main = "100 samples", xlab=expression("T"["Total"]))
+hist(tmrcas, main="100 samples", xlab=expression("T"["MRCA"]))
+hist(ttots, main = "100 samples", xlab=expression("T"["Total"]))
 ```
 How well do our simulations match the theoretical expectations from coalescent theory? The expected values for both parameters are below:
 
