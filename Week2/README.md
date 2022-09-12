@@ -256,4 +256,7 @@ class(trees)="multiPhylo"
 library(phangorn)
 densiTree(trees, alpha=0.1, col="black", direction="downwards")
 ```
-What do you see? Do you notice any general pattenrs about the topologies or coalescence times?
+What do you see? Do you notice any general pattenrs about the topologies or coalescence times? 
+
+![Densitree](../Images/Densitree.png)
+
