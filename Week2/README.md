@@ -152,6 +152,7 @@ Now lets visualize our tree. The code below converts the results table into an o
 ```R
 sim2Tree=function(results){
 
+	n<-max(results$nlineages)
 	tree<-list()
 	class(tree) <- "phylo"
 	tree$tip.label<-1:n
