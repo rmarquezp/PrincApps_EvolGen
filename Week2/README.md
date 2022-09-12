@@ -96,18 +96,18 @@ Take a moment to understand the code for the simulation. In broad terms, what it
 
 <summary> Click here to see the answer </summary>
   
-  ```R
-  ## Step 2: Sample the exponential distribution for a coalescent time. We first calculate the rate for for our exponential distribution 
+```R
+## Step 2: Sample the exponential distribution for a coalescent time. We first calculate the rate for for our exponential distribution 
   
-  rate=nl*(nl-1)/2
-	tcoal=rexp(1, rate=rate)
+rate=nl*(nl-1)/2
+tcoal=rexp(1, rate=rate)
   
-  ## Step 3: Randomly pick two samples to coalesce. We then remove them from our lineage pool using the setdiff() function and add one of the parental nodes into the lineage pool. 
+## Step 3: Randomly pick two samples to coalesce. We then remove them from our lineage pool using the setdiff() function and add one of the parental nodes into the lineage pool. 
   
-  coal_lin=sample(lineages,2,rep=F)
-	lineages=setdiff(lineages,coal_lin)
-	lineages=c(lineages, nodes[i])
-  ```
+coal_lin=sample(lineages,2,rep=F)
+lineages=setdiff(lineages,coal_lin)
+lineages=c(lineages, nodes[i])
+```
   </details>
   
   Now our table has been populated with the results: 
@@ -152,7 +152,7 @@ Now lets visualize our tree. The code below converts the results table into an o
 ```R
 sim2Tree=function(results){
 
-  tree<-list()
+	tree<-list()
 	class(tree) <- "phylo"
 	tree$tip.label<-1:n
 
