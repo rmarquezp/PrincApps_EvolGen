@@ -20,8 +20,8 @@ library(phangorn)
 ```
 If you get an error message saying there is no such package, it is probably due to ape not being installed on your machine. If this is the case please install it:
 ```R
-install.packages(ape)
-install.packages(phangorn)
+install.packages("ape")
+install.packages("phangorn")
 ```
 
 ## Running a single simulation
