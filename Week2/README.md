@@ -44,7 +44,7 @@ nodes=(n+(n-1)):(n+1)
 [1] 19 18 17 16 15 14 13 12 11
 ```
 
-Note that for a tree with <i>n</i> nodes there are $n-1$ nodes (9 in our case). We name our nodes with numbers between 11 and 19 ordered backwards just to match the format used by the ape package to plot trees.
+Note that for a tree with $n$ lineages there are $n-1$ nodes (9 in our case). We name our nodes with numbers between 11 and 19 ordered backwards just to match the format used by the ape package to plot trees.
 <br>
 Now lets create an empty table for our simulation results. 
 
@@ -258,5 +258,9 @@ densiTree(trees, alpha=0.1, col="black", direction="downwards")
 ```
 What do you see? Do you notice any general pattenrs about the topologies or coalescence times? 
 
+<details>
+<summary> Click here to see the plot</summary>
 
 <img src="../Images/Densitree.png" width="500">
+
+</details>
