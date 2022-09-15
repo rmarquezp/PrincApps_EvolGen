@@ -20,11 +20,22 @@ We usually don't interact with computer clusters such as UM's Greatlakes the way
 
 <img src="https://cdn2.macpaw.com/images/content/Screen%20Shot%202021-09-03%20at%2014.32.58_1630671309.png" width=500>
 <br>
-This window is where we will type commands and receive outputs from Greatlakes. The first step to do so is logging into Greatlakes. To do so we must use a command called `ssh`, as well as our UM credentials.
+This window is where we will type commands and receive outputs from Greatlakes. The first step to do so is logging into Greatlakes. To do so we must use a command called "ssh" and our UM credentials.
 
 ```bash
 ssh uniqname@greatlakes.arc-ts.umich.edu
 ```
+You will then be asked for your password (this is the same password you use to log into other UM services, such as your email). Type it it and hit enter. <b>Don't worry if the cursor doesn't move as you type, this is normal</b>. If you entered your password correctly, you should connect to Greatlakes. Before letting you in, the cluster will ask for Duo two-factor authentication, giving you multiple options to do so. 
+
+```bash
+Enter a passcode or select one of the following options:
+
+ 1. Duo Push to XXX-XXX-NNNN
+ 2. Phone call to XXX-XXX-NNNN
+ 3. SMS passcodes to XXX-XXX-NNNN
+ ```
+ 
+Choose your preferred option and type its number (or enter a passcode), and hit enter. After authenticating you should see a welcome screen, and a command prompt ready for you to type. On the terminal we can do 
 
 ## Obtaining Fastq files
 The first step in most bioinformatic pipelines is transferring the data to our work environment. If you have generated these data yourself this may involve transferring it from the sequencing facility's computer to yours. If you are using data available in 
