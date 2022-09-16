@@ -64,18 +64,11 @@ module load Bioinformatics bwa sratoolkit samtools fastqc
 The first step in most bioinformatic pipelines is transferring the data to our work environment. If you have generated these data yourself this may involve transferring it from the sequencing facility's computer to yours. If you are using data available in the SRA, we can use a set of programs specifically created by the NIH to interact with the SRA, called the SRA toolkit. Each file uploaded to the SRA is assigned a unique ID number. Below are the ID numbers for 12 read files from our snowshoe hare system. 
 
 ```bash
-1. SRS6102628
-2. SRS6102626
-3. SRS6102627
-4. SRS6102625
-5. SRS6102623
-6. SRS6102624
-7. SRS6102622
-8. SRS6102621
-9. SRS6102620
-10. SRS6102619
-11. SRS6102618
-12. SRS6102617
+1. SRR11020240
+2. SRR11020241
+3. SRR11020242
+4. SRR11020243
+5. SRR11020245
 ```
 Pick one of these files so that each person in the class analyzes a different file. Nowlets download it using the SRA Toolkit. We will first download each file and then extract it in <i>fastq</i> format. This format is a commonly used file format for sequence data, which includes base calls and associated quality values (ie. error rates) for each base. 
 
