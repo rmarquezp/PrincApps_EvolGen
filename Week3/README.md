@@ -79,7 +79,7 @@ prefetch fileID
 #Extract it as fastq
 fasterq-dump fileID
 ```
-These sequences were generated using a technology called<i>paired-ejnd</i> sequencing where the beginind and end of each DNA fragment is sequenced. Therefore, after running the commands above, you should find two fastq files, one containing the beginings, and another the eands of the sequenced DNA fragments. Use the "ls" command to verify they are there. Lets now take a look inside these files 
+These sequences were generated using a technology called<i>paired-ejnd</i> sequencing where the beginind and end of each DNA fragment is sequenced. Therefore, after running the commands above, you should find two fastq files, one containing the beginings, and another the eands of the sequenced DNA fragments. Use the "ls" command to verify they are there. Lets now take a look inside these files. 
 ```bash
 less fileID_1.fastq
 ```
@@ -90,7 +90,7 @@ ATCGATGATTAAATCACCCTAATTTGCATTGTCTGAGCTAATCACCGATGATTTATTTACCTGCTATGTTTACACGAAGT
 +SRR11020240.1 1 length=101
 AAFFFJJJFJJJJJJJJJJFJJJJFJJJJJJJJJJJJJJJJJJJJJJJJAJ-FJJJJJJJFJJJFFJF7FFJJJJFJFFJJJJFJFJJJFJJA7JJFF<FF
 ```
-The first and third lines include information avout the read, in this case the file name, read number, and read length. The second line contains the sequence, and the fourth line contains the quality for each base. To save space, numerical values are stored as letters istead of numbers. YOu can read more about the fastq file [here](https://en.wikipedia.org/wiki/FASTQ_format). 
+The first and third lines include information avout the read, in this case the file name, read number, and read length. The second line contains the sequence, and the fourth line contains the quality for each base. To save space, numerical values are stored as letters istead of numbers. You can read more about the fastq file [here](https://en.wikipedia.org/wiki/FASTQ_format). 
 
 ## Assessing read quality and trimming reads
 
