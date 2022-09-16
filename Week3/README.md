@@ -110,7 +110,7 @@ This command copies all files with the extension ".html" in the folder Week3 to 
 Overall our reads seem to be OK, but there seems to be some adapter contamination. There are many many programs to deal with this sort of artifact. One that I particularly like is called [skewer](https://github.com/relipmoc/skewer). Run it as follows:
 
 ```bash
-/home/marquezr/software/skewer/skewer -o fileID fileID_1.fastq fileID_2.fastq
+/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/skewer/skewer -o fileID fileID_1.fastq fileID_2.fastq
 ```
 This should create two new fastq files. Use the "ls" command to see their names, and run fastqc on tehse new files. This should generate two new html files. Download them to the desktop and check them out. Was the adapter contamination removed?
 
