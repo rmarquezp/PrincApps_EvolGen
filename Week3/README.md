@@ -133,30 +133,92 @@ Now that we have high-quality, uncontaminated read files, we can map them back t
 
 bwa mem -o fileID.sam /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa fileID-trimmed-pair1.fastq fileID-trimmed-pair2.fastq
 ```
-The mapped reads in our output file are organized in the order in which there were sequenced. We can save a considerable amount of space by 1. organizing them according to the regions of the genome that they map back to, and 2. compressing the file. We can achieve this using the program "samtools":
+The mapped reads in our output file are organized in the order in which there were sequenced. We can save a considerable amount of space by 1. organizing them according to the regions of the genome that they map back to, and 2. compressing the file. We can achieve this using the program "samtools". In addition, we will create an <i>index</i> file, which allows programs to quickly access specific regions of our file without reading it all in first. 
 
 ```bash
 samtools sort -O BAM -o fileID.sorted.bam fileID.sam
-
-#We can remove the unsorted filel
+samtools index fileID.sorted.bam
+#We can remove the unsorted file
 
 rm fileID.sam
 ```
-Now lets have a look at what is inside our file:
+The resulting file (`fileID.sorted.bam`) contains the mapping information for all of our reads. Lets have a look at what this file contains. Since it is a pretty large file (we mappend over 1 million reads!), we can just print the first five lines.
 
 ```bash
-samtools view fileID.sorted.bam
+samtools view fileID.sorted.bam | head -n 5 
 
+ 
+SRR11020240.450129	163	PVJM010000001.1	5412	60	150M	=	5460	198	GCAAACTGGTTAAGCCACTATGGAAGTCTGTCTGGAGATTCCTCAGAAACCTGAATATAACCCTACCATACAACCCAGCCATACCTCTCCTTGGAATTTACCCAAAGGAAATTAAATTGGCAAACAAAAAAGCTGTCTGCACATTAATAT	AAAF<JFJJJJJJJJJJJFJJJJJFJJJFJJJJJJJJJJJJJJJJJJJAJJJJJFFJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJFJFFJJFFFFJJJJ	NM:i:0	MD:Z:150	MC:Z:150M	AS:i:150	XS:i:128	XA:Z:PVJM010200518.1,-755,150M,5;PVJM010242128.1,-656,150M,6;
+SRR11020240.979244	163	PVJM010000001.1	5412	60	150M	=	5460	198	GCAAACTGGTTAAGCCACTATGGAAGTCTGTCTGGAGATTCCTCAGAAACCTGAATATAACCCTACCATACAACCCAGCCATACCTCTCCTTGGAATTTACCCAAAGGAAATTAAATTGGCAAACAAAAAAGCTGTCTGCACATTAATAT	AAAFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ	NM:i:0	MD:Z:150	MC:Z:150M	AS:i:150	XS:i:128	XA:Z:PVJM010200518.1,-755,150M,5;PVJM010242128.1,-656,150M,6;
+SRR11020240.450129	83	PVJM010000001.1	5460	60	150M	=	5412	-198	ACCTGAATATAACCCTACCATACAACCCAGCCATACCTCTCCTTGGAATTTACCCAAAGGAAATTAAATTGGCAAACAAAAAAGCTGTCTGCACATTAATATTTATTGCAGCTCAATTCACAATAGCTGAGACCTGGAACCAATCCAAAT	FFFA7F<<AFA-<JJFJJJJFJ<JAJJJJJFJJJJAA<J<JJJJJJJFJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJAF-JJJFF7JJJJJFJJJJJJJJJJJJJJJJJJJJJJFFFJJJJJJJJJJJJJJJJJJJJJJJFFJJFFAAA	NM:i:1	MD:Z:113T36	MC:Z:150M	AS:i:145	XS:i:125	XA:Z:PVJM010021171.1,-4762,150M,5;PVJM010077295.1,+8871,150M,5;PVJM010080142.1,-5293,150M,6;
+SRR11020240.979244	83	PVJM010000001.1	5460	60	150M	=	5412	-198	ACCTGAATATAACCCTACCATACAACCCAGCCATACCTCTCCTTGGAATTTACCCAAAGGAAATTAAATTGGCAAACAAAAAAGCTGTCTGCACATTAATATTTATTGCAGCTCAATTCACAATAGCTGAGACCTGGAACCAATCCAAAT	JJJJFJJJJJJJJJJJJJJJFFJJAJFJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFFFAA	NM:i:1	MD:Z:113T36	MC:Z:150M	AS:i:145	XS:i:125	XA:Z:PVJM010077295.1,+8871,150M,5;PVJM010021171.1,-4762,150M,5;PVJM010080142.1,-5293,150M,6;
+SRR11020240.419008	99	PVJM010000001.1	9848	60	150M	=	9943	245	TTATATTATTGGCCCTATTTTGCTTCTGCAATGAATTTCATTGCCTGCATTGTAAAATCAGCAGGCAGCAAAGTTTCTGCTAATGATTTAATATACTGTCTGATCAGTTTGGACAAAAGTCATAGTAAGAACTACAAGGCAATTTTATCG	AAFF-AFJJAJJJFJJJJJJJA7-FJJJJJJJJJJJJJJJ<JJFJJAFJJJJFJJFJJJJ<FFJJFJJJJJJJAJJJFFJJJJJAJ--AFJJJJJJJJJJJJJJJJ-FJ-7<FJ<JJJJAFJ7JJJ-F7FFAJJJFJJ7FJAFFJJ-F--	NM:i:2	MD:Z:106T42A0	MC:Z:150M	AS:i:144	XS:i:22
 
 ```
+As you can see, our file is a tab-separated table with lots of mapping information. For example, column 1 contains the read name, column 3 the chromosome to which our read mapped, and column 4 the position at which it mapped. Further columns include the sequence, its quality values, and other metrics related to alignment. Column 2 is of special interest, as it contains a code that summarizes a lot of this information. These codes are known as flags. A useful resource to interpret them can be found [here](https://broadinstitute.github.io/picard/explain-flags.html).
 
-### Evaluating bam/sam file statistics
+Samtools also allows us to see all the reads mapped to a particular region of the genome. For example, lets look at the first five reads mapping to the chromosome labelled as "PVJM010000002.1", between bases 10,000 and 20,000
 
-Finally, lets gather some statsitics to see how our mapping went. We can obtain several 
+```bash
+samtools view fileID.sorted.bam PVJM010000002.1:10000-20000 | head -n 5
+
+SRR11020240.906012	99	PVJM010000002.1	10134	60	150M	=	10174	190	ACACATTCAAAGGTACTTTAAAATGTTGGTGGAAAATGGAATTAAAAGATAAGTTTTTTTGGTACAAAAATTTTTGAAATCCTTGCATATGTATATTATGCAAAAAGTACATATGGATCTGAAAACTGAATTGCACCAAGCATGAACTTT	AAFFFFJFJJJJJJJJJJJJJJJJJJJJJJJJ<JFJJJFAJJJJJJJJJJJJFJJJJJJJ-FJFJJFJJJJJJJJAFFJJFJFJJJJJJJJJFJJJJJJJJJJJFJJJJJJFJJFFJ<-FF<77<AAFFJFFF7JF<JJJ<AFAFJFJJJ	NM:i:0	MD:Z:150	MC:Z:150M	AS:i:150	XS:i:28
+SRR11020240.906012	147	PVJM010000002.1	10174	60	150M	=	10134	-190	ATTAAAAGATAAGTTTTTTTGGTACAAAAATTTTTGAAATCCTTGCATATGTATATTATGCAAAAAGTACATATGGATCTGAAAACTGAATTGCACCAAGCATGAACTTTTTGAAGTGCTCTTGCACAAACTACAGAAAATGGCCCTTCT	JJJFJJJJJFAJJJJJJJJJFFAJJJJJJJJJJJJJJAFJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJAAFAA	NM:i:1	MD:Z:118A31	MC:Z:150M	AS:i:145	XS:i:26
+SRR11020240.570046	163	PVJM010000002.1	11544	60	20M2D130M	=	11616	222	TACACAGAGAGAGGAGAGGCAGAGAGAGAGAGAGAGAGAGAGGTCTTCCATCTGCTGGTTCACTCCCTAATTGGCCACAATGGCCGGAGCCATGACGATTTGAAGCCAGGAGCCAGAAGCTTCCTCCCGGGTCTCCCATGCGGGTGCAGG	AAFFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJ	NM:i:3	MD:Z:20^AG121AMC:Z:150M	AS:i:137	XS:i:90
+SRR11020240.570046	83	PVJM010000002.1	11616	60	150M	=	11544	-222	TTGGCCACAATGGCCGGAGCCATGACGATTTGAAGCCAGGAGCCAGAAGCTTCCTCCCGGGTCTCCCATGCGGGTGCAGGGGCCTAAGGGCTTGGGCCATCTTCTACTGCTTTCCCAGGCCTCAGCAGAGAGCTGGATTGGAAGTGGAGC	AFJJJJJJJF-FJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJAJFJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFFFAA	NM:i:10	MD:Z:71A12C4A13T0C16A0T15C0A5A4	MC:Z:20M2D130M	AS:i:103	XS:i:81
+SRR11020240.728680	99	PVJM010000002.1	12091	60	150M	=	12120	179	CTGTTTCTAAGAACAAATTTAGAAACCACTGCATTATTACATGTACCACAGGGAAAGAAGAGAGGGAATATCATAAGGATCCATATCTGAAACATCACTGTTAGTAGCCAGCATGAGAAATCCCAGATAATGTACTGCATATAATAATGG	AAFFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJ	NM:i:0	MD:Z:150	MC:Z:150M	AS:i:150	XS:i:0
+```
+
+## Evaluating bam/sam file statistics
+
+Finally, lets gather some statsitics to see how our mapping went. We can obtain several metrics using the "flagstat" function of samtools, which summarizes the information in all of our reads' flags. 
 
 ```bash
 samtools flagstat fileID.sorted.bam
+
+2933857 + 0 in total (QC-passed reads + QC-failed reads)
+2898178 + 0 primary
+0 + 0 secondary
+35679 + 0 supplementary
+0 + 0 duplicates
+0 + 0 primary duplicates
+2920653 + 0 mapped (99.55% : N/A)
+2884974 + 0 primary mapped (99.54% : N/A)
+2898178 + 0 paired in sequencing
+1449089 + 0 read1
+1449089 + 0 read2
+2810828 + 0 properly paired (96.99% : N/A)
+2881004 + 0 with itself and mate mapped
+3970 + 0 singletons (0.14% : N/A)
+64084 + 0 with mate mapped to a different chr
+42093 + 0 with mate mapped to a different chr (mapQ>=5)
+
 ```
 
+Based on this, does it look like our alignment went well?
 
+An additional metric of interest is the read depth that we've obtained. Since this is directly related to the confidence we will have in our genotypes, it is important to know how much cooverage we've obtained. This can be obtained using the "depth" function of samtools. The resulting file can be quite large, so in the itenrest of time lets look only at the first 1,000,000 sites covered. 
 
+```bash
+samtools depth SRR11020240.sorted.bam | head -n 1000000 > SRR11020240.depth.txt
+#note we are writing the output of our command to a file using the > character.
+
+## Take a peek inside the file
+
+head -n 5 SRR11020240.depth.txt
+
+PVJM010000001.1	5412	2
+PVJM010000001.1	5413	2
+PVJM010000001.1	5414	2
+PVJM010000001.1	5415	2
+PVJM010000001.1	5416	2
+
+# It is a table with three columns: crhomosome name, position, and depth. 
+```
+
+Finally, lets plot depth along out chromosome. First use `scp` to download the file, then open an R window to plot using the following commands:
+
+```R
+depth<-read.table("SRR11020240.depth.txt")
+hist(depth[,3], breaks=0:max(depth[,3]), xlab="Coverage", ylab="Frequency")
+```
