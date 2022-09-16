@@ -82,6 +82,7 @@ fasterq-dump fileID
 These sequences were generated using a technology called<i>paired-ejnd</i> sequencing where the beginind and end of each DNA fragment is sequenced. Therefore, after running the commands above, you should find two fastq files, one containing the beginings, and another the eands of the sequenced DNA fragments. Use the "ls" command to verify they are there. Lets now take a look inside these files. 
 ```bash
 less fileID_1.fastq
+# To exit the less screen just hit the 'q' key.
 ```
 Note how each sequence is represented by four lines:
 ```bash
