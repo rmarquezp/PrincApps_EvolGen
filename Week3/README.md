@@ -136,16 +136,27 @@ bwa mem -o fileID.sam /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shar
 The mapped reads in our output file are organized in the order in which there were sequenced. We can save a considerable amount of space by 1. organizing them according to the regions of the genome that they map back to, and 2. compressing the file. We can achieve this using the program "samtools":
 
 ```bash
-samtools sort -O BAM -o fileID.sorted.bam SRR11020240.sam
+samtools sort -O BAM -o fileID.sorted.bam fileID.sam
 
 #We can remove the unsorted filel
 
-rm -r fileID.sorted.bam
+rm fileID.sam
 ```
 Now lets have a look at what is inside our file:
 
 ```bash
-samtools view
+samtools view fileID.sorted.bam
+
+
 ```
 
-NEXT DO SAMTOOLS FLAGSTAT AND SAMTOOLS DEPTH, PLOT DEPTH HISTOGRAM. IF THERE IS TIME DOWNLOAD TO IGV. 
+### Evaluating bam/sam file statistics
+
+Finally, lets gather some statsitics to see how our mapping went. We can obtain several 
+
+```bash
+samtools flagstat fileID.sorted.bam
+```
+
+
+
