@@ -173,10 +173,10 @@ The `-b` flag tells Angsd to use the bam files in a list that can be found at "$
 <br><br>
    The command will take about 30 minutes to run. Since you may not want to wait this long, feel free to cancel the run (`ctrl+C`) and copy the output of this step into your directory: `cp /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/L_amer.saf.* .`
    
-   Now that we have our counts, we can try to find the most likely SFS. Angsd comes with an auxiliary program that maximizes the likelihood of the SFS, called realSFS. We can ask it to run for at most 200 iterations while trying to find the best SFS. In the interest of time, we will limit out analysis to the first 50,000,000 sites. 
+   Now that we have our counts, we can try to find the most likely SFS. Angsd comes with an auxiliary program that maximizes the likelihood of the SFS, called realSFS. We can ask it to run for at most 200 iterations while trying to find the best SFS. In the interest of time, we will limit out analysis to the first 20,000,000 sites. 
    
    ```bash 
-   realSFS -maxIter 200 -nSites 50000000 L_amer.saf.idx > L_amer.ml.sfs.txt
+   realSFS -maxIter 200 -nSites 20000000 L_amer.saf.idx > L_amer.ml.sfs.txt
    ```
 Download the file called L_amer.ml.sfs.txt to the desktop as we did last time. You can read it into R using `sfs<-scan("L_amer.ml.sfs.txt"), and plot it as we did above. Note that this SFS has 13 entries, as it includes values for fixed sites both at the ancestral (first entry) and derived (last entry) allele. You may want to plot values 2-12. <br>
 <br>
@@ -190,6 +190,6 @@ How does the SFS look? Does it seem real?
    
    ```bash
    
-  realSFS -maxIter 200 -nSites 50000000 -fold 1 L_amer.saf.idx > L_amer.ml.folded.sfs.txt
+  realSFS -maxIter 200 -nSites 20000000 -fold 1 L_amer.saf.idx > L_amer.ml.folded.sfs.txt
 ```
    Does this look better?
