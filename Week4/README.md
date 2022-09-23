@@ -171,7 +171,7 @@ The `-b` flag tells Angsd to use the bam files in a list that can be found at "$
    After this there are multiple flags aimed at removing data that isn't in great shape, for example by setting minimum base quality thesholds, using only sites that don't deviate too much from HWE, or removing reads that don't map too well. 
 
 <br><br>
-   The command will take about 30 minutes to run. Since you may not want to wait this long, feel free to cancel the run (`ctrl+C`) and copy the output of this step into your directory: `cp XXX`
+   The command will take about 30 minutes to run. Since you may not want to wait this long, feel free to cancel the run (`ctrl+C`) and copy the output of this step into your directory: `cp /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/L_amer.saf.* .`
    
    Now that we have our counts, we can try to find the most likely SFS. Angsd comes with an auxiliary program that maximizes the likelihood of the SFS, called realSFS. We can ask it to run for at most 200 iterations while trying to find the best SFS. In the interest of time, we will limit out analysis to the first 50,000,000 sites. 
    
