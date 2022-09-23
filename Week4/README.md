@@ -154,7 +154,7 @@ Type `ls $bams`. What do you see in there?
 OK, time to estimate our SFS frequencies. The first step is to go over all the genotyped sites and calculate the likelihood of all possible SFS at each site.
 
 ```bash
-angsd -b "$lists"/ingroup.filelist -GL 1 -anc ancestral.fa -ref $ref -sites OutgroupFixedSites.txt -rf OutgroupFixed_chr.txt -dosaf 1 -out L_amer -baq 1 -C 50 -minMapQ 20 -minQ 20 -remove_bads 1 -only_proper_pairs 1
+angsd -b "$lists"/ingroup.filelist -GL 1 -anc ancestral.fa -ref $ref -sites OutgroupFixedSites.txt -rf OutgroupFixed_chr.txt -dosaf 1 -out L_amer -baq 1 -C 50 -minMapQ 20 -minQ 20 -remove_bads 1 -only_proper_pairs 1 -doHWE 1 -minHWEpval 0.001
 ```
 
 Lets unpack this command a little. <br><br>
@@ -168,7 +168,7 @@ The `-b` flag tells Angsd to use the bam files in a list that can be found at "$
    `-dosaf 1` tells Angsd to calculate site allele frequencies and their associated likelihoods.<br>
    `-out` Specifies the name of the output files.<br>
    <br>
-   After this there are multiple flags aimed at removing data that isn't in great shape, for example by setting minimum base quality thesholds or removing reads that don't map too well. 
+   After this there are multiple flags aimed at removing data that isn't in great shape, for example by setting minimum base quality thesholds, using only sites that don't deviate too much from HWE, or removing reads that don't map too well. 
 
 <br><br>
    The command will take about 30 minutes to run. Since you may not want to wait this long, feel free to cancel the run (`ctrl+C`) and copy the output of this step into your directory: `cp XXX`
