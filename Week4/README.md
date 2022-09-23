@@ -124,7 +124,7 @@ rm SRR11020246.sorted.bam
    
  We are now ready to go. Sign into the Greatlakes cluster as we did last time, create a directory named `Week4`, move into it (`cd Week4`) and request a job. This time around we will need some more memory. 
 ```bash
-srun --account eeb401s002f22_class --time 1:30:00 --mem 24G --tasks-per-node 1 --pty bash
+srun --account eeb401s002f22_class --time 1:30:00 --mem 48G --tasks-per-node 1 --pty bash
 ```
    
 <b> What is the ancestral allele though?</b>
@@ -154,7 +154,7 @@ Type `ls $bams`. What do you see in there?
 OK, time to estimate our SFS frequencies. The first step is to go over all the genotyped sites and calculate the likelihood of all possible SFS at each site.
 
 ```bash
-angsd -b "$lists"/ingroup.filelist -GL 1 -anc ancestral.fa -ref $ref -sites OutgroupFixedSites.txt -rf OutgroupFixed_chr.txt -dosaf 1 -out L_amer -baq 1 -C 50 -minMapQ 20 -minQ 20 -remove_bads 1 -only_proper_pairs 1 -doHWE 1 -minHWEpval 0.001
+angsd -b "$lists"/ingroup.filelist -GL 1 -anc ancestral.fa -ref $ref -sites OutgroupFixedSites.txt -rf OutgroupFixed_chr.txt -dosaf 1 -out L_amer -baq 1 -C 50 -minMapQ 20 -minQ 20 -remove_bads 1 -only_proper_pairs 1 -doMajorMinor 1 -doHWE 1 -minHWEpval 0.001
 ```
 
 Lets unpack this command a little. <br><br>
