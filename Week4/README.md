@@ -30,7 +30,7 @@ How does the SFS look? Does it appear to follow the theoretical expectation? We 
 
 ```R
 # First create a matrix with observed and expected SFS together. Recall Theta=300
-ObsExp=matrix(c(SFS, 300/1:19), nrow=2, byrow=T)
+ObsExp=matrix(c( 300/1:19,SFS), nrow=2, byrow=T)
 
 ## Plot
 barplot(ObsExp, beside=T, col=c("grey15", "grey65"), xlab="Derived Allele count", ylab="Number of Sites", names=1:19)
