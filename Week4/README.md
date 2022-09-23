@@ -184,10 +184,12 @@ How does the SFS look? Does it seem real?
 <br><br>
    <b>What if we can't confidently infer the ancestral allele</b><br><br>
    
-   I'm sure you can imagine several situations in which infering ancestral bases confidently may be difficult or problematic. In those cases, we can use a version of the SFS often called the <i>folded</i> or <i>minor</> allele frequency spectrum. It is still a frequency spectrum, but uses the frequency of the minor (ie least comon) allele, regardless of which one is ancestral. Therefore, for n samples it goes from 1 to (n/2), instead of 1 to n. We can obtain this spectrum from the unfolded (ie. regular) SFS by just adding $\eta_i+\eta_{n-i}$. For example, for 10 samples, sites with 1 derived alleles get added to sites with 9 derived alleles, since in both cases the least common allele is at frequency 0.1. <br><br>
+   I'm sure you can imagine several situations in which infering ancestral bases confidently may be difficult or problematic. In those cases, we can use a version of the SFS often called the <i>folded</i> or <i>minor</i> allele frequency spectrum. It is still a frequency spectrum, but uses the frequency of the minor (ie least comon) allele, regardless of which one is ancestral. Therefore, for n samples it goes from 1 to (n/2), instead of 1 to n. We can obtain this spectrum from the unfolded (ie. regular) SFS by just adding $\eta_i+\eta_{n-i}$. For example, for 10 samples, sites with 1 derived alleles get added to sites with 9 derived alleles, since in both cases the least common allele is at frequency 0.1. <br><br>
    
    We can easily produce a folded spectrum on reafSFS by just adding the `-fold 1` flag. 
    
    ```bash
    
   realSFS -maxIter 200 -nSites 50000000 -fold 1 L_amer.saf.idx > L_amer.ml.folded.sfs.txt
+   
+   Does this look better?
