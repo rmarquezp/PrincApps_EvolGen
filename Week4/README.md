@@ -191,5 +191,5 @@ How does the SFS look? Does it seem real?
    ```bash
    
   realSFS -maxIter 200 -nSites 50000000 -fold 1 L_amer.saf.idx > L_amer.ml.folded.sfs.txt
-   
+```
    Does this look better?
