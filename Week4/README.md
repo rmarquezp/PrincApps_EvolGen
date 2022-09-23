@@ -124,7 +124,7 @@ rm SRR11020246.sorted.bam
    
  We are now ready to go. Sign into the Greatlakes cluster as we did last time, create a directory named `Week4`, move into it (`cd Week4`) and request a job. This time around we will need some more memory. 
 ```bash
-srun --account eeb401s002f22_class --time 1:30:00 --mem 48G --tasks-per-node 1 --pty bash
+salloc --account eeb401s002f22_class --time 1:30:00 --mem 48G --tasks-per-node 1
 ```
    
 <b> What is the ancestral allele though?</b>
