@@ -42,9 +42,17 @@ $$\hat{\theta}_{FL}=\eta_1$$
 Theta_FL=SFS[1]
 
 > ThetaFL
-309
+[1] 309
 ```
 
 Pretty close, now lets calculate Watterson's estimator, which is equal to the number of segregating sites controlled by sample size:
 
-$$\hat{\theta}_{W}=\sum_{i=1}$$
+$$\hat{\theta}_{W} = \frac{S}{\sum\frac{1}{i}} = \frac{\sum \eta_i}{\sum\frac{1}{i}}$$ 
+  
+  ```R
+  Theta_W=sum(SFS)/sum(1/1:19)
+  
+> Theta_W
+[1] 281.8696
+```
+
