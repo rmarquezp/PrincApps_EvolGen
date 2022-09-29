@@ -36,3 +36,4 @@ $$Q = \begin{bmatrix}
 k\pi_{A}&  \pi_{GC}&\cdot  & \pi_{T}  \\
 \pi_{A}&  k\pi_{C}& \pi_{G}  & \cdot  \\
 \end{bmatrix}
+$$
