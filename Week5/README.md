@@ -28,14 +28,22 @@ Now we'll set up a configuration file for BEAST to run our skyline plot analysis
 <br><br>
 The "Tip Dates" tab can be used to give BEAST the dates at which out sequences were sampled, which can help callibrate the branch lengths from units of genetic distance to time. Since all of our sequences were collected this month, we will use an experimentally-determinaed mutation rate instead (see below), so we can skip the "Tip Dates" tab . 
 <br><br>
-In the "Site Model" tab we will specify our mutation model (also known as a model of DNA evolution). Since we are dealing with a relatively short DNA sequence with a high mutation rate, we will use a finitely-many alleles model. This is commonly done for tree-inference, since we need sequences that evolve fast enough to generate enough information that allows us to infer the tree, so back-mutation must be taken into account. We will use a model commonly known as "HKY", which uses the following rate matrix:
+In the "Site Model" tab we will specify our mutation model (also known as a model of DNA evolution). Since we are dealing with a relatively short DNA sequence with a high mutation rate, we will use a finitely-many alleles model. This is commonly done for tree-inference, since we need sequences that evolve fast enough to generate enough information that allows us to infer the tree, so back-mutation must be taken into account. We will use a model commonly known as "HKY", which considers all <i>transversions</i>, that is changes between a purine (A, G) and a pyrimidine (C, T), are equally probable, and all <i>transitions</i>, changes between two purines or pyrimidines, as $\kappa$ (kappa) times as probable as transitions. In addition, we will add add an extra parameter called $\Gamma$ (Gamma) that allows for some sites to vary more than others. Specifically, it considers sites as part of four variation categories (something like not too variable, somewhat variable, variable, really variable). This may seem a little confusing if you are not familiar with tree inference methods. Fully understanding this model is not essential for our purposes beyond the fact that it is a finitely-many alleles model. If you are itnerested in learning mroe about this type of nucleotide substitution models, I highly recommend this <a> href="https://revbayes.github.io/tutorials/ctmc/">site</a>. 
+<br><br> 
+To specify this model on BEAUTi change the "Subst Model" item to "HKY", and endet "4" in the number of Gamma categories. 
+<img src="../Images/SiteModelTab.png" width="500">
+<br>The "Clock Model" tab deals with how we will callibrate our tree so that branches are in units of time. This can be done in two main ways: Either setting some of the nodes/tips to specific dates to estimate the mutation rate and the ages of the remaining nodes, or by assuming a mutation rate. We will use the mutation rate reported by Castillo Morales and collaborators ([2021](https://doi.org/10.1093/gbe/evab196)), who estimated a rate of ~0.0015 mutations per site per year (that is FAST!). Since months are a more appropriate time scale for our analyses, we will use 0.0015/12=0.000125 mutations per site per month. Enter this rate into the text box. 
+  <br><br>
+We will be optimizing the parameters in our tree model using an algorithm known as Markov CHain Monte Carlo (MCMC), which is a Bayesian method. HTerefore, we must specify some of our prior beliefs about the data. WHile the analysis is running, we will briefly discuss this algorithm as a class. We can use most of the default priors, excepr for the one regarding the tree structure. THe default is a Yule model, which describes a branching process more appropriate for modelling speciation than coalescence (ie. it is more adequate for phylogenetics). We will use a "Coalescent Bayesian Skyline," which models a coalescent genealogy with varying population size. 
+  <br><br>
+  Finally, the "MCMC" tab deals with the technical aspects of our optimization algorithm. The default number of iterations (labelled as "Chain length" is 10,000,000. In the itnerest of time we will only run 3,000,000. Change the chain length to 3,000,000, and save you configuration file using File -> Save. 
+  <br>
+  <b>Running the MCMC</b>
+ To run BEASTopen the terminal (but don't log into the cluster yet) and use `cd` to navigate to the directory where your files are. Once there run the following command to start the run
+  ```bash
+/Applications/BEAST\ 2.7.0/bin/beast -threads 2 MI_Covid.aln.100random.xml
+#Remember to adjust your path and file name accordingly!
+```
+While the analysis runs, we will briefly go over how an MCMC algorith works. 
   
-$$Q = \begin{bmatrix}
-\cdot & 1 & k  & 1  \\
-1 &  \cdot & 1  & k  \\
-k &  1 & \cdot  & 1  \\
-1 &  k & 1  & \cdot  \\
-\end{bmatrix}
-$$
-
-Basically, this model considers 
+  <b> Building the Skyline Plot</b>
