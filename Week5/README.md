@@ -55,5 +55,24 @@ When the analysis finishes running, open Tracer and load the log file from your 
 What does the plot suggest about the history of Covid-19 in Michigan over the last few months? 
 <details>
   <summary> Click here to see the plot</summary>
-  <img src="CovidSkyline" width="600">
-  
+  <img src="../Images/CovidSkyline.png" width="600">
+  There is a clear ~50-fold population expansion around the first few weeks of August. What may have happened around this time?
+  </details>
+<br>
+  <b> Obtaining the Genealogy </b> 
+<br><br>
+Lets now look at the genealogy of our samples. Being a Bayesian method, BEAST produces a set of "credible" trees. We can summarize these sets into a single "averaged" estimate using the TreeAnnotator program, also distributed with BEAST. Open this program, load your trees file, and pick a name for your new summary tree file. Leave the rest of fields as default and hit the "Run" button. Once the program is finished, you should find the tree fiel in your work directory. We can plot this tree in R
+```R
+library(ape)
+tree=read.nexus("
+plot(tree, direction="downwards", show.tip.label=F)
+```
+What do you see? Does this coincide with the skyline plot?
+
+<detalis>
+  <summary> Click here to see the tree</summary>
+<img src="../Images/CovidGenealogy.png" width="600">
+ The long branches towards the tips are what we' expect under a pretty big expansion like the one on the skyline plot!. 
+<details>
+
+## Estimating Parameters from the SFS
