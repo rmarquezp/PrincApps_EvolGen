@@ -1,4 +1,4 @@
-Demographic Inference using Coalescence
+Demographic Inference from Coalescent Genealogies
 ==========
 
 The evolutionary history of a lineage is often marked by changes in population size. Therefore, estimating historical demographic changes can be a highly informative approach for evolutionary biologists. Coalescent theory provides a powerful framework for this, since the rate of coalescence depends on the (effective) population size. Today we will be impleenting a widely-used approach for demographic inference under the coalescent model: The "skyline" plot. You will some software installed: <a href="https://www.beast2.org/" >BEAST2</a>, a very powerful suite of programs for the inference and analysis of evolutionary trees, and <a href="https://github.com/beast-dev/tracer/releases/tag/v1.7.2" >Tracer</a>, used to visualize the results of Bayesian MCMC analysis. If you haven't please install the first two (locally) on your cumputer.
