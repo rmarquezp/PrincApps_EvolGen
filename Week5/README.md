@@ -65,7 +65,7 @@ Lets now look at the genealogy of our samples. Being a Bayesian method, BEAST pr
   
 ```R
 library(ape)
-tree=read.nexus("
+tree=read.nexus(""MI_Covid.aln.100random.tre")
 plot(tree, direction="downwards", show.tip.label=F)
 ```
 What do you see? Does this coincide with the skyline plot?
@@ -80,5 +80,9 @@ What do you see? Does this coincide with the skyline plot?
 </details>
 
 ## Estimating Parameters from the SFS
-                                                
+
+Lets now switch gears and move on to demographic inference using teh SFS produced from genotypes at multiple loci across the genome. For this we will be using data collected from <i>Drosophila sechellia</i>, a fruit fly species endemic to the Seychelles archipelago. This species is thought to have recently colonized the Seychelles, where it is abundant now, so we are interested in whether it has experienced a bottleneck in the process. To this end we will infer the SFS using Angsd and fastsimcoal2 for demographic inference. 
+
+
+
 
