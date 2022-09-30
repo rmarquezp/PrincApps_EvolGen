@@ -34,16 +34,26 @@ To specify this model on BEAUTi change the "Subst Model" item to "HKY", and ende
 <img src="../Images/SiteModelTab.png" width="500">
 <br>The "Clock Model" tab deals with how we will callibrate our tree so that branches are in units of time. This can be done in two main ways: Either setting some of the nodes/tips to specific dates to estimate the mutation rate and the ages of the remaining nodes, or by assuming a mutation rate. We will use the mutation rate reported by Castillo Morales and collaborators ([2021](https://doi.org/10.1093/gbe/evab196)), who estimated a rate of ~0.0015 mutations per site per year (that is FAST!). Since months are a more appropriate time scale for our analyses, we will use 0.0015/12=0.000125 mutations per site per month. Enter this rate into the text box. 
   <br><br>
-We will be optimizing the parameters in our tree model using an algorithm known as Markov CHain Monte Carlo (MCMC), which is a Bayesian method. HTerefore, we must specify some of our prior beliefs about the data. WHile the analysis is running, we will briefly discuss this algorithm as a class. We can use most of the default priors, excepr for the one regarding the tree structure. THe default is a Yule model, which describes a branching process more appropriate for modelling speciation than coalescence (ie. it is more adequate for phylogenetics). We will use a "Coalescent Bayesian Skyline," which models a coalescent genealogy with varying population size. 
+We will be optimizing the parameters in our tree model using an algorithm known as Markov CHain Monte Carlo (MCMC), which is a Bayesian method. HTerefore, we must specify some of our prior beliefs about the data. WHile the analysis is running, we will briefly discuss this algorithm as a class. We can use most of the default priors, excepr for the one regarding the tree structure. The default is a Yule model, which describes a branching process more appropriate for modelling speciation than coalescence (ie. it is more adequate for phylogenetics). We will use a "Coalescent Bayesian Skyline," which models a coalescent genealogy with varying population size. 
   <br><br>
   Finally, the "MCMC" tab deals with the technical aspects of our optimization algorithm. The default number of iterations (labelled as "Chain length" is 10,000,000. In the itnerest of time we will only run 3,000,000. Change the chain length to 3,000,000, and save you configuration file using File -> Save. 
-  <br>
+  <br><br>
   <b>Running the MCMC</b>
+  <br><br>
  To run BEASTopen the terminal (but don't log into the cluster yet) and use `cd` to navigate to the directory where your files are. Once there run the following command to start the run
   ```bash
 /Applications/BEAST\ 2.7.0/bin/beast -threads 2 MI_Covid.aln.100random.xml
 #Remember to adjust your path and file name accordingly!
 ```
 While the analysis runs, we will briefly go over how an MCMC algorith works. 
+<br><br>
   
   <b> Building the Skyline Plot</b>
+<br><br>
+When the analysis finishes running, open Tracer and load the log file from your run (e.g. `MI_Covid.aln.100random.log`). After your file loads, you should see the parameters of your model and some statistics regarding how well their ran durring the MCMC. We will briefly discuss the meaning of these parameters as a class before proceeding to generate our skyline plot. Once that is done, on the top menu bar go to "Analysis -> Bayesian Skyline Reconstruction". A new dialog box will open. On the "Trees Log" window select the "trees" file from your BEAST run (e.g. `MI_Covid.aln.100random.trees`). Leave teh rest of fields as defaults, except for the last text box, which asks for the age of the youngest sample. For the purposes of htis lab, we can enter an age of 9.5 months (ie. mid-September), to reflect the fact that our samples were collected throughout the month of September. Click "OK" and wait for the analysis to complete. A plot should appear. 
+<br><br>
+What does the plot suggest about the history of Covid-19 in Michigan over the last few months? 
+<details>
+  <summary> Click here to see the plot</summary>
+  <img src="CovidSkyline" width="600">
+  
