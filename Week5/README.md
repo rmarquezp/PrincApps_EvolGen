@@ -1,7 +1,8 @@
 Demographic Inference using Coalescence
 ==========
 
-The evolutionary history of a lineage is often marked by changes in population size. Therefore, estimating historical demographic changes can be a highly informative approach for evolutionary biologists. Coalescent theory provides a powerful framework for this, since the rate of coalescence depends on the (effective) population size. Today we will be impleenting two approaches for demographic inference under the coalescent model: The "skyline" plot and demographic parameter estimation from the site frequency spectrum (SFS). For today's lab you will some software installed: <a href="https://www.beast2.org/" >BEAST2</a>, a very powerful suite of programs for the inference and analysis of evolutionary trees, <a href="https://github.com/beast-dev/tracer/releases/tag/v1.7.2" >Tracer</a>, used to visualize the results of Bayesian MCMC analysis, and <a href="http://cmpg.unibe.ch/software/fastsimcoal27/">fastsimcoal2<a/>. If you haven't please install the first two (locally) on your cumputer. The third one is already on greatlakes. 
+The evolutionary history of a lineage is often marked by changes in population size. Therefore, estimating historical demographic changes can be a highly informative approach for evolutionary biologists. Coalescent theory provides a powerful framework for this, since the rate of coalescence depends on the (effective) population size. Today we will be impleenting two approaches for demographic inference under the coalescent model: The "skyline" plot and demographic parameter estimation from the site frequency spectrum (SFS). For today's lab you will some software installed: <a href="https://www.beast2.org/" >BEAST2</a>, a very powerful suite of programs for the inference and analysis of evolutionary trees, and <a href="https://github.com/beast-dev/tracer/releases/tag/v1.7.2" >Tracer</a>, used to visualize the results of Bayesian MCMC analysis. If you haven't please install the first two (locally) on your cumputer.
+<!---The third one is already on greatlakes. --->
 
 ## Skyline plot
 
@@ -74,14 +75,16 @@ What do you see? Does this coincide with the skyline plot?
 <details>
   <summary> Click here to see the tree</summary>
   <img src="../Images/CovidGenealogy.png" width="600">
-  <br?
+  <br>
  The long branches towards the tips are what we' expect under a pretty big expansion like the one on the skyline plot!. 
 
 </details>
 
-## Estimating Parameters from the SFS
+<!---## Estimating Parameters from the SFS
 
 Lets now switch gears and move on to demographic inference using teh SFS produced from genotypes at multiple loci across the genome. For this we will be using data collected from <i>Drosophila sechellia</i>, a fruit fly species endemic to the Seychelles archipelago. This species is thought to have recently colonized the Seychelles, where it is abundant now, so we are interested in whether it has experienced a bottleneck in the process. To this end we will infer the SFS using Angsd and fastsimcoal2 for demographic inference. 
+# <br><br>
+# Log into greatlakes, and start a job that uses 8GB of memory and one task per node (ie. one processor). Now load the modules `Bioinformatics bcftools angsd`. -->
 
 
 
