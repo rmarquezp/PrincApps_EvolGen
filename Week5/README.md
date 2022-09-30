@@ -76,7 +76,7 @@ What do you see? Does this coincide with the skyline plot?
   <summary> Click here to see the tree</summary>
   <img src="../Images/CovidGenealogy.png" width="600">
   <br>
- The long branches towards the tips are what we' expect under a pretty big expansion like the one on the skyline plot!. 
+ The long branches towards the tips are what we'd expect under a pretty big expansion like the one on the skyline plot!. 
 
 </details>
 
