@@ -31,9 +31,11 @@ The "Tip Dates" tab can be used to give BEAST the dates at which out sequences w
 In the "Site Model" tab we will specify our mutation model (also known as a model of DNA evolution). Since we are dealing with a relatively short DNA sequence with a high mutation rate, we will use a finitely-many alleles model. This is commonly done for tree-inference, since we need sequences that evolve fast enough to generate enough information that allows us to infer the tree, so back-mutation must be taken into account. We will use a model commonly known as "HKY", which uses the following rate matrix:
   
 $$Q = \begin{bmatrix}
-\cdot&  \pi_{C}& k\pi_{G}  & \pi_{T}  \\
-\pi_{A}&  \cdot& \pi_{G}  & \pi_{T}  \\
-k\pi_{A}&  \pi_{GC}&\cdot  & \pi_{T}  \\
-\pi_{A}&  k\pi_{C}& \pi_{G}  & \cdot  \\
+\cdot & 1 & k  & 1  \\
+1 &  \cdot & 1  & k  \\
+k &  1 & \cdot  & 1  \\
+1 &  k & 1  & \cdot  \\
 \end{bmatrix}
 $$
+
+Basically, this model considers 
