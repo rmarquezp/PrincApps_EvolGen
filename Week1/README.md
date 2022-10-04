@@ -40,7 +40,7 @@ And so on and so forth....
 <br><br>
 To obtain allele frequencies over a large number of generations we can use a *loop* to execute the code above multiple times. 
 <br>
-First lets create an empty vector (ie. a group of numbers) that we will populate with allele frequencies fo each generation, and set the first value to 0.64.
+First lets create an empty vector (ie. a group of numbers) that we will populate with allele frequencies for each generation, and set the first value to 0.64.
 ```R
 p_vec<-c()
 p_vec[1]<-0.64
