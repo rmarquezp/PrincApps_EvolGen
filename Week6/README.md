@@ -29,7 +29,7 @@ Now, before jumping into LD calculations, it is a good idea to make sure we have
 vcftools --gzvcf Sech_Anro.vcf.gz --chr NC_052520.2 --out Dsech --site-mean-depth
 vcftools --gzvcf Sim_Anro.vcf.gz --chr NC_052520.2 --out Dsim --site-mean-depth
 ```
-This produces two files called `Dsech.ldepth.mean` and `Dsim.ldepth.mean`, which contain tables with the mean depth across all individuals for each site. We could obtain a file with depths for each individual at each site by replacing the `--site-mean-depth` flag with `--geno-depth`, but this file would be very big, so for the purposes of this clas we will work with the average depth across samples. 
+This produces two files called `Dsech.ldepth.mean` and `Dsim.ldepth.mean`, which contain tables with the mean depth across all individuals for each site. We could obtain a file with depths for each individual at each site by replacing the `--site-mean-depth` flag with `--geno-depth`, but this file would be very big, so for the purposes of this class we will work with the average depth across samples. 
 <br><br>
 Lets take a look inside one of these tables
 ```bash
@@ -82,7 +82,7 @@ Now that we're happy with our data, we can use vcftools to estimate LD. The comm
 vcftools --gzvcf Sech_Anro.vcf.gz --chr NC_052520.2 --from-bp 10000 --to-bp 20000000 --max-meanDP 50 --max-missing 0.5 --maf 0.01 --out Dsech --geno-r2 --ld-window-bp 10000
 vcftools --gzvcf Sim_Anro.vcf.gz --chr NC_052520.2 --from-bp 10000 --to-bp 20000000 --max-meanDP 50 --max-missing 0.5 --maf 0.01 --out Dsim --geno-r2 --ld-window-bp 10000
 ```
-Note that we specified our region of interest using the `--chr`, `--from-bp`, and `--to-bp`. We aslo specified the maximum depth with `-max-meanDP`, and filtered out sites with more than 50% of the samples missing, and with minor allele frequencies below 0.05 with `--max-missing` and `--maf`, respectively. 
+Note that we specified our region of interest using the `--chr`, `--from-bp`, and `--to-bp`. We aslo specified the maximum depth with `-max-meanDP`, and filtered out sites with more than 50% of the samples missing, and with minor allele frequencies below 0.01 with `--max-missing` and `--maf`, respectively. The allele frequency filter is done to only use sites that are variable, since invariant sites aren't informative for LD calculation. 
 
 This will produce a table with the positions of the two sites being compared, the corresponding $r^2$ value, and the number of individuals genotyped for both sites. 
 
@@ -102,7 +102,7 @@ NC_052520.2	47039	47251	12	0.0454545
 ```
 Now that we have our data, it is time to visualize it. Download the two files ending in ".geno.ld" to your computer, and open R. We will need two new packages for this part: `minpack.lm` and `data.table`. The first one allows us to fit non-linear equations to data, and the second one speeds up the reading of large tables. Install them if necessary using `install.packages()`. Once the packages are installed, read in the data and process it a little. 
 
-```
+```R
 ## Load packages
 library(minpack.lm)
 library(data.table)
@@ -115,7 +115,7 @@ ld_sim=fread(file="Dsim.geno.ld",sep='\t', header=T)
 colnames(ld_sech)[5]="R2"
 colnames(ld_sim)[5]="R2"
 ```
-As we saw above, the talbe contains the positions of the sites being compared, but not the distance between them, so we must calculate it. 
+As we saw above, the table contains the positions of the sites being compared, but not the distance between them, so we must calculate it bu substracting the positions . 
 
 ```R
 # Create vectors with the distance
