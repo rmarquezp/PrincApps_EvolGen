@@ -122,4 +122,31 @@ As we saw above, the talbe contains the positions of the sites being compared, b
 ld_sech$Dist=ld_sech$POS2-ld_sech$POS1
 ld_sim$Dist=ld_sim$POS2-ld_sim$POS1
 ```
-Finally, it is time to visualize LD. Since these are pairwise comparisons, there are an enormous number of data points. Therfore, to distill some useful information out of them, we will fit a curve describing the expectation for $R^2$ as a function of physical distance and the population recombination parameter (i.e. $\rho=4N_ec$).
+Finally, it is time to visualize LD. Since these are pairwise comparisons, there are an enormous number of data points. Therfore, to distill some useful information out of them, we will fit a curve describing the expectation for $R^2$ as a function of physical distance and the population recombination parameter (i.e. $\rho=4N_ec$), where $c$ is the recombination rate par base pair per generation.
+
+$$E[r^2]=\frac{1}{1+\rho}$$
+To do so, we can use the `nlsLM()` function in R, which uses least-squares to fit non-linear equations to data (nls stands for non-linear least squares). 
+In doing so, we will get an estimate of $\rho$ that we can then use to plot the expected LD decline curve for each species. 
+```R
+# Fit the model. Trace=T lets you see how the likelihood changes over each iteration. 
+fit1=nlsLM(R2~(1/(1+rho*Dist)), data=ld_sech, start = list(rho=0.1), trace=T)
+fit2=nlsLM(R2~(1/(1+rho*Dist)), data=ld_sim, start = list(rho=0.1), trace=T)
+
+# Obtain best-fitting rho
+fit_rho1=coef(fit1)[1]
+fit_rho2=coef(fit2)[1]
+
+## Calculate expected r2 over distance given best-fitting rho
+x=1:10000
+exp_r1=(1/(1+fit_rho1*x))
+exp_r2=(1/(1+fit_rho2*x))
+
+#Plot
+plot(x, exp_r1, type="l", lwd=3, col="magenta4", xlab="Physical Distance (bp)", ylab=expression(r^2), ylim=c(0,1))
+points(x, exp_r2, type="l", lwd=3, col="turquoise4")
+legend(6000,0.95, c("D. sechellia", "D. simulans"), col=c("magenta4", "turquoise4"), lwd=3)
+```
+What does your plot say? Does this match what we know about these flies' natural and biogeographic history?
+<br><br>
+Note: You may have noticed that we didn't plot the points at all. This is because plotting such a large number of points would result in a very large computational burden. At the end of the practical you will find the versions of this plot that include points. 
+
