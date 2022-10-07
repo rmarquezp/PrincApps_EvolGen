@@ -1,6 +1,6 @@
 Calculating Linkage Disequilibrium
 ==============================
-Linkage disequilibrium is a very useful source of information in population genetics, which can be used to make inferences about demography, selection, and genome architecture, among others. Today, we will be exploring two ways of visualizing linkage disequilibrium in the genome: its decay with physical distance in the genome, and the length and distribution of runs of homozygocity (ROHs) along the genome. 
+Linkage disequilibrium is a very useful source of information in population genetics, which can be used to make inferences about demography, selection, and genome architecture, among others. Today, we will be exploring the decay of LD with physical distance in the genome. 
 ## Study System
 In today's practical, we will focus on populations of two closely-related species of <i>Drosophila</i> flies that inhavit the Seychelles archipelago in West Africa, <i> D. sechellia</i> and <i> D. simulans</i>. The former is endemic to some of the islands in the Seychelles, while the latter is a human commensal with a worldwide distribution. We will be comparing the degrees of LD in populations of both species collected at a single locality in the Seychelles where they coexist. A big thanks to Daniel Matute and Adam Stuckert for making these data available prior to publication. 
 ## The data
@@ -10,7 +10,7 @@ Log into the cluster, and start an interactive job and load the relevant modules
 ```bash
 srun --account eeb401s002f22_class --time 1:30:00 --mem 8G --tasks-per-node 1 --pty bash
 
-module load Bioinformatics vcftools plink
+module load Bioinformatics vcftools
 ```
 
 Now use `cd` to create a directiry called `Week6` (or something else that you can remember), and copy the input files into this directory:
@@ -100,4 +100,26 @@ NC_052520.2	47039	47188	12	0.00826446
 NC_052520.2	47039	47189	12	0.454545
 NC_052520.2	47039	47251	12	0.0454545
 ```
-Now lets visaluze 
+Now that we have our data, it is time to visualize it. Download the two files ending in ".geno.ld" to your computer, and open R. We will need two new packages for this part: `minpack.lm` and `data.table`. The first one allows us to fit non-linear equations to data, and the second one speeds up the reading of large tables. Install them if necessary using `install.packages()`. Once the packages are installed, read in the data and process it a little. 
+
+```
+## Load packages
+library(minpack.lm)
+library(data.table)
+
+#read in the data
+ld_sech=fread(file="Dsech.geno.ld", sep='\t', header=T)
+ld_sim=fread(file="Dsim.geno.ld",sep='\t', header=T)
+
+#Change the name for the R2 value to avoid problems, having it called "R^2" makes R believe you are elevating an object called R to the second power.
+colnames(ld_sech)[5]="R2"
+colnames(ld_sim)[5]="R2"
+```
+As we saw above, the talbe contains the positions of the sites being compared, but not the distance between them, so we must calculate it. 
+
+```R
+# Create vectors with the distance
+ld_sech$Dist=ld_sech$POS2-ld_sech$POS1
+ld_sim$Dist=ld_sim$POS2-ld_sim$POS1
+```
+Finally, it is time to visualize LD. Since these are pairwise comparisons, there are an enormous number of data points. Therfore, to distill some useful information out of them, we will fit a curve describing the expectation for $R^2$ as a function of physical distance and the population recombination parameter (i.e. $\rho=4N_ec$).
