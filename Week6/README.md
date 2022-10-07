@@ -13,7 +13,7 @@ srun --account eeb401s002f22_class --time 1:30:00 --mem 8G --tasks-per-node 1 --
 module load Bioinformatics vcftools
 ```
 
-Now use `mkdir` to create a directory called `Week6` (or something else that you can remember), and copy the input files into this directory:
+Now use `mkdir` to create a directory called `Week6` (or something else that you can remember), move into the directory using `cd` and copy the input files into this directory:
 ```bash
 cp /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/Dsimulans/Sech_Anro.vcf.gz ./
 cp /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/Dsimulans/Sim_Anro.vcf.gz ./
