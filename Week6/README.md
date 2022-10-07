@@ -69,7 +69,7 @@ What do you see? Would you use these data?
 
 <details>
 <summary> Click here to see the plot and some ideas</summary>
-<img src="../Images/W6Depth.png" width="600">
+<img src="../Images/W6Depth.png" width="800" class="center">
 <br><br>
 For most sites depth oscilates around 20X, which we have seen in class is a good level of coverage to work with called genotypes. However, there are several sites with very high depth, which suggests there may have been problems with read mapping. Many of these sites are towards the ends of the chromosomes, where repetitive elements are abundant, so this makes sense. To avoid using these suspect sites, moving on we will specify a maximum depth, 50X, beyond which sites will be ignored. Since the end of the chromosome has many sites with high depth, we will ignore it, and focus on the first 2e7 bases. 
 </details>
@@ -148,5 +148,6 @@ legend(6000,0.95, c("D. sechellia", "D. simulans"), col=c("magenta4", "turquoise
 ```
 What does your plot say? Does this match what we know about these flies' natural and biogeographic history?
 <br><br>
-Note: You may have noticed that we didn't plot the points at all. This is because plotting such a large number of points would result in a very large computational burden. At the end of the practical you will find the versions of this plot that include points. 
+Note: You may have noticed that we didn't plot the points at all. This is because plotting such a large number of points would result in a very large computational burden. Below is what it would look like.
+<img src="../Images/DrosophilaLD.png" width="800" class="center">
 
