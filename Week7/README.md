@@ -1,0 +1,3 @@
+Estimating Selection coefficients from genotype frequency time series
+====================
+Selection coefficients (usually denoted as $s$) describe the extent to which selection deviates allele frequencies from a given neutral model (e.g. Hardy-Weinberg or Wright-Fisher). As such, they are a very useful tool to gain insight on the strenth of selection experienced by genotypes (and the phenotypes that they code for) in a given environment. Today we will be looking at common ways to estimate $s$ from time-series data of genotype frequenciese. We will be working in R, using the packages `minpack.lm` and XXX.
