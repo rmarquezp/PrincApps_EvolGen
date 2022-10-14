@@ -92,7 +92,7 @@ covFit
 # Number of iterations to convergence: 57 
 # Achieved convergence tolerance: 1.49e-08
 ```
-The morel estimated an initial allele frequency of $3x10^-7$, and a selection coefficient of 0.6829. This is an incredibly high coefficient. Recall from lecture that we were using $s-0.1$ in examples of strong positive selection. Maybe this explains how Omicron took over the world in a few weeks! Now, before buying into our results, we should visualize how well the model with our estimated parameters fits the data. 
+The morel estimated an initial allele frequency of $3\times10^{-7}$, and a selection coefficient of 0.6829. This is an incredibly high coefficient. Recall from lecture that we were using $s=0.1$ in examples of strong positive selection. Maybe this explains how Omicron took over the world in a few weeks! Now, before buying into our results, we should visualize how well the model with our estimated parameters fits the data. 
 ```R
 #First Get the expected genotype frequencies under the model
 
