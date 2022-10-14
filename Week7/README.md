@@ -74,10 +74,18 @@ Run the code below.
 ```R
 covFit=nlsLM(OmicronFreq~p0/(p0+((1-s)^DateGen)*(1-p0)), data=covidFreqs_crop, start=list(p0=1e-5, s=0.01), trace=T)
 ```
-Did everything go as expected? You have likely gotten a warning from R, stating that the algorithm ran for the pre-extablished maximum number of generations. This is not ideal, as it raises the possibility that our algorithm didn'd find parameter values that fit the model appropriately, but rather just ran for a pre-specified maximum ammount of iterations and stopped. Since computational time is not an issue here, it is advisable that we run the algorithm for longer. To do so, we can specify a higher maximum number of iterations. 
+Did everything go as expected? You have likely gotten a warning from R, stating that the algorithm ran for the pre-extablished maximum number of generations. This is not ideal, as it raises the possibility that our algorithm didn'd find parameter values that fit the model appropriately, but rather just ran for a pre-specified maximum ammount of iterations and stopped. How would you solve this?
+
+<details>
+  <summary> Click here to see the (ie. my) answer</summary>
+
+Since computational time is not an issue here, it is advisable that we run the algorithm for longer. To do so, we can specify a higher maximum number of iterations. 
+
 ```R
 covFit=nlsLM(OmicronFreq~p0/(p0+((1-s)^DateGen)*(1-p0)), data=covidFreqs_crop, start=list(p0=1e-5, s=0.01), trace=T, control=list(maxiter=500))
 ```
+</details>
+  
 OK, the model seems to have converged this time. Lets take a look at the estimated parameters. 
 ```R
 covFit
