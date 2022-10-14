@@ -109,9 +109,10 @@ exp=p0_exp/(p0_exp+((1-s_exp)^gen)*(1-p0_exp))
 <img src="../Images/OmicronFit.png" width="500" class="center">
 Great fit! It looks like even with our very simple model that assumed no mutation and infinite population size fits the data pretty well! 
 
-%## Estimating Selection Coefficients in Diploids
-%Haploid genomes are very ameanable for popualtion genetic modelling, since having a single copy of each locus simplifies things quite a bit. Diploidy is, however, widespread in nature, so we will now use a similar strategy as above to estimate $s$ in a diploid system. We will be considering data of the peppered moth, <i>Biston betularia</i>, which is a moth that exhibits two different color morphs, consisting of individuals with light grey and very dark grey winds and body. 
+<!---## Estimating Selection Coefficients in Diploids
+Haploid genomes are very ameanable for popualtion genetic modelling, since having a single copy of each locus simplifies things quite a bit. Diploidy is, however, widespread in nature, so we will now use a similar strategy as above to estimate $s$ in a diploid system. We will be considering data of the peppered moth, <i>Biston betularia</i>, which is a moth that exhibits two different color morphs, consisting of individuals with light grey and very dark grey winds and body. 
 
-%<img src="https://www.icr.org/i/wide/peppered_moth_wide.jpg" width="600" class="center">
+<img src="https://www.icr.org/i/wide/peppered_moth_wide.jpg" width="600" class="center">
 
-%This color morph is controlled by a single locus, and 
+This color morph is controlled by a single locus, and 
+-->
