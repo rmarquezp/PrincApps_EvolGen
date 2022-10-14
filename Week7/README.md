@@ -68,7 +68,7 @@ genT=5
 covidFreqs_crop$DateGen=as.numeric(covidFreqs_crop$DateNumeric/genT)
 ```
 Now it is finally time to estimate $s$. To do so, we will use non-linear least squares to fit the expression for the expected allele frequency under Hardy-Weinberg given initial frequency $p(0)$ and selection coefficient $s$. 
-$$p(t)=\frac{p(0)}{p(0)+(1-s)^t(1-p0)}$$
+$$p(t)=\frac{p(0)}{p(0)+(1-s)^t(1-p(0))}$$
 
 Run the code below.
 ```R
