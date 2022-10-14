@@ -70,7 +70,7 @@ covidFreqs_crop$DateGen=as.numeric(covidFreqs_crop$DateNumeric/genT)
 Now it is finally time to estimate $s$. To do so, we will use non-linear least squares to fit the expression for the expected allele frequency under Hardy-Weinberg given initial frequency $p(0)$ and selection coefficient $s$. 
 $$p(t)=\frac{p(0)}{p(0)+(1-s)^t(1-p(0))}$$
 
-Run the code below.
+Run the code below. Note that instead of assuming $p(0)$ corresponds to the frequency at which we first observed Omicron, we are also estimating this parameter. This is because strains need to rise to some frequency before we actually detect them, so the frequency at which we first observe a strain is not likely to be its actual initial frequency, the value of which may be of interest. 
 ```R
 covFit=nlsLM(OmicronFreq~p0/(p0+((1-s)^DateGen)*(1-p0)), data=covidFreqs_crop, start=list(p0=1e-5, s=0.01), trace=T)
 ```
