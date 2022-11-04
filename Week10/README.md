@@ -14,6 +14,7 @@ Log into the cluster, and request a job with 8 processors and 24 Gb RAM. Once th
 ```bash
 ref=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/Hmel2.5/Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa
 listDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/heliconius_bams
+softwareDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/
 ```
 
 ## Calculating genotype likelihoods
