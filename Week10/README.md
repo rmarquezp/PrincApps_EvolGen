@@ -99,6 +99,34 @@ The number hypothetical populations to which we assign individuasl in STRUCTURE-
 
 <details>
   <summary> Click here to see the code</summary>
- <details.
+  ```bash
+  
+  #Run ngsADmix
+$softwareDir/ngsAdmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 3 -outfiles  All_hermathena_K3
+$softwareDir/ngsAdmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 4 -outfiles  All_hermathena_K4
+  ```
+<br><br>
+ Now in R plot results
 
+  ```R
+# Set up the plot for a multi-panel figure. 
+par(mfrow=c(3,1), mar=c(1,4.1,1,1))
+ 
+#read and plot k=2 
+admix2=read.table("All_hermathena_K2.qopt")
+barplot(t(admix2), col=c("coral","cyan"))
+
+#read and plot k=3 
+admix3=read.table("All_hermathena_K3.qopt")
+barplot(t(admix3), col=c("cyan","coral", "black"),  ylab="Admixture Proportion")
+
+#read and plot k=4 
+admix4=read.table("All_hermathena_K4.qopt")
+barplot(t(admix4), col=c("black","cyan", "coral", "darkgreen"))
+
+
+```
+ </details>
+
+How does your plot look? How does it relate to PCA?
 
