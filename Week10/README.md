@@ -124,7 +124,7 @@ admix4=read.table("All_hermathena_K4.qopt")
 barplot(t(admix4), col=c("black","cyan", "coral", "darkgreen"))
 ```
 
-<img src="../Images/NGSAdmix.png" width="750" class="center">
+<img src="../Images/NGSadmix.png" width="750" class="center">
 
  </details>
 
