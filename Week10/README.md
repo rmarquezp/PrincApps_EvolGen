@@ -43,6 +43,7 @@ Lets now use our genotype likelihoods file to run a PCA using `PCAngsd`, a pytho
 
 ```bash
 python3 $softwareDir/pcangsd/pcangsd/pcangsd.py -b All_hermathena_GenLik.beagle.gz -t 8 -o All_hermathena
+pcangsd -b All_hermathena_GenLik.beagle.gz -t 8 -o All_hermathena
 ```
 
 PCAngsd will produce a file called `All_hermathena.cov`, which contains our covariance matrix. We can now use this matrix to conduct PCA in R. Download the covariance matrix to your local machine, and run the code below in R. YOu will also ned a table with information on wach individual's population assignment. We will use this table to color the PCA points according to their population assignment. I have previously ordered this table in the same order as the list of bam files we passed to Angsd, to make sure samples are in the same order across output files. 
