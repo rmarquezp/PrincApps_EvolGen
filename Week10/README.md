@@ -9,7 +9,7 @@ There are multiple subspecies of <i>H. hermathena</i> most of which have quite r
 
 ## Setup
 
-Today we will be working on Greatlakes, using data from the paper cited above. The data for today have already been downloaded, quality-trimmed, and mapped to the reference genome for <i>Heliconius melpomene</i> using the code from [Week 2](../Week2).<br><br>
+Today we will be working on Greatlakes, using data from the paper cited above. The data for today have already been downloaded, quality-trimmed, and mapped to the reference genome for <i>Heliconius melpomene</i> using the code from [Week 4](../Week4).<br><br>
 Log into the cluster, and request a job with 8 processors and 24 Gb RAM. Once the job starts create the following variables:
 ```bash
 ref=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/Hmel2.5/Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa
