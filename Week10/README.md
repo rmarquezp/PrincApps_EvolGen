@@ -55,10 +55,11 @@ pop=read.table("Individuals.txt", h=T)
 
 eig=eigen(covar, symm=TRUE)
 ```
-The `eig` object 
+The `eig` object consists of a series of vectors, which are our principal components, and a series of associated variances, which correspond to the ammount of vriance each component is accounting for. The components are organized by the ammount of variance they explain. It is important to consider how much variation a PC explains when interpreting the results of PCA. To have this information handy, we can re-organize the `eig` object into a table with PCs on the columns, where the title of each PC contains information on the variance explained. 
+```R
 #Extract percentage of variance explained
-eig$val <- eig$val/sum(eig$val);
-PropVar=signif(eig$val, digits=3)*100
+val=eig$val/sum(eig$val);
+PropVar=signif(val, digits=3)*100
 
 #Create a table with PCs.
 PC <- as.data.frame(eig$vectors)
@@ -67,9 +68,37 @@ PC <- as.data.frame(eig$vectors)
 colnames(PC) <- gsub("V", "PC", colnames(PC))
 for(i in 1:length(colnames(PC))){colnames(PC)[i]=paste(colnames(PC)[i]," (",PropVar[i],"%)",sep="")}
 
+## Finally, plot PC1 vs PC2. Note that we are using the locality of each sample to specify its color. 
+## This is a quick trick to color points by some category. 
 
 plot(PC[,1:2], bg=as.factor(pop$Loc), pch=21)
 legend("bottomleft", c("Barcelos", "Manaus", "PF"), pt.bg=1:3, pch=21)
 ```
+How does your plot look? Do the different localities appear to be structured? Submit your plot on Canvas, we will discuss it as a class when everyone is done. 
+
+
+## Admixture Proportions
+
+As we talked in class, we can use the Hardy-Weinberg expectations to assign individuals, or fractions of their genomes, toto one of a pre-defined number of hypothetical ancestral populations. This excercise is often known as estimating admixture proportions, as the probability of assigning an individual to a particular ancestral population can be interpreted as the proportion of its genome that descends from such population. This is a usefull tool to understand genetic structure, as it provides a comparison of the genetic makeup of individuals. The most commonly used way to estimate admixture proportions is the so called "STRUCTURE" model, named after the first program to implement it. Today we will use a variation of this model implemented in the program NGSadmix, which uses genotype likelihoods as imput, thus accounting for technical uncertainty.<br>
+<br>
+Lets run NGSadmix assuming $k=2$ ancestral populations. 
+```bash
+$softwareDir/ngsAdmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 2 -outfiles  All_hermathena_K2
+```
+NGSadmix will fit the STRUCTURE model using maximum likelihood, and produce two files, one called `All_hermathena_K2.qopt`, which is a table with the assignment probabilities (or admixture proportions) of each individual to the two hypothetical populations., and one called `All_hermathena_K2.fopt.gz`, which  contains the best-fitting allele frequencies for the hypothetical ancestral populations. <br><br>
+
+Download the All_hermathena_K2.qopt file to your computer and run the code below in R to plot it:
+
+```R
+admix=read.table("All_hermathena_K2.qopt")
+barplot(t(admix), col=c("coral","cyan"), ylab="Admixture Proportion")
+```
+How does this result compare with what you obtained with PCA? Can you think of ways to explain the similarities and/or differences between both methods? Submit your image on Canvas for discussion as a class. <br><br>
+<br><br>
+The number hypothetical populations to which we assign individuasl in STRUCTURE-type analyses need to be assumed prior to running the anlysis. WIth this in mind, it is alywas usefult to explore the behavior of our data under multiple values of $k$. Try to run NGSadmix for $k=1\text{and}3$ by yourself and plotting the results. What do you observe? How does this compare with the results frem PCA? 
+
+<details>
+  <summary> Click here to see the code</summary>
+ <details.
 
 
