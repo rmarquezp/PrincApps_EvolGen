@@ -118,7 +118,7 @@ $$BABA=(p_1(1-p_2)p_3(1-p_O))$$
 Where $p_O$ is the allele frequency at the outgroup. However, in our code above we did not include $p_O$. Why do you think this is?
 
 <details>
-<summary Click here to see the answer</summary>
+<summary> Click here to see the answer</summary>
 We are liminting our analyses to sites fixed at the outgroup, so $(1-p_O)$ is always equal to 1. 
 </details>
 
@@ -203,9 +203,10 @@ How do ABBA and BABA relate along the chromosome? Do they co-vary, show opposite
 ```R
 plot(centers, ABBA_w-BABA_w, type="l", col="navy", xlab="Position (bp)", ylab="ABBA-BABA")
 ```
-
+<details> <summary> Click here to see the plot</summary>
+<img src="../Images/ABBA_and_BABA.png" width="500" class="center">
 From this plot it is clear that a region at around 1Mbp shows a clear excess of ABBA sites. Lets zoom in. 
-
+</details>
 ```R 
 plot(centers, ABBA_w-BABA_w, type="l", col="navy", xlab="Position (bp)", ylab="ABBA-BABA", xlim=c(1e6, 2e6))
 
@@ -216,6 +217,13 @@ abline(h=0, lty=3,lwd=0.5)
 From this it becomes clear that there is a single large peak around 1.45 Mbp. An online portal named [lepbase](www.lepbase.org) contains a wide array for genomic resources for several species of Lepidoptera (butterflies and moths). If we look at what genes are in our region of interest, we will find, among others, the gene <i>cortex</i>, which has recently been found to underlie variation in melanic color pattern elements in a few species of lepidopterans, such as the famous Pepperd moth, and some species of <i>Heliconius</i> and <i>Papilio</i>. Lets highlight the region where <i>cortex</i> occurs on our plot.
 
 ```R
+#Create an object with the begining and end of Cortex obtained from Lepbase
+cortex=c(1413804,1424719)
 
+#Plot a tiny gray rectangle to highlight this region
+rect(cortex[1],-0.7,cortex[2],-0.35,col="grey65", border=NA)
+```
+
+What do you see? Does this plot give you some ideas about how <i>H. h. vereatta</i> may have evolved its mimetic color pattern? 
 
 
