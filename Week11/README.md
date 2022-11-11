@@ -213,6 +213,9 @@ plot(centers, ABBA_w-BABA_w, type="l", col="navy", xlab="Position (bp)", ylab="A
 abline(h=0, lty=3,lwd=0.5)
 ```
 
-From this it becomes clear that there is a 
+From this it becomes clear that there is a single large peak around 1.45 Mbp. An online portal named [lepbase](www.lepbase.org) contains a wide array for genomic resources for several species of Lepidoptera (butterflies and moths). If we look at what genes are in our region of interest, we will find, among others, the gene <i>cortex</i>, which has recently been found to underlie variation in melanic color pattern elements in a few species of lepidopterans, such as the famous Pepperd moth, and some species of <i>Heliconius</i> and <i>Papilio</i>. Lets highlight the region where <i>cortex</i> occurs on our plot.
+
+```R
+
 
 
