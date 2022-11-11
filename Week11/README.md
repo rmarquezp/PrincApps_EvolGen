@@ -10,7 +10,9 @@ Could this resemblance be due to hybridization between closely related populatio
 
 ## The Data
 
-We will use data from three focal populations: <i>H.h. vereatta</i>, its close neighbor <i>H. h. duckei</i>, which displays <i>H. hermathena</i>'s hallmanrk yellow wing pigmentation, and <i>H. erato</i>, which is closely related to <i>H. hermathena</i> and co-occurs with <i>H. h. vereatta</i>, which makes an interesting suspect in the context of hybridization associated with coloration similarities. In addition, we will use an outgroup to identify ancestral alleles.  which will be composed of individuals from two closely-related species: <i>H. charitonia</i> and <i>H. telesiphe</i>.Using combining multiple outgroup species allows us to better identify ancestral alleles. 
+We will use data from three focal populations: <i>H.h. vereatta</i>, its close neighbor <i>H. h. duckei</i>, which displays <i>H. hermathena</i>'s hallmanrk yellow wing pigmentation, and <i>H. erato</i>, which is closely related to <i>H. hermathena</i> and co-occurs with <i>H. h. vereatta</i>, which makes an interesting suspect in the context of hybridization associated with coloration similarities. In addition, we will use an outgroup to identify ancestral alleles.  which will be composed of individuals from two closely-related species: <i>H. charitonia</i> and <i>H. telesiphe</i>.Using combining multiple outgroup species allows us to better identify ancestral alleles.
+<br><br>
+Whole-genome resequencing data from 14 <i>H.h. vereatta</i>, 8 <i>H. h. duckei</i>, 6 <i>H. erato</i>, 2 <i>H. charitonia</i>, and 2 <i>H. telesiphe</i> were downloaded from the SRA, trimmed, and mapped to the <i>H. melpomene</i> genome as specified in the Week 2 practical. 
 
 PHYLOGENY
 
