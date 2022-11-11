@@ -210,7 +210,12 @@ Key to our goals is identifying sites that have an excess of ABBA vs. BABA sites
 ```R
 plot(centers, ABBA_w-BABA_w, type="l", col="navy", xlab="Position (bp)", ylab="ABBA-BABA")
 ```
-From this it becomes clear that there is a single large peak around 1.5 Mbp. Lets zoom in to to get a closer look.
+<details> <summary> Click here to see the plot</summary>
+<img src="../Images/ABBA-BABA.png" width="700" class="center">
+Most of the variation in ABBA or BABA sites has flattened out, indicating that at most regions where these deviated from zero the number of each type of discordant site was very similar. The one exception is a single large peak around 1.5 Mbp with an excess of ABBA sites. 
+</details>
+
+Lets zoom in to to get a closer look.
 
 ```R 
 plot(centers, ABBA_w-BABA_w, type="l", col="navy", xlab="Position (bp)", ylab="ABBA-BABA", xlim=c(1e6, 2e6))
@@ -219,7 +224,7 @@ plot(centers, ABBA_w-BABA_w, type="l", col="navy", xlab="Position (bp)", ylab="A
 abline(h=0, lty=3,lwd=0.5)
 ```
 
-It is clearly a single large peak at 1.45 Mbp. An online portal named [lepbase](www.lepbase.org) contains a wide array for genomic resources for several species of Lepidoptera (butterflies and moths). If we look at what genes are in our region of interest, we will find, among others, the gene <i>cortex</i>, which has recently been found to underlie variation in melanic color pattern elements in a few species of lepidopterans, such as the famous Pepperd moth, and some species of <i>Heliconius</i> and <i>Papilio</i>. Lets highlight the region where <i>cortex</i> occurs on our plot.
+An online portal named [lepbase](www.lepbase.org) contains a wide array for genomic resources for several species of Lepidoptera (butterflies and moths). If we look at what genes are in our region of interest, we will find, among others, the gene <i>cortex</i>, which has recently been found to underlie variation in melanic color pattern elements in a few species of lepidopterans, such as the famous Pepperd moth, and some species of <i>Heliconius</i> and <i>Papilio</i>. Lets highlight the region where <i>cortex</i> occurs on our plot.
 
 ```R
 #Create an object with the begining and end of Cortex obtained from Lepbase
@@ -231,4 +236,8 @@ rect(cortex[1],-0.7,cortex[2],-0.35,col="grey65", border=NA)
 
 What do you see? Does this plot give you some ideas about how <i>H. h. vereatta</i> may have evolved its mimetic color pattern? 
 
+<details> <summary> Click here to see the plot</summary>
+<img src="../Images/ABBA-BABA_Closeup.png" width="700" class="center">
+	This view confirms that there is a single peak around 1.45Mbp, right on top of <i>cortex</i>, suggesting that this gene, and possibly the darker melanic pattern observed in <i>vereatta</i> got to this subspecies via <i>introgression</i> (also known as horizontal gene transfer), from <i>H. erato<i/> or another closely related species. 
+</details>
 
