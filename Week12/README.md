@@ -1,7 +1,7 @@
 Visualizing Genetic Structure in Space
 ============
 
-Visualizing the distribution of genetic variation across geography is a powerful tool in studies of biogeogprahy and historical demography. Today we will be using a few different approaches to visualize patterns of both discrete and continuous population structure on a map, which vary in the degree to which they explicitly consider geography in their estimation of demographic parameters. The first approach will consist of estimating admixture proportions and plotting them directly on the map, while the second will consist of directly estimating rates of migration across the landscape based off of the degree of genetic differentiation and sampling positions of a set of samples. 
+Visualizing the distribution of genetic variation across geography is a powerful tool in studies of biogeogprahy and historical demography. Today we will be using a two different approaches to visualize patterns of both discrete and continuous population structure on a map, which vary in the degree to which they explicitly consider geography in their estimation of demographic parameters. The first approach will consist of estimating admixture proportions and plotting them directly on the map, while the second will consist of directly estimating rates of migration across the landscape based off of the degree of genetic differentiation and sampling positions of a set of samples. 
 
 ## The Data
 
@@ -43,7 +43,7 @@ From the map we can see that the sampling was pretty consistent across northern 
 
 ## Admixture proportions on a map
 
-A commonly used way to visualize genetic structure on a map is to estimate admixture proportions and plotting them as pie chars at each collection locality. Since the data were obtained using a SNP array (instead of sequencing), we can't use `ngsAdmix` as we did perviously, since we cannot estimate genotype likelihoods. Instead, we will use [Admixture](https://dalexander.github.io/admixture/index.html), which implements the same model and also optimizes it using maximum likelihood, but assumes genotypes are known. Log into `greatlakes` and start an interactive job with 8Gb and one processor. Then load the follwing modules: `Bioinformatics plink clang gcc intel eigen boost`, and define the following variable:<br>
+A commonly used way to visualize genetic structure on a map is to estimate admixture proportions and plotting them as pie chars at each collection locality. Since the data were obtained using a SNP array (instead of sequencing), we can't use `ngsAdmix` as we did perviously, since we cannot estimate genotype likelihoods. Instead, we will use [Admixture](https://dalexander.github.io/admixture/index.html), which implements the same model and also optimizes it using maximum likelihood, but assumes genotypes are known. Log into `greatlakes` and start an interactive job with 8Gb and one processor. Then load the follwing modules: `Bioinformatics plink/1.9 clang gcc intel eigen boost`, and define the following variable:<br>
 
 ```software_dir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data```
 <br>
@@ -123,3 +123,19 @@ Use the code above to plot the results for other values of $k$, what do you see 
 <details> <summary> Click here to see the plot</summary>
 <img src="../Images/Wolves_admixture_k2-8.png" width="1000">  
 </details>
+
+## Estimating Effective Migration Surfaces
+
+We can already say a few things about the geographic distrubtuion of genetic structure based on plotting admixture proportions on the map. However, population gentic theory lets us go further, and actually estimate parameters that explicitly incorporate geography. For example, `EEMS` uses genetic distances and sample coordinates to estimate <i> effective migration surfaces </i>, which can be seen as maps of gene flow, wehre we can identify areas of the map that may be allowing more or less migration than others. To run `EEMS` we need two things: A matrix of genetic distances, and the coordinates of our samples. We already have coordinates. To generate genetic distance matrix we can use the program `bed2diffs`, which is distributed with `EEMS`. All this program does is, for each pair of samples ($i$ and $j$) calculate the average genetic distance, $D_{ij}$ defined as
+
+$$Dij = \frac{1}{N_{ij}} \sum_{m=1}^{N_{ij}} (p_{i_m} - p_{j_m})^2$$
+
+Where $N_{ij}$ is the number of sites with data for both samples, and $p_{i_m}$ and $p_{j_m}$ are the allele frequencies of each population at site $m$. Conveniently, `bed2diffs` takes plink-formatted files as input. 
+
+```bash
+"$software_dir"/eems/bed2diffs/src/bed2diffs_v1 --bfile wolves_0.25mis_thinned
+
+#Note that we give the file name without its extension. This is common in some bioinformatics programs, such as plink
+```
+Now we're ready to run `EEMS`. Lets 
+
