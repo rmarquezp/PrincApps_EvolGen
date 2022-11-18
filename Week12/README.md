@@ -43,7 +43,7 @@ From the map we can see that the sampling was pretty consistent across northern 
 
 ## Admixture proportions on a map
 
-A commonly used way to visualize genetic structure on a map is to estimate admixture proportions and plotting them as pie chars at each collection locality. Since the data were obtained using a SNP array (instead of sequencing), we can't use `ngsAdmix` as we did perviously, since we cannot estimate genotype likelihoods. Instead, we will use [Admixture](https://dalexander.github.io/admixture/index.html), which implements the same model, but assumes genotypes are known. Log into `greatlakes` and start an interactive job with 8Gb and one processor. Then load the follwing modules: `Bioinformatics plink clang gcc intel eigen boost`, and define the following variable:<br>
+A commonly used way to visualize genetic structure on a map is to estimate admixture proportions and plotting them as pie chars at each collection locality. Since the data were obtained using a SNP array (instead of sequencing), we can't use `ngsAdmix` as we did perviously, since we cannot estimate genotype likelihoods. Instead, we will use [Admixture](https://dalexander.github.io/admixture/index.html), which implements the same model and also optimizes it using maximum likelihood, but assumes genotypes are known. Log into `greatlakes` and start an interactive job with 8Gb and one processor. Then load the follwing modules: `Bioinformatics plink clang gcc intel eigen boost`, and define the following variable:<br>
 
 ```software_dir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data```
 <br>
@@ -92,8 +92,34 @@ Now that we have our file in the adequate forat, we can run `Admixture`. It take
 "$software_dir"/admixture_linux-1.3.0//admixture wolves_0.25mis_thinned.bed 2
 ```
 
-The above code runs `Admixture` for $k=2$. Considering our dataset contains samples covering a very large extent of land and many possible barriers to gene flow (i.e. the Rocky Mountains, Hudson Bay, etc...), we may want to look at a wider range of values fo $k$. We can use a loop to estimate admixture proportions assuming $k=2-8$
+The above code runs `Admixture` for $k=2$. Considering our dataset contains samples covering a very large extent of land and many possible barriers to gene flow (i.e. the Rocky Mountains, Hudson Bay, etc...), we may want to look at a wider range of values fo $k$. We can use a loop to estimate admixture proportions assuming $k=2-8$. In the interest of time we will only run each value of $k$ once, but, as usual, it is advisable to run optimization algorithms multiple times to make sure that they consistently arrive at the same maximum-likelihood model.
 
 ```bash 
-for i in {2..8}; do ../admixture_linux-1.3.0//admixture wolves_0.25mis_thinned.bed $i; done
+for i in {2..8}; do "$software_dir"/admixture_linux-1.3.0//admixture wolves_0.25mis_thinned.bed $i; done
 ```
+ This should result in eight sets of two files, named ` wolves_0.25mis_thinned.k.Q` and ` wolves_0.25mis_thinned.k.P`, which contain the admixture proportions for each individual and the allele frequencies at each of the $k$ hypothetical populations, respectively. Download the admixture proportion files to your computer to plot them in R. <br><br>
+ 
+Instead of the barplots that we have plotted in the past, this time we will plot pie charts with admixture proportions at each one of the sampling localities. Lets begin by plotting the results for $k=2$
+ 
+ ```R
+ ## If you closed your session re-load the packages and create the elevation and coastline/border objects again
+ 
+ library(conStruct)
+
+## Read in admixture proportions
+q2=read.table("wolves_0.25mis_thinned.2.Q")
+
+## Plot the map
+plot(altitude_crop, xlim=northNA[1:2], ylim=northNA[3:4])
+plot(map_crop, lwd=1, add=T, xlim=c(-175,-54), ylim=c(43,80))
+
+## Add the pies. This is kind of slow for some reason
+make.admix.pie.plot(admix.proportions = as.matrix(q2), coords = as.matrix(coords), add=T, radii=1.5)
+```
+What can you say from these results? How does genetic variation seem to be structured in this system?<br><br>
+
+Use the code above to plot the results for other values of $k$, what do you see as the number of clusters increases? Wait here to discuss these results as a class.
+
+<details> <summary> Click here to see the plot</summary>
+<img src="../Images/Wolves_admixture_k2-8.png" width="1000">  
+</details>
