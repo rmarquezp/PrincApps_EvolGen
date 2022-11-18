@@ -181,4 +181,24 @@ mkdir eems_mcmc
 "$software_dir"/eems/runeems_snps/src/runeems_snps --params eems.config
 ```
 
-You should se the MCMC begin to run. Unfortunately, `EEMS` takes some time to run long enough MCMC chains to propperly optimize the model. In view of this, we can use results from a previous `EEMS` run. Download the `eems_mcmc.zip` from Canvas to your computer for plotting. 
+You should se the MCMC begin to run. Unfortunately, `EEMS` takes some time to run long enough MCMC chains to propperly optimize the model. In view of this, we can use results from a previous `EEMS` run. Download the `eems_mcmc.zip` from Canvas to your computer for plotting and extract its contents. You will also need to install the `rEEMSplots` package, which is distributedwith `EEMS` as well. To avoid having to install all of `EEMS` into your computer, you can download and extract rEEMSplots.zip from Canvas. Once you've donde this, change the R working directory to rEEMSplots using `setwd()`, and once there run the following command:
+
+```R
+install.packages("rEEMSplots", repos = NULL, type = "source")
+```
+After the package is installed change back the directory to where the eems_mcmc folder is, and run the following to generate the `EEMS` plots. 
+
+```R
+ibrary(rEEMSplots)
+library(rworldmap)
+library(rworldxtra)
+
+## Set up the map projections to be used. This is especially important in our case since we are working close to the north pole, which is a difficult part of the world to project to a 2D flat image. 
+
+projection_none="+proj=longlat +datum=WGS84" 
+projection_mercator="+proj=merc +datum=WGS84"
+
+## Generate eems figures, including the grid, the deme locations outer polygon, and coastline/boundaries. 
+eems.plots(mcmcpath="eems_mcmc",plotpath="./",longlat=T,add.demes=T,add.grid=T,add.outline=T,out.png=F, add.map=T, col.map="black", lwd.map=1, lwd.grid=0.5, min.cex.demes=0.75, max.cex.demes = 2, projection.in=projection_none, projection.out=projection_mercator)
+```
+This will generate a series of pdf files that will be saved in your folder. Wait here and we will discuss them as a class. 
