@@ -84,7 +84,7 @@ As you can see, the `.tfam` file contains sample names, while `.tped` contains g
 ```bash
 plink --tfile nacanids_111indiv_unrel_noYNP_42Ksnps --dog --missing-genotype N --biallelic-only --geno 0.25 --maf 0.05 --bp-space 10000 --make-bed --out wolves_0.25mis_thinned
 ```
-Can you match the filters to the flags passed to `plink`? Out of the ~42,000 sites genotyped, how many were retained after filtering? <br><br>
+Can you match the filters to the flags passed to `plink`? Out of the ~42,000 sites genotyped, how many were retained after filtering? Write this down. You'll need it later.<br><br>
 
 Now that we have our file in the adequate forat, we can run `Admixture`. It takes two arguments, the fenotype file, and the number of hypothetical populations to which we will be assigning our samples (i.e. $k$). 
 
@@ -137,5 +137,48 @@ Where $N_{ij}$ is the number of sites with data for both samples, and $p_{i_m}$ 
 
 #Note that we give the file name without its extension. This is common in some bioinformatics programs, such as plink
 ```
-Now we're ready to run `EEMS`. Lets 
+Now we're almost ready to run `EEMS`, we just need to do a bit of housekeeping. First, `EEMS` needs the coordinate and genetic distance files to have the same name (but different file extensions. Our files have different names,`wolves.coord`and `wolves_0.25mis_thinned.diffs`. Let's fix that. 
 
+```bash
+cp wolves_0.25mis_thinned.diffs wolves.diffs
+```
+
+Second, we need to set some boundaries for `EEMS`. Estimate effective migration across the whole world is effectively impossible, so we need to give `EEMS` an area within which to estimate migration. We do this by passing the coordinates for a polygon that encloses our focal area. These can be found in the file called `wolves.outer`. To understand a little better what this polygon looks like, lets quickly plot it on our map (locally in R).
+
+```R
+# Read in the polygon
+outer=read.table("wolvesadmix.outer")
+
+# Plot the map as aobve
+plot(altitude_crop, xlim=northNA[1:2], ylim=northNA[3:4])
+plot(map_crop, lwd=1, add=T, xlim=c(-175,-54), ylim=c(43,80))
+
+# Add samples
+points(coords, pch=21, bg="white")
+
+# Add polygon
+points(outer, type="l", lty=2, lwd=2, col="magenta")
+```
+
+Finally, we need to write a configuration file, which gives `EEMS` all the information it needs to run the analysis. On the terminal (in the cluster) type `nano eems.config`. This will open a blank file in lightweight text editor. Add the following lines to your file, modifying it as appropriate for your own workspace. 
+
+```
+datapath = ./wolves 
+mcmcpath = ./eems_mcmc
+nIndiv = 111
+nSites = 23902
+nDemes = 300
+diploid = true
+numMCMCIter = 7500000
+numBurnIter = 2500000
+numThinIter = 9999
+```
+
+Can you tell what most of these arguments do? You may have noticed that the `mcmcpath` line points to a folder that doesn't exist yet. The code below creates it and runs `EEMS`. 
+
+```bash 
+mkdir eems_mcmc
+"$software_dir"/eems/runeems_snps/src/runeems_snps --params eems.config
+```
+
+You should se the MCMC begin to run. Unfortunately, `EEMS` takes some time to run long enough MCMC chains to propperly optimize the model. In view of this, we can use results from a previous `EEMS` run. Download the `eems_mcmc.zip` from Canvas to your computer for plotting. 
