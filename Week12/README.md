@@ -92,7 +92,7 @@ Now that we have our file in the adequate forat, we can run `Admixture`. It take
 "$software_dir"/admixture_linux-1.3.0//admixture wolves_0.25mis_thinned.bed 2
 ```
 
-The above code runs `Admixture` for $k=2$. Considering our dataset contains samples covering a very large extent of land and many possible barriers to gene flow (i.e. the Rocky Mountains, Hudson Bay, etc...), we may want to look at a wider range of values fo $k$. We can use a loop to estimate admixture proportions assuming $k=2-8$. In the interest of time we will only run each value of $k$ once, but, as usual, it is advisable to run optimization algorithms multiple times to make sure that they consistently arrive at the same maximum-likelihood model.
+The above code runs `Admixture` for $k=2$. Considering our dataset contains samples covering a very large extent of land and many possible barriers to gene flow (i.e. the Rocky Mountains, Hudson Bay, etc...), we may want to look at a wider range of values of $k$. We can use a loop to estimate admixture proportions assuming $k=2-8$. In the interest of time we will only run each value of $k$ once but, as usual, it is advisable to run optimization algorithms multiple times to make sure that they consistently arrive at the same solution.
 
 ```bash 
 for i in {2..8}; do "$software_dir"/admixture_linux-1.3.0//admixture wolves_0.25mis_thinned.bed $i; done
