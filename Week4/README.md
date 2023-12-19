@@ -65,9 +65,9 @@ Theta_W=sum(SFS)/sum(1/1:(n-1))
 </details>
   
 Finally, lets calculate Tajima's estimator. Try to do this one on your own as well. It is a bit more complicated, since you'll have to use a loop, but it is worth giving it a try. 
-
-$$\hat{\theta}_{\pi}= \frac{\sum d_{i,j}}{n(n-1)\big{/}2}=\frac{\sum i(n-i)\eta_i}{n(n-1)\big{/}2}$$
-  
+```math
+\hat{\theta}_{\pi}= \frac{\sum d_{i,j}}{n(n-1)\big{/}2}=\frac{\sum i(n-i)\eta_i}{n(n-1)\big{/}2}
+```
 <details>
    <summary> Click here to see the answer</summary>
 
