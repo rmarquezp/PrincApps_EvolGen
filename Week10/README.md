@@ -101,11 +101,14 @@ The number hypothetical populations to which we assign individuasl in STRUCTURE-
 
 <details>
   <summary> Click here to see the code</summary>
+  
   ```bash
   
   #Run ngsADmix
 $softwareDir/ngsAdmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 3 -outfiles  All_hermathena_K3
 $softwareDir/ngsAdmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 4 -outfiles  All_hermathena_K4
+```
+
 <br><br>
  Now in R plot results
 
