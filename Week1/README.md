@@ -9,7 +9,9 @@ In today's practical we will simulate the evolution of allele frequencies under 
 
 In its most basic form, the WF model considers a population of constant size 2N with no mutation or selection. Lets start with a population composed of 2N = 50 individuals, and a allele frequencies of p = 0.64 and q = 0.46. 
 
-![InitialPop](../Images/InitialPop_W1.png)
+<br>
+<img src="../Images/InitialPop_W1.png" width="600">
+<br>
 
 To obtain the allele frequencies of the next generation we can sample 50 individuals at random from our population, with the probability of sampling a red allele being *p* and a yellow one *1-p*. We can do this in R as follows:
 
