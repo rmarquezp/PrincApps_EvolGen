@@ -1,7 +1,7 @@
 Simulating Genetic Drift under the Wright-Fisher Model
 ======================================================
 
-The Wright-Fisher (WF) model is arguably the most comonly used framework for modelling genetic drift. Although we didn't explicitly name it in class, all of our excercises durring lecture were based on this model. Briefly, this model considers a bi-allelic locus within a population of haploid, randomly-mating individuals with non-overlapping generations. This means that after each generation, the entire population is replaced by its offspring. In its simplest form, this model also assumes a constant population size across generations and no selection. Note that, although the WF model assumes a group of *haploid* individuals, it turns out that the dynamics predicted by models for diploid populations with two sexes are remarkably similar to those under Wright-Fisher. Since the haploid model is simpler mathematically, it is often used as a more practical yet very close approximation of diploid models. 
+The Wright-Fisher (WF) model is arguably the most commonly used framework for modelling genetic drift. Although we didn't explicitly name it in class, all of our excercises durring lecture were based on this model. Briefly, this model considers a bi-allelic locus within a population of haploid, randomly-mating individuals with non-overlapping generations. This means that after each generation, the entire population is replaced by its offspring. In its simplest form, this model also assumes a constant population size across generations and no selection. Note that, although the WF model assumes a group of *haploid* individuals, it turns out that the dynamics predicted by models for diploid populations with two sexes are remarkably similar to those under Wright-Fisher. Since the haploid model is simpler mathematically, it is often used as a more practical yet very close approximation of diploid models. 
 <br><br>
 In today's practical we will simulate the evolution of allele frequencies under the WF model and explore what such simulations can tell us about the evolutionary process.
 
@@ -10,7 +10,7 @@ In today's practical we will simulate the evolution of allele frequencies under 
 In its most basic form, the WF model considers a population of constant size 2N with no mutation or selection. Lets start with a population composed of 2N = 50 individuals, and a allele frequencies of p = 0.64 and q = 0.46. 
 
 <br>
-<img src="../Images/InitialPop_W1.png" width="600">
+<img src="../Images/InitialPop_W1.png" width="600" class="center">
 <br>
 
 To obtain the allele frequencies of the next generation we can sample 50 individuals at random from our population, with the probability of sampling a red allele being *p* and a yellow one *1-p*. We can do this in R as follows:
