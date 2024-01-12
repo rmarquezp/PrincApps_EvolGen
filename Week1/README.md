@@ -1,7 +1,7 @@
 Simulating Genetic Drift under the Wright-Fisher Model
 ======================================================
 
-The Wright-Fisher (WF) model is arguably the most commonly used framework for modelling genetic drift. Although we didn't explicitly name it in class, all of our excercises durring lecture were based on this model. Briefly, this model considers a bi-allelic locus within a population of haploid, randomly-mating individuals with non-overlapping generations. This means that after each generation, the entire population is replaced by its offspring. In its simplest form, this model also assumes a constant population size across generations and no selection. Note that, although the WF model assumes a group of *haploid* individuals, it turns out that the dynamics predicted by models for diploid populations with two sexes are remarkably similar to those under Wright-Fisher. Since the haploid model is simpler mathematically, it is often used as a more practical yet very close approximation of diploid models. 
+The Wright-Fisher (WF) model is arguably the most commonly used framework for modelling genetic drift. Briefly, this model considers a bi-allelic locus within a population of haploid, randomly-mating individuals with non-overlapping generations. This means that after each generation, the entire population is replaced by its offspring. In its simplest form, this model also assumes a constant population size across generations and no selection. Note that, although the WF model assumes a group of *haploid* individuals, it turns out that the dynamics predicted by models for diploid populations with two sexes are remarkably similar to those under Wright-Fisher. Since the haploid model is simpler mathematically, it is often used as a more practical yet very close approximation of diploid models. 
 <br><br>
 In today's practical we will simulate the evolution of allele frequencies under the WF model and explore what such simulations can tell us about the evolutionary process.
 
@@ -31,7 +31,7 @@ table(alleles)/50
  R   Y 
 0.54 0.46 
 ```
-Our new allele frequency (*p*) is 0.54 (quite a jump!). We can repeat this same excercise using our new allele frequencies to obtain the next generation.
+In this particular simulation our new "R" allele frequency (*p*) was 0.54 (quite a jump!). YOurs will probably differ, since we're sampling alleles randomly. We can repeat this same excercise using our new allele frequencies to obtain the next generation.
 ```R
 alleles<-sample(c("R","Y"), 50, rep=T, prob=c(0.54, 0.46))
 table(alleles)/50
@@ -40,7 +40,7 @@ table(alleles)/50
 ```
 And so on and so forth....
 <br><br>
-To obtain allele frequencies over a large number of generations we can use a *loop* to execute the code above multiple times. 
+To obtain allele frequencies over a large number of generations we can use a *loop* to execute the code above multiple times.
 <br>
 First lets create an empty vector (ie. a group of numbers) that we will populate with allele frequencies for each generation, and set the first value to 0.64.
 ```R
@@ -56,12 +56,14 @@ for(i in 2:100){
   p_vec[i]<-freqs[1]
   }
   ```
+<p style="color:DodgerBlue"><b>Question 1:</b></p> What do the lines `freqs<-table(alleles)/50` and `p_vec[i]<-freqs[1]` do?
+<br><br>
   Finally, lets plot our allele frequencies over time (generations 1-100). 
   
   ```R
   plot(1:100, p_vec, type='l', xlab="Generation", ylab="Allele Frequency (p)", ylim=c(0,1), xlim=c(1,100))
   ```
-  ![WF_once](../Images/WF_Iteration.png)
+  <img src="../Images/WF_Iteration.png" width="600" class="center"> 
   
   In order to draw generalities out of simulations we should simulate multiple times. To make this easier, we can create an R *function* that runs our simulation given some initial parameters, which we can then run many times. We can use our same code above, and replace some of the numbers for variables. 
   
