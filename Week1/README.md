@@ -191,7 +191,7 @@ As we've discussed in the past under the model studied in the previous section o
   
 We can use these mutation rates to calculate the expected value of *p* for the next generation.
   <br>
-  $$p_{t+1}=p_t(1-u)+(1-p_t)v$$
+  $$p_{t+1}=p_t(1-\mu)+(1-p_t)v$$
   <br>
 The first term of the sum represents the probability of a red allele <i>not</i> mutating to yellow, while hte second term reperesents the probability of a yellow allele mutating to red. Recall that $p$ represents the frequency of the red allele. We can now incorporate this expression into our code from the previous point to write a function that simulates genetic drift and mutation. 
   
@@ -207,10 +207,10 @@ p_vec[1] <- p0
 	return(p_vec)
 	}
 ```
-<b>Question 5:</b> Run a few simulations using the following parameters.
+<b>Question 5a:</b> Run (and plot) a few simulations using the following parameters.
 
 ```R
-p1=0.5
+p1=0.25
 ngen=200
 N=100
 u=0.0005
@@ -218,3 +218,5 @@ v=0.0007
 ```
 
 What do you notice? 
+
+<b>Question 5b:</b> Run (and plot) a new set of simulations with population size $2N=10,000$ for 10,000 generations. Describe and explain your observations.
