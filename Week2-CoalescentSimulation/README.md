@@ -268,7 +268,7 @@ densiTree(trees, alpha=0.1, col="black", direction="downwards")
 <details>
 <summary> Click here to see the plot for $n=100$</summary>
 
-<img src="../Images/Densitree.png" width="500">
+<img src="../Images/Densitree.png" width="500" class="center">
 
 </details>
 
