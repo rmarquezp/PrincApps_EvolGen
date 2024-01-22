@@ -13,7 +13,7 @@ The basic algorithm for a coalescent simulation ca be written as follows:
 
 ## Required packages
 
-Most of the code we will be using here does not require any additional packages to be luaded onto our R environment. However, we will be using the packages <i>ape</i> and <i>phangorn</i>to visualize our genealogies. Before you begin, please load these packages:
+The goal of today's lab is learning how coalescent simulation is written "from scratch", so most of the code we will be using here does not require any additional packages to be loaded onto our R environment. However, we will be using the packages <i>ape</i> and <i>phangorn</i>to visualize and manipulate our genealogies. Before you begin, please load these packages:
 ```R
 library(ape)
 library(phangorn)
@@ -35,7 +35,7 @@ lineages=1:n
 > lineages
 [1]  1  2  3  4  5  6  7  8  9 10
 ```
-Let's create another vector with the names of the ancestral lineages (also called nodes) that our samples will coalesce into. Whenever two lineages coalesce durring our simulation, we will merge them by removing them from our lineages vector and replacing thm by an ancestral lineage. 
+Let's create another vector with the names of the ancestral lineages (also called nodes) that our samples will coalesce into. Whenever two lineages coalesce durring our simulation, we will merge them by removing them from our lineages vector and replacing them by an ancestral lineage. 
 
 ```R
 nodes=(n+(n-1)):(n+1)   
@@ -44,8 +44,8 @@ nodes=(n+(n-1)):(n+1)
 [1] 19 18 17 16 15 14 13 12 11
 ```
 
-Note that for a tree with $n$ lineages there are $n-1$ nodes (9 in our case). We name our nodes with numbers between 11 and 19 ordered backwards just to match the format used by the ape package to plot trees.
-<br>
+Note that for a tree with $n$ lineages there are $n-1$ nodes (9 in our case). We name our nodes with numbers between 11 and 19 ordered backwards just to match the format used by the <i>ape</i> package to plot trees.
+<br><br>
 Now lets create an empty table for our simulation results. 
 
 ```R
@@ -72,6 +72,8 @@ As the simulation runs it will populate the table with the genealogy's coalescen
 <b>parent:</b> The name of the parent lineage that they merged into. <br>
 <b>surv_lineages:</b> The pool of lineages that remain active. <br><br>
 
+<b>Question 1:</b> What does each row in our table correspond to? 
+<br><br>
 Now lets run the simulation. 
 ```R
 for(i in 1:(n-1)){ 	## For n lineages there are n-1 coalescence events.
@@ -90,8 +92,11 @@ for(i in 1:(n-1)){ 	## For n lineages there are n-1 coalescence events.
 	results$surv_lineages[i]=paste(lineages, collapse=" ")	
 }
 ```
-Take a moment to understand the code for the simulation. In broad terms, what it does is go down the table's rows and following the algorithm above, and then logs the results into the table. Can you identify which lines of code correspond to steps 2 and 3?
+Take a moment to understand the code for the simulation. In broad terms, what it does is go down the table's rows and following the algorithm above, and then logs the results into the table. 
+<br><br>
+<b>Question 2:</b> Can you identify which lines of code correspond to steps 2 and 3? Explain how those lines of code acheive each step. 
 
+<!---
 <details>
 
 <summary> Click here to see the answer </summary>
@@ -109,7 +114,7 @@ lineages=setdiff(lineages,coal_lin)
 lineages=c(lineages, nodes[i])
 ```
   </details>
-  
+-->  
   Now our table has been populated with the results: 
   
   ```R
@@ -125,14 +130,14 @@ lineages=c(lineages, nodes[i])
 8         3 0.375632971      19      13     12                9 12
 9         2 2.782158583      12       9     11                  11
 ```
-We can see how, as the simulation preogresses, lineages become merged into parent lineages. As the surv_lineages column shows, the coalescing lineages get removed from the active lineages, and the newly created parent lineage gets added.The time to the most recent comon ancestor (TMRCA) and the total tree length are informative parameters about genealogies. They can be calculated as:
+We can see how, as the simulation preogresses, lineages become merged into parent lineages. Note how, in the surv_lineages column, coalescing lineages get replaced by newly created parent lineages after each coalescence event. The time to the most recent comon ancestor (TMRCA) and the total tree length are informative parameters about genealogies. They can be calculated as:
 
 $$T_{MRCA}=\sum_{i=2}^{n}T_{n}$$
  
 $$T_{Total}=\sum_{i=2}^{n}iT_{n}$$
 
-Try calculating these two values from the table. 
-
+<b>Question 3:</b> Try calculating these two values from the table. 
+<!---
 <details>
 
 <summary> Click here to see the answer </summary>
@@ -147,7 +152,8 @@ Ttotal=sum(results$Tcoal*results$nlineages)
 [1] 8.801194
 ```
 </details>
-Now lets visualize our tree. The code below converts the results table into an object of the class <i>phylo</i>, which is what the ape package uses to handle phylogenetic trees. This is not immediately related to our class, so feel free to just run the code below without much thought. As usual, if you are interested in understanding it further I'm happy to go over it. 
+-->
+Now lets visualize our tree. The code below converts the results table into an object of the class <i>phylo</i>, which is the format used by the ape package to handle trees. This is not immediately related to our class, so feel free to just run the code below without much thought. As usual, if you are interested in understanding it further I'm happy to go over it. 
 
 ```R
 sim2Tree=function(results){
@@ -188,10 +194,11 @@ plot(tree, direction="downwards", show.node.label=T)
 ```
 
 Look at the results table from our simulation. Can you match the events described on each row with the tree you've plotted?
-
+<br><br>
+<b>Question 4:</b> Paste your tree and corresponding table on your report. Pick and label two nodes on your tree and identify the corresponding entires on the table. Then indicate the lineages coalescing into that node andthe associated coalescence time.
 ## Multiple Simulations
 
-Lets now run our simulation many times to explore how our model behaves. To this end, we can re-purpose the code used above into a function that we can run many times. 
+Lets now run our simulation many times to explore how our model behaves more generally. To this end, we can re-purpose the code used above into a function that we can run many times. 
 ```R
 simCoaltree=function(n=10){
 
@@ -218,7 +225,7 @@ simCoaltree=function(n=10){
 }
 ```
 
-Run the simulation 1000 times for 100 lineages. 
+Run the simulation 500 times for 100 lineages. 
 ```R
 res_list=list()
 
@@ -226,7 +233,7 @@ for(j in 1:1000){
 	res_list[[j]]=simCoaltree(n=100)
 }
 ```
-This results in a list with 1000 results tables as the ones we created above. We can now calculate TMRCA and Ttotal from each tree using the lapply command, which runs the same function for each element of a list. This function returns results as a list, which we can turn into a vector using the unlist() function. 
+This results in a list with 1000 results tables as the ones we created above. We can now calculate TMRCA and Ttotal from each tree using the ```lapply()``` command, which runs the same function for each element of a list. This function returns results as a list, which we can turn into a vector using the unlist() function.
 ```R
 tmrcas=lapply(res_list,function(x){sum(x$Tcoal)})
 tmrcas=unlist(tmrcas)
@@ -238,17 +245,17 @@ ttots=unlist(ttots)
 hist(tmrcas, main="100 samples", xlab=expression("T"["MRCA"]))
 hist(ttots, main = "100 samples", xlab=expression("T"["Total"]))
 ```
-How well do our simulations match the theoretical expectations from coalescent theory? The expected values for both parameters are below:
+How well do our simulations match the theoretical expectations from coalescent theory? Expressions for the expected values for both parameters are below:
 
 $$E[T_{MRCA}]=\sum_{i=2}^{n}E[T_{i}]=\sum_{i=2}^{n}\frac{2}{i(i-1)}=2-\frac{2}{n}$$
  
 $$E[T_{Total}]=\sum_{i=2}^{n}iE[T_i]=2\sum_{i=2}^{n}\frac{1}{i-1}=2\sum_{i=1}^{n-1}\frac{1}{i}$$
 
-Now instead of 100 samples run simulations for 5, 10, and 500 (500 may take a couple of minutes). How do TMRCA and Ttotal change?
+<b>Question 5:</b> Run simulations for 5, 10, and 500 samples (500 may take a couple of minutes). How do TMRCA and Ttotal change as the sample size increases?
 
 ## Visualizing trees
 
-Finally, lets visualize the trees resulting from our simulation. We can use the apply command to convert our tables to trees. THe package phangorn has a function called densiTree(), which plots multiple everlaid trees. We can use this function to look for general patterns in our tree set. 
+Finally, lets visualize the trees resulting from our simulation. We can use the apply command to convert our tables to trees. The package <i>phangorn</i> has a function called ```densiTree()```, which plots multiple overlaid trees. We can use this function to look for general patterns in our tree set. 
 
 ```R
 trees=lapply(res_list,function(x){sim2Tree(x)})
@@ -257,11 +264,12 @@ class(trees)="multiPhylo"
 library(phangorn)
 densiTree(trees, alpha=0.1, col="black", direction="downwards")
 ```
-What do you see? Do you notice any general pattenrs about the topologies or coalescence times? 
-
+<b>Question 6:</b> Do you notice any general pattenrs about the topologies or coalescence times? 
 <details>
-<summary> Click here to see the plot</summary>
+<summary> Click here to see the plot for $n=100$</summary>
 
 <img src="../Images/Densitree.png" width="500">
 
 </details>
+
+<b>Question 7:</b> You may have noticed that, although the population size (i.e. N or 2N) is a central parameter of coalescent theory, we have not provided or used it in any of our simulations. Why do you think this is?
