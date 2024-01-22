@@ -225,7 +225,7 @@ simCoaltree=function(n=10){
 }
 ```
 
-Run the simulation 500 times for 100 lineages. 
+Run the simulation 1000 times for 100 lineages. 
 ```R
 res_list=list()
 
