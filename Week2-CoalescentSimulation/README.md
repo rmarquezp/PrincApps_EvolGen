@@ -132,9 +132,9 @@ lineages=c(lineages, nodes[i])
 ```
 We can see how, as the simulation preogresses, lineages become merged into parent lineages. Note how, in the surv_lineages column, coalescing lineages get replaced by newly created parent lineages after each coalescence event. The time to the most recent comon ancestor (TMRCA) and the total tree length are informative parameters about genealogies. They can be calculated as:
 
-$$T_{MRCA}=\sum_{i=2}^{n}T_{n}$$
+$$T_{MRCA}=\sum_{i=2}^{n}T_{i}$$
  
-$$T_{Total}=\sum_{i=2}^{n}iT_{n}$$
+$$T_{Total}=\sum_{i=2}^{n}iT_{i}$$
 
 <b>Question 3:</b> Try calculating these two values from the table. 
 <!---
