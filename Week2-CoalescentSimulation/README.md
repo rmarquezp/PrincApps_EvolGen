@@ -1,7 +1,7 @@
 Simulating Coalescent Genealogies
 ======================================================
 
-Today's lab will deal with simulating coalescent genealogies under the continuous time approximation of the Wright-Fisher model, which assumes large population sizes. From lectures you may recall that in coalescent theory provides us with a simple model for the <i> genealogical relationships</i> among a set of samples. The process described by this model starts in the present and runs backwards in time, tracking lineages as they <i>coalesce</i> into common ancestors. 
+Today's lab will deal with simulating coalescent genealogies under the continuous time approximation of the Wright-Fisher model, which assumes large (i.e. infinite) population sizes. From lectures you may recall that coalescent theory provides us with a simple model for the <i> genealogical relationships</i> among a set of samples obtained from a larger population. The process described by this model starts in the present and runs backwards in time, tracking lineages as they <i>coalesce</i> into common ancestors. 
 <br><br>
 The basic algorithm for a coalescent simulation ca be written as follows:
 <br>
@@ -9,7 +9,7 @@ The basic algorithm for a coalescent simulation ca be written as follows:
 2. Randomly generate the time to the next coalescent event by sampling an exponential fistribution with parameter $\frac{i(i-1)}{2}$.<br>
 3. Chose two samples to coalesce at random and merge them into a single parent lineage.<br>
 4. Set $i$ to $i = i - 1$
-5. If $i > 1$ go to step 2. 
+5. If $i > 1$ go to step 2. Otherwise stop.
 
 ## Required packages
 
