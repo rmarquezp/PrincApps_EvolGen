@@ -264,12 +264,11 @@ class(trees)="multiPhylo"
 library(phangorn)
 densiTree(trees, alpha=0.1, col="black", direction="downwards")
 ```
-<b>Question 6:</b> Do you notice any general pattenrs about the topologies or coalescence times? 
-<details>
-<summary> Click here to see the plot for $n=100$</summary>
+<b>Question 6:</b> Include the plot in your report. Do you notice any general pattenrs about the topologies or coalescence times? 
+<br><br>
+Below is a plot for $n=100$
 
 <img src="../Images/Densitree.png" width="500" class="center">
 
-</details>
 
 <b>Question 7:</b> You may have noticed that, although the population size (i.e. N or 2N) is a central parameter of coalescent theory, we have not provided or used it in any of our simulations. Why do you think this is?
