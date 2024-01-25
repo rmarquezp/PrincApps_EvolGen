@@ -4,7 +4,7 @@ Handling Illumina data on the Greatlakes HPC Cluster
 This week we will begin working with data. As we discussed in lecture, one of the most comonly used genotyping strategies in current population genetic studies consists on using the Illumina technology to sequence short fragments of DNA, which we will call <b>reads</b>. These short reads are them aligned against a previously generated reference genome, which allows us to 1. find their location in the genome, and 2. obtain genotypic information for our individual(s) of interest. 
 <br><br>In this practical we will learn how to:<br>
 * Interact with a remote high performance computing (HPC) cluster through the terminal.
-* Download data from the NCBI's [Assembly](http://www.ncbi.nlm.nih.gov/Datasets) and [Short Read Archive](http://www.ncbi.nlm.nih.gov/sra) (SRA) repositories, where sequence data are publicly ccessible.
+* Download data from the NCBI's [Datasets](http://www.ncbi.nlm.nih.gov/Datasets) and [SRA](http://www.ncbi.nlm.nih.gov/sra) (SRA) repositories, where sequence data are publicly ccessible.
 * Conduct quality-control analyses on Illumina data.
 * Align these data against a reference genome.
 * Generate basic quality metrics of mapped data.
@@ -57,18 +57,21 @@ cd Week3
 Until now, we've been working on the <i>head node</i> of the cluster. This is a computer meant for logging in and running menial tasks, such as moving/copying files and creating new directories. To run computationally intensive tasks, 
 we use <i>compute nodes</i>, which are more powerful, and exclusively allocatod for this purpose. To gain access to a compute node, we can use the `srun` command:
 ```bash 
-srun --account eeb401s002f22_class --time 1:30:00 --mem 8G --tasks-per-node 1 --pty bash
+srun --account eeb401s002w24_class --time 1:30:00 --mem 8G --tasks-per-node 4 --pty bash
 ```
-This command asks for acces to a compute node with 8Gb RAM and one processor for 1.5 hours. The resources used will come from our class allocation (`--account eeb401s002w24_class`). 
+This command asks for acces to a compute node with 8Gb RAM and four processors for 1.5 hours. The resources used will come from our class allocation (`--account eeb401s002w24_class`). An alternative way to use compute nodes is writing a script with instructions and asking the cluster to run it all at once. This way we can run many different such <i>batch jobs</i> simultaneously. This can be done using the `sbatch` command. Throughout the course we will be using compute nodes <i>interactively</i>, as detailed above, mainly for pedagogical purposes, but it may be good to explore batch jobs for your own analyses, as they allow users to take advantag of the cluster's full capabilities.
 <br><br>
-An alternative way to use compute nodes is writing a script with instructions and asking the cluster to run it. This way we can run many different such <i>jobs</i> simultaneously 
-A few momments after typing this you should get a message saying the requested resources have been allocated, together with a command prompt in which you can type. This is where we will work today. Before we start, we need to load some <i>modules</i>, which contain the programs that we will use. This is analogous to loading packages in R. 
+A few momments after running `srun` you should get a message saying the requested resources have been allocated, together with a command prompt in which you can type. This is where we will work today. Before we start, we need to load some <i>modules</i>, which contain the programs that we will use. This is analogous to loading packages in R. 
 ```bash
-module load Bioinformatics bwa sratoolkit samtools fastqc
+module load Bioinformatics bwa sratoolkit samtools fastqc trimmomatic
 ```
 
-## Obtaining Fastq files
-The first step in most bioinformatic pipelines is transferring the data to our work environment. If you have generated these data yourself this may involve transferring it from the sequencing facility's computer to yours. If you are using data available in the SRA, we can use a set of programs specifically created by the NIH to interact with the SRA, called the SRA toolkit. Each file uploaded to the SRA is assigned a unique ID number. Below are the ID numbers for 12 read files from our snowshoe hare system. 
+## Downloading sequence data from NCBI
+The first step in most bioinformatic pipelines is transferring the data to our work environment. If you have generated these data yourself this may involve transferring it from the sequencing facility's computer to yours. If you are using publicly available data, it needs to be downloaded from a repository. In this case, we will be using data hosted by the USA's National Center for Biotechnology Information (NCBI). Raw data from next-generation (i.e. massively parallel) sequencing runs is hosted at the NCBI's [Short Read Archive](http://www.ncbi.nlm.nih.gov/sra) (SRA). To access  
+
+
+
+which has created a set of programs  specifically created by the NIH to interact with the SRA, called the SRA toolkit. Each file uploaded to the SRA is assigned a unique ID number. Below are the ID numbers for 12 read files from our snowshoe hare system. 
 
 ```bash
 1. SRR11020240
