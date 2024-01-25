@@ -4,23 +4,27 @@ Handling Illumina data on the Greatlakes HPC Cluster
 This week we will begin working with data. As we discussed in lecture, one of the most comonly used genotyping strategies in current population genetic studies consists on using the Illumina technology to sequence short fragments of DNA, which we will call <b>reads</b>. These short reads are them aligned against a previously generated reference genome, which allows us to 1. find their location in the genome, and 2. obtain genotypic information for our individual(s) of interest. 
 <br><br>In this practical we will learn how to:<br>
 * Interact with a remote high performance computing (HPC) cluster through the terminal.
-* Download data from the NCBI's [Short Read Archive](http://www.ncbi.nlm.nih.gov/sra) (SRA), a public repository of sequence data.
+* Download data from the NCBI's [Assembly](http://www.ncbi.nlm.nih.gov/Datasets) and [Short Read Archive](http://www.ncbi.nlm.nih.gov/sra) (SRA) repositories, where sequence data are publicly ccessible.
 * Conduct quality-control analyses on Illumina data.
 * Align these data against a reference genome.
-* Asses the quality of mapped data.
+* Generate basic quality metrics of mapped data.
 <br><br>
 ## Study System
 
-For this and several other practicals we will be using data from a sample of snowshow hares (<i>Lepus americanus</i>), which was collected by Jones et al. ([2018](https://doi.org/10.1126/science.aar5273)). Briefly, the authors collected tissue samples, and generated sequence data using a technique called [exome enrichment](https://en.wikipedia.org/wiki/Exome_sequencing), in which only the coding sequences in the genome are sequenced. This is often done to reduce costw and computational effort when sequencing the entire genome is not necessary. 
+Today we will be using data from a sample of snowshow hares (<i>Lepus americanus</i>), which was collected by Jones et al. ([2018](https://doi.org/10.1126/science.aar5273)). Briefly, the authors collected tissue samples, and generated sequence data using a technique called [exome enrichment](https://en.wikipedia.org/wiki/Exome_sequencing), where a sequencing library for the whole genome is prepared, and then only the molecules corresponding to exons are extracted and sequenced. This <i>reduced representation</i> approach is often used to reduce cost and computational effort when sequencing the entire genome is not necessary. 
 
 <img src="https://www.nrcm.org/wp-content/uploads/2021/12/snowshoe-hare2-bcomeau.jpg" width="600">
 
 ## Interacting with the Greatlakes Cluster
-We usually don't interact with computer clusters such as UM's Greatlakes the way we do with personal computers. Instead of using the mouse and keyboard to give the computer instructions and receiving results on a screen, all directly connected with the computer, we will be remotely logging into the cluster and giinteracting with it through the <b>command line</b>. That means we will be typing commands into a prompt, and receiving results as text on that same window, similar to how we have interacted with R in previous sessions. To start using the command line open the Terminal (on Mac this is found under Applications -> Utilities). A window like this should open:
+Given the scale of data involved, population genetic analyses very often require much larger computational resources than what a typical personal computer can provide. Fortunately, our institution has a very powerful <i>compute cluster</i>, called [Greatlakes](http://greatlakes.arc-ts.umich.edu/), which is very well suited for the types of analyses we will be doing in class. We usually don't interact with compute clusters the way we do with personal computers. Instead of using the mouse and keyboard to give the computer instructions, and receiving results on a screen, all directly connected with the computer, we will be remotely logging into the cluster and interacting with it through the <i>command line</i>. That means we will be typing commands into a prompt, and receiving results as text on that same window, similar to how we have interacted with R in previous sessions. To start using the command line open the Terminal (on Mac this is found under Applications -> Utilities, on most Linux distributions it can be opened by pressing Ctrl-Alt-T). A window like this should open:
 
 <img src="https://cdn2.macpaw.com/images/content/Screen%20Shot%202021-09-03%20at%2014.32.58_1630671309.png" width=500>
 <br>
-This window is where we will type commands and receive outputs from Greatlakes. The first step to do so is logging into Greatlakes. To do so we must use a command called "ssh" and our UM credentials.
+This window is where we will type commands and receive outputs from Greatlakes. 
+<br><br>
+<b>NOTE:</b> If you are working on Windows, you can use software such as [Putty](https://documentation.its.umich.edu/node/350) to interact with Greatlakes. 
+<br><br>
+The first step to do so is logging into Greatlakes. To do so we must use a command called `ssh` and our UM credentials.
 
 ```bash
 ssh uniqname@greatlakes.arc-ts.umich.edu
@@ -35,27 +39,30 @@ Enter a passcode or select one of the following options:
  3. SMS passcodes to XXX-XXX-NNNN
  ```
  
-Choose your preferred option and type its number (or enter a passcode), and hit enter. After authenticating you should see a welcome screen, and a command prompt ready for you to type. On the terminal we can run analyses, but also perform routine tasks such as moving between directories or creating new folders.files. Before we start analyzing data, lets create some directories for our work. We can use the "mkdir" command for this. 
+Choose your preferred option and type its number (or enter a passcode), and hit enter. After authenticating you should see a welcome screen, and a command prompt ready for you to type. On the terminal we can run analyses, but also perform routine tasks such as moving between directories or creating new folders.files. Before we start analyzing data, lets create some directories for our work. We can use the `mkdir` command for this. 
 ```bash
  mkdir Week3
  ```
- This will create a directory called "Week3". To make sure this worked, we can use the "ls" command to list all the files and directories at our current location
+ This will create a directory called "Week3". To make sure this worked, we can use the `ls` command to list all the files and directories at our current location
  ```bash
  ls
  
  Week3
 ```
-Running this command confirms we've succesfully created our folder. Lets now go to this folder, where we can run our commands. 
+Running this command confirms we've succesfully created our folder. Lets now move into this folder, where we can run our commands. 
 
 ```bash
 cd Week3
 ```
 Until now, we've been working on the <i>head node</i> of the cluster. This is a computer meant for logging in and running menial tasks, such as moving/copying files and creating new directories. To run computationally intensive tasks, 
-we use <i>compute nodes</i>, which are more powerful, and exclusively allocatod for this purpose. To gain access to a compute node, we can use the "srun" command:
+we use <i>compute nodes</i>, which are more powerful, and exclusively allocatod for this purpose. To gain access to a compute node, we can use the `srun` command:
 ```bash 
 srun --account eeb401s002f22_class --time 1:30:00 --mem 8G --tasks-per-node 1 --pty bash
 ```
-This command asks for acces to a compute node with 8Gb RAM and one processor for 1.5 hours. The resources used will come from our class allocation (`--account eeb401s002f22_class`). A few momments after typing this you should get a message saying the requested resources have been allocated, together with a command prompt in which you can type. This is where we will work today. Before we start, we need to load some <i>modules</i>, which contain the programs that we will use. This is analogous to loading packages in R. 
+This command asks for acces to a compute node with 8Gb RAM and one processor for 1.5 hours. The resources used will come from our class allocation (`--account eeb401s002w24_class`). 
+<br><br>
+An alternative way to use compute nodes is writing a script with instructions and asking the cluster to run it. This way we can run many different such <i>jobs</i> simultaneously 
+A few momments after typing this you should get a message saying the requested resources have been allocated, together with a command prompt in which you can type. This is where we will work today. Before we start, we need to load some <i>modules</i>, which contain the programs that we will use. This is analogous to loading packages in R. 
 ```bash
 module load Bioinformatics bwa sratoolkit samtools fastqc
 ```
