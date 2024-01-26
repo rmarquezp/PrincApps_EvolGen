@@ -4,7 +4,7 @@ Handling Illumina data on the Greatlakes HPC Cluster
 This week we will begin working with data. As we discussed in lecture, one of the most comonly used genotyping strategies in current population genetic studies consists on using the Illumina technology to sequence short fragments of DNA, which we will call <b>reads</b>. These short reads are them aligned against a previously generated reference genome, which allows us to 1. find their location in the genome, and 2. obtain genotypic information for our individual(s) of interest. 
 <br><br>In this practical we will learn how to:<br>
 * Interact with a remote high performance computing (HPC) cluster through the terminal.
-* Download data from the NCBI's [Datasets](http://www.ncbi.nlm.nih.gov/Datasets) and [SRA](http://www.ncbi.nlm.nih.gov/sra) (SRA) repositories, where sequence data are publicly ccessible.
+* Download data from the NCBI's [Datasets](http://www.ncbi.nlm.nih.gov/datasets) and [SRA](http://www.ncbi.nlm.nih.gov/sra) (SRA) repositories, where sequence data are publicly ccessible.
 * Conduct quality-control analyses on Illumina data.
 * Align these data against a reference genome.
 * Generate basic quality metrics of mapped data.
@@ -133,7 +133,25 @@ Note that we are passing four flags to skewer: `-t 4` specifies that it should u
 
 ## Read Mapping
 
-Now that we have high-quality, uncontaminated read files, we can map them back to a reference genome. So our next step is, of course, downloading a suitable reference. For this practical, we are going to be using the genome assembly for the European hare, which is closely related to our focal Snowshoe hares. 
+Now that we have high-quality, uncontaminated read files, we can map them back to a reference genome. So our next step is, of course, downloading a suitable reference. For this practical, we are going to be using the genome assembly for the European hare, which is closely related to our focal Snowshoe hares. Genome assemblies can usually be found in NCBI's [Datasets](http://www.ncbi.nlm.nih.gov/datasets) repository. Go to this website, and in the search bar prompting "Enter a species" type "<i>Lepus europaeus</i>". You should now be looking at a summary of all the data available on NCBI for this species. Scroll down to the "Genome" section, and click on the link below "Reference Genome". This will take you to the record of the European hare's current reference genome assembly. You will find a lot of useful inforamtion here, but for now we are just concerned with downloading the assembly. The "download" button allows you to download the genome and its associated files (e.g. annotation, predicted protein sequences) manually to your computer. However, we can use the `curl` command, which is used to download files from the internet, to downlaod the genome assembly directly to Greatlakes. Conveniently, GenBank provides a web address from which we can download. You can see it by clicking the "curl" link.
+
+<img src="../Images/DownloadGenome.png">
+
+To download the file, copy the address provided, and incorporate it into the following `curl`command
+```bash
+curl -OJX GET "ADDRESS/TO/GENOME" -H "Accept: application/zip"
+```
+Once the download is complete, you should have a file called `ncbi_dataset.zip`. To unzip it run
+```bash
+unzip ncbi_dataset.zip
+```
+You should now have a folder with the same name, and within it are several files, most of which contain sequence data (you may have to navigate into a couple of folders to get there):<br><br>
+<b>GCF_033115175.1_mLepTim1.pri_genomic.fna:</b> The sequences for the entire genome assembly. This is the file we'll be using.<br>
+<b>genomic.gff:</b> An annotation for the genome. This is a very long table with inforamtion of where all the genes in the genome are located.<br>
+<b>rna.fna:</b> All the RNA sequences that can be transcribed from the genome.<br>
+<b>cds_from_genomic.fna:</b> The coding sequences within the above RNA (i.e. only the parts of mRNA that get translated to amino acids).<br>
+<b>protein.faa:</b> The protein sequences corresponding to the above CDS.<br>
+<br>
 
 using the program "bwa". The reference genome file is located in `/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa`.
 
@@ -144,7 +162,7 @@ using the program "bwa". The reference genome file is located in `/scratch/eeb40
 
 ## Now map the reads back to the genome
 
-bwa mem -o fileID.sam /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa fileID-trimmed-pair1.fastq fileID-trimmed-pair2.fastq
+bwa mem -t 4 -o fileID.sam /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa fileID-trimmed-pair1.fastq fileID-trimmed-pair2.fastq
 ```
 The mapped reads in our output file are organized in the order in which there were sequenced. We can save a considerable amount of space by 1. organizing them according to the regions of the genome that they map back to, and 2. compressing the file. We can achieve this using the program "samtools". In addition, we will create an <i>index</i> file, which allows programs to quickly access specific regions of our file without reading it all in first. 
 
