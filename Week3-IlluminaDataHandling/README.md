@@ -295,6 +295,6 @@ plot(chr10_depth$Pos, chr10_depth$Depth, type="l", col="dodgerblue", lwd=0.5, xl
 #Lets zoom into a region around this interval (say 95Mb to 105Mb) by passing an "xlim" argument to the plot function.
 plot(chr10_depth$Pos, chr10_depth$Depth, type="l", col="dodgerblue", lwd=0.5, xlab="Position (bp)", ylab="Coverage", xlim=c(9.5e7, 1.05e8))
 ```
-<b>Question 7a:</b> Include your plot in your report. Does it look like what you'd expect for data targeting <i>Agouti</i>? Explain. 
+<b>Question 7a:</b> Include your plot in your report. Does it look like what you'd expect for data targeting <i>Agouti</i>? Explain.<br> 
 <b>Question 7b:</b> Now produce a plot for depth along chromosome 1. How does it compare to the plot for Chr. 10? Does this make sense (and why)? 
 <br><br>
