@@ -64,7 +64,7 @@ This command asks for acces to a compute node with 8Gb RAM and four processors f
 <br><br>
 A few momments after running `srun` you should get a message saying the requested resources have been allocated, together with a command prompt in which you can type. This is where we will work today. Before we start, we need to load some <i>modules</i>, which contain the programs that we will use. This is analogous to loading packages in R. 
 ```bash
-module load Bioinformatics bwa sratoolkit samtools fastqc trimmomatic
+module load Bioinformatics bwa sratoolkit samtools fastqc
 ```
 
 ## Downloading sequence data from NCBI
@@ -73,7 +73,7 @@ The first step in most bioinformatic pipelines is transferring the data to our w
 You should now see the full record of the specific sequencing experiment that you clicked on. Here you will find information on the sequencing experiment, such as the technology used (Illumina in this case) or the experimental design (i.e. protocol) used to prepare libraries, as well as on the broader project in which the sequencing ocurred, and the sample from which DNA was obtained. You can click on the project number (PRJ...) and sample number (SAMN...) to go to their specific records in NCBI's BioProject and BioSample databases. At the end, you will find details on the specific sequencing run from which the sequences came.  
 <img src="../Images/SRA_run.png">
 
-<b>Question 1:</b> What specific Illumina instriment was used to generate these sequences?
+<b>Question 1:</b> What specific Illumina instrument was used to generate these sequences?
 
 To download these specific sequences, we can use a set of programs  specifically created by the NIH to interact with the SRA, called the SRA toolkit, using the sequencing run's unique accession number (SRR....). We first need to download the file in a format specific to the SRA, which is very compact and makes download faster. 
 
@@ -102,15 +102,17 @@ ATCGATGATTAAATCACCCTAATTTGCATTGTCTGAGCTAATCACCGATGATTTATTTACCTGCTATGTTTACACGAAGT
 +SRR11020240.1 1 length=101
 AAFFFJJJFJJJJJJJJJJFJJJJFJJJJJJJJJJJJJJJJJJJJJJJJAJ-FJJJJJJJFJJJFFJF7FFJJJJFJFFJJJJFJFJJJFJJA7JJFF<FF
 ```
-The first and third lines include information avout the read, in this case the file name, read number, and read length. The second line contains the sequence, and the fourth line contains the quality for each base. To save space, numerical values are stored as letters istead of numbers. You can read more about the fastq file [here](https://en.wikipedia.org/wiki/FASTQ_format). 
+The first and third lines include information about the read, in this case the file name, read number, and read length. The second line contains the sequence, and the fourth line contains the quality for each base. To save space, numerical values are encoded as letters istead of numbers. Each letter represent a specific error rate. For instance, the letter A corresponds to an error rate of ~0.00064, and the letter F to ~0.0002. You can read more about the fastq format [here](https://help.basespace.illumina.com/files-used-by-basespace/fastq-files), and about the error rate encoding [here](https://help.basespace.illumina.com/files-used-by-basespace/quality-scores). 
+<br><br>
+<b>Question 3:</b> Before we continue, it is useful to count the number of reads in our files. YOu can use the command `wc -l file.fastq` to count the number of lines in a file. Use this to calculate the numer of reads in each of your files. How many reads are in each file? Is this waht you expected? Why or why not?
 
 ## Assessing read quality and trimming reads
 
-As we covered ijn class, Illumina sequences have some probability of including technical artifacts, mostly in the form of sequencing errors and contamination introduced by the library preparation process. Therefore, it is advisable to evaluate the quality of our reads and to process them in order to remove low-quality and contaminated segments of reads. 
+As we covered in class, Illumina sequences have some probability of including technical artifacts, mostly in the form of sequencing errors and contamination introduced by the library preparation process. Therefore, it is advisable to evaluate the quality of our reads and to process them in order to remove low-quality and contaminated segments of reads. 
 <br><br>
-To assess read quality we can use aprogram called [fastqc](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). 
+To assess read quality we can use aprogram called [fastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/). 
 ```bash
-fastqc fileID_1.fastq fileID_2.fastq
+fastqc --threads 4 fileID_1.fastq fileID_2.fastq
 ```
 This will produce two files called fileID_1_fastqc.html and fileID_2_fastqc.html. These files can be visualized in an internet browser. To do so they need to be downloaded to your local machine. Open a new terminal window by clicking on "Shell -> New Window" on the top menu bar. In the new terminal window type:
 ```bash
@@ -118,16 +120,22 @@ scp "marquezr@greatlakes.arc-ts.umich.edu:Week3/*.html" ~/Desktop
 ```
 This command copies all files with the extension ".html" in the folder Week3 to your Desktop. Wait here while everyone catches up, and we will inspect this file as a group. 
 <br><br>
-Overall our reads seem to be OK, but there seems to be some adapter contamination. There are many many programs to deal with this sort of artifact. One that I particularly like is called [skewer](https://github.com/relipmoc/skewer). Run it as follows:
+Overall our reads seem to be OK, but fastQC did detect some issues. We will first lead with low quality bases and adapter contamination. There are many many programs to deal with these kinds of artifacts. One that I particularly like is called [skewer](https://github.com/relipmoc/skewer). However, when choosing a program to address issues with read quality, it is key to keep the issues present in the specific data being analyzed. 
+<br><br>
+Run skewer as follows:
 
 ```bash
-/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/skewer/skewer -o fileID fileID_1.fastq fileID_2.fastq
+/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/software/skewer/skewer -t 4 -q 30 -l 36 -o fileID fileID_1.fastq fileID_2.fastq
 ```
-This should create two new fastq files. Use the "ls" command to see their names, and run fastqc on tehse new files. This should generate two new html files. Download them to the desktop and check them out. Was the adapter contamination removed?
+Note that we are passing four flags to skewer: `-t 4` specifies that it should use 4 CPUs, `-q 30` sets the minimum quality score per base at a score of 30, which corresponds to an error rate of 0.001, and `-l 36` sets the minimum read length to 36bp. The `-o` flag tells skewer what to name its output files. You should have gotten two new fastq files. Use the `ls` command to see their names.
+
+<b>Question 4:</b> Run `fastqc on these new files. This should generate two new html files. Download them to the desktop and check them out. Was the adapter contamination removed? How do you know? Feel free to include figures. 
 
 ## Read Mapping
 
-Now that we have high-quality, uncontaminated read files, we can map them back to the reference genome, using the program "bwa". The reference genome file is located in `/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa`.
+Now that we have high-quality, uncontaminated read files, we can map them back to a reference genome. So our next step is, of course, downloading a suitable reference. For this practical, we are going to be using the genome assembly for the European hare, which is closely related to our focal Snowshoe hares. 
+
+using the program "bwa". The reference genome file is located in `/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa`.
 
 ```bash
 #Index the genome file. This only needs to be done once. It takes a few hours, so it has been done for you. 
