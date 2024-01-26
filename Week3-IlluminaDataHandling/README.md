@@ -11,7 +11,7 @@ This week we will begin working with data. As we discussed in lecture, one of th
 <br><br>
 ## Study System
 
-Today we will be using data from a sample of snowshow hares (<i>Lepus americanus</i>), which was collected by Jones et al. ([2018](https://doi.org/10.1126/science.aar5273)). Briefly, the authors collected tissue samples, and generated sequence data using a technique called target enrichment, where a sequencing library for the whole genome is prepared, and then only the molecules corresponding to some specific genomic regions are extracted and sequenced. A commonly used example of this approach is [exome enrichment](https://en.wikipedia.org/wiki/Exome_sequencing), where the aim is to only sequence coding regions of the genome. This <i>reduced representation</i> approach is often used to reduce cost and computational effort when sequencing the entire genome is not necessary.
+Today we will be using data from a sample of snowshow hares (<i>Lepus americanus</i>), which was collected by Jones et al. ([2020](https://doi.org/10.1086/710022)). Briefly, the authors collected tissue samples, and generated sequence data using a technique called target enrichment, where a sequencing library for the whole genome is prepared, and then only the molecules corresponding to some specific genomic regions are extracted and sequenced. A commonly used example of this approach is [exome enrichment](https://en.wikipedia.org/wiki/Exome_sequencing), where the aim is to only sequence coding regions of the genome. This <i>reduced representation</i> approach is often used to reduce cost and computational effort when sequencing the entire genome is not necessary.
 
 <img src="https://www.nrcm.org/wp-content/uploads/2021/12/snowshoe-hare2-bcomeau.jpg" width="600">
 
@@ -68,7 +68,7 @@ module load Bioinformatics bwa sratoolkit samtools fastqc
 ```
 
 ## Downloading sequence data from NCBI
-The first step in most bioinformatic pipelines is transferring the data to our work environment. If you have generated these data yourself this may involve transferring it from the sequencing facility's computer to yours. If you are using publicly available data, it needs to be downloaded from a repository. In this case, we will be using data hosted by the USA's National Center for Biotechnology Information (NCBI). Raw data from next-generation (i.e. massively parallel) sequencing runs is hosted at the NCBI's Short Read Archive (SRA). To find our data, we can go to the [SRA Website and use its search engine](http://www.ncbi.nlm.nih.gov/sra) and use its search engine. To start, type the name of today's study species (<i>Lepus americanus</i>). You should see about 300 results. It turns out most of these correspond to Jones et al's sequences. Pick one of the results titled "targeted Agouti sequencing of snowshoe hare" and click on it.  
+The first step in most bioinformatic pipelines is transferring the data to our work environment. If you have generated these data yourself this may involve transferring it from the sequencing facility's computer to yours. If you are using publicly available data, it needs to be downloaded from a repository. In this case, we will be using data hosted by the USA's National Center for Biotechnology Information (NCBI). Raw data from next-generation (i.e. massively parallel) sequencing runs is hosted at the NCBI's Short Read Archive (SRA). To find our data, we can go to the [SRA Website and use its search engine](http://www.ncbi.nlm.nih.gov/sra) and use its search engine. To start, type the name of today's study species (<i>Lepus americanus</i>). You should see about 300 results. It turns out most of these correspond to Jones et al's sequences. Pick one of the results titled "targeted Agouti sequencing of snowshoe hare" and click on it. These sequences correspond to a target enrichment experiment where the authors targeted a ~600kb (i.e. 600,000bp) region around the gene <i>Agouti</i>, which was previously shown to be involved in seasonal color change in these hares. 
 <br><br>
 You should now see the full record of the specific sequencing experiment that you clicked on. Here you will find information on the sequencing experiment, such as the technology used (Illumina in this case) or the experimental design (i.e. protocol) used to prepare libraries, as well as on the broader project in which the sequencing ocurred, and the sample from which DNA was obtained. You can click on the project number (PRJ...) and sample number (SAMN...) to go to their specific records in NCBI's BioProject and BioSample databases. At the end, you will find details on the specific sequencing run from which the sequences came.  
 <img src="../Images/SRA_run.png">
@@ -217,6 +217,9 @@ SRR11020214.1063784     99      NC_084827.1     20769   44      35M1I114M       
 As noted, reads SRR11020214.986398 and SRR11020214.1063784 are identical, and map to the same position. This is proably because they correspond to PCR copies of the same molecule! As we saw in our fastQC run, our data had a relatively high level of reads that looked like PCR duplicates, so it is worth finding and marking them with a new flag that denotes their status as duplicates. Again, `samtools` has a command to do this called `markdup`. 
 ```bash
 samtools markdup -@ 4 -O BAM fileID.sorted.bam fileID.sorted.deduped.bam
+
+#Don't forget to index the new file!
+samtools index fileID.sorted.deduped.bam
 ```
 All this will do is go over all read mappings, and find instances of duplication. It will then keep the best-scoring pair of reads (based on the `fixmate` scores we calculated earlier), and mark their duplicates with the corresponding flags. <br><br>
 Lets see how we did:
@@ -257,30 +260,40 @@ samtools flagstat fileID.sorted.deduped.bam
 8143 + 0 with mate mapped to a different chr (mapQ>=5)
 ```
 
-Based on this, does it look like our alignment went well?
+Based on this, does it looks like our alignment went pretty well. Out of 2,392,731 total reads `bwa` was able to align 2,384,760 (99.67%) to the reference, and of the reads that were paired, 98.15% had both reads map to the same chromosome (we call this propperly paired). You may be wondering "Aren't all our reads supposed to be paired?" you have asked a great question. The reason why that is not the case, is that in a minority of cases `skewer` discarded one of the reads in a pair due to bad quality, but we still kept the surviving read. In this specific case, one read was discarded for $2,392,731-2,359,298=33,433$ read pairs (so very few). Fianlly, 854,364 reads (35.7%) reads were flagged as PCR duplicates, which we expected based on fastQC, and is common in target enrichment experiments. 
 
-An additional metric of interest is the read depth that we've obtained. Since this is directly related to the confidence we will have in our genotypes, it is important to know how much cooverage we've obtained. This can be obtained using the "depth" function of samtools. The resulting file can be quite large, so in the itenrest of time lets look only at the first 1,000,000 sites covered. 
+An additional metric of interest is the read depth (i.e. coverage) that we've obtained, as it is directly related to the confidence we will have in our genotypes. Furthermore, since we're dealing with target enrichment data, we expect some regions (our targets), to have higher coverage than others (the rest of the genome). This can be obtained using the `depth` function of `samtools`. The resulting file can be quite large, so in the itenrest of time we will focus only on Chromosome 10, where the <i>Agouti</i> gene is located. In the [Datasets](http://www.ncbi.nlm.nih.gov/datasets) record of the European hare genome, we can see that Chromosome 10 is represented by the sequence named "NC_084836.1". We can calculate depth for this specific region using the `-r` flag on samtools. 
 
 ```bash
-samtools depth SRR11020240.sorted.bam | head -n 1000000 > SRR11020240.depth.txt
+samtools depth -@ 2 -r NC_084836.1 SRR11020214.sorted.deduped.bam > SRR11020214_Chr10.depth.txt
+
 #note we are writing the output of our command to a file using the > character.
 
 ## Take a peek inside the file
 
 head -n 5 SRR11020240.depth.txt
 
-PVJM010000001.1	5412	2
-PVJM010000001.1	5413	2
-PVJM010000001.1	5414	2
-PVJM010000001.1	5415	2
-PVJM010000001.1	5416	2
+NC_084836.1	1216	1
+NC_084836.1	1217	1
+NC_084836.1	1218	1
+NC_084836.1	1219	1
+NC_084836.1	1220	1
 
 # It is a table with three columns: crhomosome name, position, and depth. 
 ```
 
-Finally, lets plot depth along out chromosome. First use `scp` to download the file, then open an R window to plot using the following commands:
+Finally, lets plot depth along our chromosome. First use `scp` to download the file to your computer, then open an R window to plot using the following commands:
 
 ```R
-depth<-read.table("SRR11020240.depth.txt")
-hist(depth[,3], breaks=0:max(depth[,3]), xlab="Coverage", ylab="Frequency")
+chr10_depth<-read.table("SRR11020214_Chr10.depth.txt") # read the data
+colnames(chr10_depth)<-c("Chr","Pos","Depth") #name the columns
+
+# Plot
+plot(chr10_depth$Pos, chr10_depth$Depth, type="l", col="dodgerblue", lwd=0.5, xlab="Position (bp)", ylab="Coverage")
+
+#Agouti is located roughly between 101.7Mb and 102.0Mb from the start of the chromosome (1Mb=1,000,000bp). Lets zoom into a region around this interval (say 95Mb to 105Mb) by passing an "xlim" argument to the plot function.
+plot(chr10_depth$Pos, chr10_depth$Depth, type="l", col="dodgerblue", lwd=0.5, xlab="Position (bp)", ylab="Coverage", xlim=c(9.5e7, 1.05e8))
 ```
+<b>Question 7a:</b> Include your plot in your report. Does it look like what you'd expect for data targeting <i>Agouti</i>? Explain. 
+<b>Question 7b:</b> Now produce a plot for depth along chromosome 1. How does it compare to the plot for Chr. 10? Does this make sense (and why)? 
+<br><br>
