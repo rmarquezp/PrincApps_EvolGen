@@ -22,7 +22,9 @@ Given the scale of data involved, population genetic analyses very often require
 <br>
 This window is where we will type commands and receive outputs from Greatlakes. 
 <br><br>
-<b>NOTE:</b> If you are working on Windows, you can use software such as [Putty](https://documentation.its.umich.edu/node/350) to interact with Greatlakes. 
+
+
+<b>Note:</b> If you are using Windows, you can use software such as [Putty](https://documentation.its.umich.edu/node/350)
 <br><br>
 The first step to do so is logging into Greatlakes. To do so we must use a command called `ssh` and our UM credentials.
 
@@ -68,6 +70,7 @@ module load Bioinformatics bwa sratoolkit samtools fastqc trimmomatic
 
 ## Downloading sequence data from NCBI
 The first step in most bioinformatic pipelines is transferring the data to our work environment. If you have generated these data yourself this may involve transferring it from the sequencing facility's computer to yours. If you are using publicly available data, it needs to be downloaded from a repository. In this case, we will be using data hosted by the USA's National Center for Biotechnology Information (NCBI). Raw data from next-generation (i.e. massively parallel) sequencing runs is hosted at the NCBI's Short Read Archive (SRA). To find our data, we can go to the [SRA Website and use its search engine](http://www.ncbi.nlm.nih.gov/sra) and use its search engine. To start, type the name of today's study species (<i>Lepus americanus</i>). You should see about 300 results. It turns out most of these correspond to Jones et al's sequences. Pick one of the results titled "targeted Agouti sequencing of snowshoe hare" and clock on it.  
+<br><br>
 
 
 
