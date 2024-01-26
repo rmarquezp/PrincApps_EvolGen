@@ -16,15 +16,14 @@ Today we will be using data from a sample of snowshow hares (<i>Lepus americanus
 <img src="https://www.nrcm.org/wp-content/uploads/2021/12/snowshoe-hare2-bcomeau.jpg" width="600">
 
 ## Interacting with the Greatlakes Cluster
-Given the scale of data involved, population genetic analyses very often require much larger computational resources than what a typical personal computer can provide. Fortunately, our institution has a very powerful <i>compute cluster</i>, called [Greatlakes](http://greatlakes.arc-ts.umich.edu/), which is very well suited for the types of analyses we will be doing in class. We usually don't interact with compute clusters the way we do with personal computers. Instead of using the mouse and keyboard to give the computer instructions, and receiving results on a screen, all directly connected with the computer, we will be remotely logging into the cluster and interacting with it through the <i>command line</i>. That means we will be typing commands into a prompt, and receiving results as text on that same window, similar to how we have interacted with R in previous sessions. To start using the command line open the Terminal (on Mac this is found under Applications -> Utilities, on most Linux distributions it can be opened by pressing Ctrl-Alt-T). A window like this should open:
+Given the scale of data involved, population genetic analyses very often require much larger computational resources than what a typical personal computer can provide. Fortunately, our institution has a very powerful <i>high-performance computing (HPC) cluster</i>, called [Greatlakes](http://greatlakes.arc-ts.umich.edu/), which is very well suited for the types of analyses we will be doing in class. We usually don't interact with compute clusters the way we do with personal computers. Instead of using the mouse and keyboard to give the computer instructions, and receiving results on a screen, all directly connected with the computer, we will be remotely logging into the cluster and interacting with it through the <i>command line</i>. That means we will be typing commands into a prompt, and receiving results as text on that same window, similar to how we have interacted with R in previous sessions. To start using the command line open the Terminal (on Mac this is found under Applications -> Utilities, on most Linux distributions it can be opened by pressing Ctrl-Alt-T). A window like this should open:
 
 <img src="https://cdn2.macpaw.com/images/content/Screen%20Shot%202021-09-03%20at%2014.32.58_1630671309.png" width=500>
 <br>
 This window is where we will type commands and receive outputs from Greatlakes. 
 <br><br>
 
-
-<b>Note:</b> If you are using Windows, you can use software such as [Putty](https://documentation.its.umich.edu/node/350)
+<b>Note:</b> If you are using Windows, you can use software such as [Putty](https://documentation.its.umich.edu/node/350) to log into Greatlakes.
 <br><br>
 The first step to do so is logging into Greatlakes. To do so we must use a command called `ssh` and our UM credentials.
 
@@ -69,30 +68,29 @@ module load Bioinformatics bwa sratoolkit samtools fastqc trimmomatic
 ```
 
 ## Downloading sequence data from NCBI
-The first step in most bioinformatic pipelines is transferring the data to our work environment. If you have generated these data yourself this may involve transferring it from the sequencing facility's computer to yours. If you are using publicly available data, it needs to be downloaded from a repository. In this case, we will be using data hosted by the USA's National Center for Biotechnology Information (NCBI). Raw data from next-generation (i.e. massively parallel) sequencing runs is hosted at the NCBI's Short Read Archive (SRA). To find our data, we can go to the [SRA Website and use its search engine](http://www.ncbi.nlm.nih.gov/sra) and use its search engine. To start, type the name of today's study species (<i>Lepus americanus</i>). You should see about 300 results. It turns out most of these correspond to Jones et al's sequences. Pick one of the results titled "targeted Agouti sequencing of snowshoe hare" and clock on it.  
+The first step in most bioinformatic pipelines is transferring the data to our work environment. If you have generated these data yourself this may involve transferring it from the sequencing facility's computer to yours. If you are using publicly available data, it needs to be downloaded from a repository. In this case, we will be using data hosted by the USA's National Center for Biotechnology Information (NCBI). Raw data from next-generation (i.e. massively parallel) sequencing runs is hosted at the NCBI's Short Read Archive (SRA). To find our data, we can go to the [SRA Website and use its search engine](http://www.ncbi.nlm.nih.gov/sra) and use its search engine. To start, type the name of today's study species (<i>Lepus americanus</i>). You should see about 300 results. It turns out most of these correspond to Jones et al's sequences. Pick one of the results titled "targeted Agouti sequencing of snowshoe hare" and click on it.  
 <br><br>
+You should now see the full record of the specific sequencing experiment that you clicked on. Here you will find information on the sequencing experiment, such as the technology used (Illumina in this case) or the experimental design (i.e. protocol) used to prepare libraries, as well as on the broader project in which the sequencing ocurred, and the sample from which DNA was obtained. You can click on the project number (PRJ...) and sample number (SAMN...) to go to their specific records in NCBI's BioProject and BioSample databases. At the end, you will find details on the specific sequencing run from which the sequences came.  
+<img src="../Images/SRA_run.png">
 
+<b>Question 1:</b> What specific Illumina instriment was used to generate these sequences?
 
-
-which has created a set of programs  specifically created by the NIH to interact with the SRA, called the SRA toolkit. Each file uploaded to the SRA is assigned a unique ID number. Below are the ID numbers for 12 read files from our snowshoe hare system. 
-
-```bash
-1. SRR11020240
-2. SRR11020241
-3. SRR11020242
-4. SRR11020243
-5. SRR11020245
-```
-Pick one of these files so that each person in the class analyzes a different file. Nowlets download it using the SRA Toolkit. We will first download each file and then extract it in <i>fastq</i> format. This format is a commonly used file format for sequence data, which includes base calls and associated quality values (ie. error rates) for each base. 
+To download these specific sequences, we can use a set of programs  specifically created by the NIH to interact with the SRA, called the SRA toolkit, using the sequencing run's unique accession number (SRR....). We first need to download the file in a format specific to the SRA, which is very compact and makes download faster. 
 
 ``` bash
-#Download data, replace the file ID for your chosen file. 
+#Download data, replace the file ID for your specific accession number. 
 prefetch fileID
-
-#Extract it as fastq
+```
+<b>Question 2:</b> Use `ls` to list the contents of your current directory. Where do you think your file was downloaded to?
+<br><br>
+Now lets convert to the file to a format that we can align to a reference genome. In this case, we will use the very comon <i>fastq</i> format, which inclkudes both the sequencess and their associated <i>quality scores</i> (i.e. error probabilities). 
+```bash
+#Extract reads in fastq
 fasterq-dump fileID
 ```
-These sequences were generated using a technology called<i>paired-ejnd</i> sequencing where the beginind and end of each DNA fragment is sequenced. Therefore, after running the commands above, you should find two fastq files, one containing the beginings, and another the eands of the sequenced DNA fragments. Use the "ls" command to verify they are there. Lets now take a look inside these files. 
+These sequences were generated using a technology called <i>paired-end</i> sequencing, where the beginind and end of each DNA fragment is sequenced. Therefore, after running the commands above, you should find two separate fastq files, one containing the beginings, and another the eands of the sequenced DNA fragments. Use `ls` to verify they are there. 
+<br><br>
+Lets now take a look inside these files. 
 ```bash
 less fileID_1.fastq
 # To exit the less screen just hit the 'q' key.
