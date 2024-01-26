@@ -104,7 +104,7 @@ AAFFFJJJFJJJJJJJJJJFJJJJFJJJJJJJJJJJJJJJJJJJJJJJJAJ-FJJJJJJJFJJJFFJF7FFJJJJFJFFJ
 ```
 The first and third lines include information about the read, in this case the file name, read number, and read length. The second line contains the sequence, and the fourth line contains the quality for each base. To save space, numerical values are encoded as letters istead of numbers. Each letter represent a specific error rate. For instance, the letter A corresponds to an error rate of ~0.00064, and the letter F to ~0.0002. You can read more about the fastq format [here](https://help.basespace.illumina.com/files-used-by-basespace/fastq-files), and about the error rate encoding [here](https://help.basespace.illumina.com/files-used-by-basespace/quality-scores). 
 <br><br>
-<b>Question 3:</b> Before we continue, it is useful to count the number of reads in our files. YOu can use the command `wc -l file.fastq` to count the number of lines in a file. Use this to calculate the numer of reads in each of your files. How many reads are in each file? Is this waht you expected? Why or why not?
+<b>Question 3:</b> Before we continue, it is useful to count the number of reads in our files. You can use the command `wc -l file.fastq` to count the number of lines in a file. Use this to calculate the numer of reads in each of your files. How many reads are in each file? Is this waht you expected? Why or why not?
 
 ## Assessing read quality and trimming reads
 
@@ -118,7 +118,7 @@ This will produce two files called fileID_1_fastqc.html and fileID_2_fastqc.html
 ```bash
 scp "marquezr@greatlakes.arc-ts.umich.edu:Week3/*.html" ~/Desktop
 ```
-This command copies all files with the extension ".html" in the folder Week3 to your Desktop. Wait here while everyone catches up, and we will inspect this file as a group. 
+This command copies all files with the extension ".html" in the folder Week3 to your Desktop. If you're using Windows you may need to use an FTP server such as [FileZilla](https://filezilla-project.org/) to transfer files to your desktop. <b>Wait here while everyone catches up, and we will inspect this file as a group.</b>
 <br><br>
 Overall our reads seem to be OK, but fastQC did detect some issues. We will first lead with low quality bases and adapter contamination. There are many many programs to deal with these kinds of artifacts. One that I particularly like is called [skewer](https://github.com/relipmoc/skewer). However, when choosing a program to address issues with read quality, it is key to keep the issues present in the specific data being analyzed. 
 <br><br>
@@ -129,7 +129,7 @@ Run skewer as follows:
 ```
 Note that we are passing four flags to skewer: `-t 4` specifies that it should use 4 CPUs, `-q 30` sets the minimum quality score per base at a score of 30, which corresponds to an error rate of 0.001, and `-l 36` sets the minimum read length to 36bp. The `-o` flag tells skewer what to name its output files. You should have gotten two new fastq files. Use the `ls` command to see their names.
 
-<b>Question 4:</b> Run `fastqc on these new files. This should generate two new html files. Download them to the desktop and check them out. Was the adapter contamination removed? How do you know? Feel free to include figures. 
+<b>Question 4:</b> Run `fastqc` on these new files. This should generate two new html files. Download them to the desktop and check them out. Was the adapter contamination removed? How do you know? Feel free to include figures. 
 
 ## Read Mapping
 
@@ -158,7 +158,7 @@ Now that we have an assembly, we can map our clean reads back to it using progra
 ```bash
 bwa index ReferenceGenome.fna
 ```
-Instead, you can copy all the files comprising the index from our shared class folder into your current directory (note that we refer to the current directory as `.`. 
+Instead, you can copy all the files comprising the index from our shared class folder into your current directory (note that we refer to the current directory as `.`). 
 ```bash
 cp /scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/ReferenceGenomes/GCF_033115175.1_mLepTim1.pri_genomic.* .
 ```
@@ -166,7 +166,7 @@ Finally, we can map the reads back to the genome with `bwa` (keep going with the
 ```bash
 bwa mem GCF_033115175.1_mLepTim1.pri_genomic.fna -t 4 -o fileID.sam  fileID-trimmed-pair1.fastq fileID-trimmed-pair2.fastq
 ```
-As `bwa` runs, observe the output. You will notice that it first reads in a chunk of reads, and then after a couple of minutes it outputs the results of mapping them as: `candidate unique pairs for (FF, FR, RF, RR): (##, ##, ##, ##)`. These numbers correspond to the numer of read pairs that map in each of the possible different orientations. For instance orientation FR is the case where the first read in the pair aligns "forwards" with the genome and the other one aligns in the reverse orientation,  FF the case where they both align forwards, RR both backwards, etc... The image below illustrates the four possible orientations. 
+As `bwa` runs, observe the output. You will notice that it first reads in a chunk of reads, and then after a couple of minutes it outputs the results of mapping them as: `# candidate unique pairs for (FF, FR, RF, RR): (##, ##, ##, ##)`. These numbers correspond to the numer of read pairs that map in each of the possible different orientations. For instance orientation FR is the case where the first read in the pair aligns "forwards" with the genome and the other one aligns in the reverse orientation,  FF the case where they both align forwards, RR both backwards, etc... The image below illustrates the four possible orientations. 
 
 <img src="../Images/ReadOrientations.png">
 
@@ -184,7 +184,7 @@ Note that we passed four flags to `samtools`: `-@ 4` tells it to use 4 cores, `-
 The mapped reads in our file are organized in the order in which there were sequenced. We can save a considerable amount of space by organizing them according to the regions of the genome that they map back to. Having all reads that map to the same genomic region in the same place also makes downstream analyses much quicker. We will also create an index file that allows programs to reach specific regions of the file quickly without needing to read in the whole file.  
 
 ```bash
-samtools sort -@ 4 -O BAM -o fileID.sorted.bam SRR11020214.fixed.bam
+samtools sort -@ 4 -O BAM -o fileID.sorted.bam fileID.fixed.bam
 samtools index fileID.sorted.bam
 ```
 The resulting file (`fileID.sorted.bam`) contains the mapping information for all of our reads. Lets have a look at what this file contains. Since it is a pretty large file (we mappend over 1 million reads!), we can just print the first five lines.
@@ -197,7 +197,7 @@ SRR11020214.838407      147     NC_084827.1     143     0       3S126M  =       
 SRR11020214.911280      147     NC_084827.1     143     0       4S118M  =       155     -106    CCCTACCCCTAACCCTACCCCTACCCCTACCCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACC        A7F7A-7-77--F-<A-<7-A-7-<77---F-<---A-JAFJJJA--AJAA---JFJAA<JJJFAFJJFF--JJJF<FJJJJ<FJJJJAFJJJJFFJJJJJFJJJJJFJJJJJFJJJFFAAA        NM:i:3  MD:Z:13A5A5A92  AS:i:103        XS:i:110        MQ:i:0  MC:Z:124M       ms:i:5013
 SRR11020214.925008      147     NC_084827.1     143     0       3S126M  =       164     -105    CCCACCCCTACCCCTAACCCTACCCCTAACCCCACCCCTAACCCTAACCCTAACCCCAACCCTACCCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCT A7---JJ7---JFA-<-FA7-7-JJ<-7-JA7-7-JJA7--JFA-A-JF<-7-JF7-<-JFA-7-JF<-A7JJF-<-JJFAA-JJFFJAJJJJFFJJJFJ7JJJJJJJJFFJFJJJFJFJJJJJFFFAA NM:i:6  MD:Z:7A11A9T1A21T7A64   AS:i:96 XS:i:99 MQ:i:0  MC:Z:129M       ms:i:5212
 ```
-As you can see, our file is a tab-separated table with lots of mapping information. For example, column 1 contains the read name, column 3 the chromosome to which our read mapped, and column 4 the position at which it mapped. Further columns include the sequence, its quality values, and other metrics related to alignment. Column 2 is of special interest, as it contains a code that summarizes a lot of this information. These codes are known as flags. A useful resource to interpret them can be found [here](https://broadinstitute.github.io/picard/explain-flags.html).
+As you can see, our file is a tab-separated table with lots of mapping information. For example, column 1 contains the read name, column 3 the chromosome to which our read mapped, and column 4 the position at which it mapped. Further columns include the sequence, its quality values, and other metrics related to alignment. You can find what each column contains [here](https://en.wikipedia.org/wiki/SAM_(file_format)). Column 2 is of special interest, as it contains a code that summarizes a lot of this information. These codes are known as <i>flags</i>. A useful resource to interpret them can be found [here](https://broadinstitute.github.io/picard/explain-flags.html).
 
 
 Samtools also allows us to see all the reads mapped to a particular region of the genome. For example, lets look at the first five reads mapping to the chromosome labelled as "NC_084827.1", between bases 20,000 and 30,000
@@ -212,13 +212,13 @@ SRR11020214.986398      99      NC_084827.1     20769   44      35M1I114M       
 SRR11020214.1063784     99      NC_084827.1     20769   44      35M1I114M       =       20787   167     GGCACTGTGGTGCAGCAACTTAAGCCAACACCTGCAAGTGCCAACATCCCATAGGAGCGCTGGTTCAAGCCCCCGGTGCTGCACTCCAATCCAGCTCCCTGCTAATGCGCCTGGGAAAGCAGCAGATGATGGTCCTAGTGTCTGGGTCGT    AAAFFJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJA<AAFJJJFJJJAAJJJJJJJJJJJJJJJJJFJJJ7JJJJJJJJJJJJ    NM:i:2  MD:Z:54G94      AS:i:137        XS:i:132        MQ:i:45 MC:Z:17M1I132M  ms:i:6017
 ```
 
-Wait here to discuss the output as a class. 
+<b>Wait here to discuss the output as a class.</b>
 <br><br>
 As noted, reads SRR11020214.986398 and SRR11020214.1063784 are identical, and map to the same position. This is proably because they correspond to PCR copies of the same molecule! As we saw in our fastQC run, our data had a relatively high level of reads that looked like PCR duplicates, so it is worth finding and marking them with a new flag that denotes their status as duplicates. Again, `samtools` has a command to do this called `markdup`. 
 ```bash
 samtools markdup -@ 4 -O BAM fileID.sorted.bam fileID.sorted.deduped.bam
 ```
-All this will do is go over all read mappings, and find instances of duplication. It will then keep the best-scoring pair of reads, and mark their duplicates with the corresponding flags. <br><br>
+All this will do is go over all read mappings, and find instances of duplication. It will then keep the best-scoring pair of reads (based on the `fixmate` scores we calculated earlier), and mark their duplicates with the corresponding flags. <br><br>
 Lets see how we did:
 ```bash
 samtools view fileID.sorted.deduped.bam NC_084827.1:20000-30000 | head -n 5
@@ -229,7 +229,7 @@ SRR11020214.24407       147     NC_084827.1     20728   10      92M1D7M =       
 SRR11020214.986398      1123    NC_084827.1     20769   44      35M1I114M       =       20787   167     GGCACTGTGGTGCAGCAACTTAAGCCAACACCTGCAAGTGCCAACATCCCATAGGAGCGCTGGTTCAAGCCCCCGGTGCTGCACTCCAATCCAGCTCCCTGCTAATGCGCCTGGGAAAGCAGCAGATGATGGTCCTAGTGTCTGGGTCGT    AAFFFFJJJAAAFFJAJJJFJFJFFJJJFJJJJJJJJFAJFAJJJJJJJFJJJF7-FFFJFJF7A<AFJFFFAF<JJAFJ<AAJAJJFJJFFJFJ<FFFJJF7AFA<FAJFJFAJFJFJJJJJJJJFJJFFFFFFJJFJFJJFFFJJAJF    NM:i:2  MD:Z:54G94      AS:i:137        XS:i:132        MQ:i:45 MC:Z:17M1I132M  ms:i:5974
 SRR11020214.1063784     99      NC_084827.1     20769   44      35M1I114M       =       20787   167     GGCACTGTGGTGCAGCAACTTAAGCCAACACCTGCAAGTGCCAACATCCCATAGGAGCGCTGGTTCAAGCCCCCGGTGCTGCACTCCAATCCAGCTCCCTGCTAATGCGCCTGGGAAAGCAGCAGATGATGGTCCTAGTGTCTGGGTCGT    AAAFFJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJA<AAFJJJFJJJAAJJJJJJJJJJJJJJJJJFJJJ7JJJJJJJJJJJJ    NM:i:2  MD:Z:54G94      AS:i:137        XS:i:132        MQ:i:45 MC:Z:17M1I132M  ms:i:6017
 ```
-<b>Question 6:</b> Was the problem solved? Explain. (Tip: Use the guide to SAM flags linked above).
+<b>Question 6:</b> Was the problem solved? Explain. <b>Tip:</b> Compare the flags of each read in this file and the one without duplicates marked. Use the guide to SAM flags linked above to see what they mean.
 <br><br>
 
 ## Evaluating bam/sam file statistics
