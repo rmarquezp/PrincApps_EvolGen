@@ -237,25 +237,24 @@ SRR11020214.1063784     99      NC_084827.1     20769   44      35M1I114M       
 Finally, lets gather some statsitics to see how our mapping went. We can obtain several metrics using the `flagstat` function of samtools, which summarizes the information in all of our reads' flags. 
 
 ```bash
-samtools flagstat fileID.sorted.bam
+samtools flagstat fileID.sorted.deduped.bam
 
-2933857 + 0 in total (QC-passed reads + QC-failed reads)
-2898178 + 0 primary
+2392731 + 0 in total (QC-passed reads + QC-failed reads)
+2359298 + 0 primary
 0 + 0 secondary
-35679 + 0 supplementary
-0 + 0 duplicates
-0 + 0 primary duplicates
-2920653 + 0 mapped (99.55% : N/A)
-2884974 + 0 primary mapped (99.54% : N/A)
-2898178 + 0 paired in sequencing
-1449089 + 0 read1
-1449089 + 0 read2
-2810828 + 0 properly paired (96.99% : N/A)
-2881004 + 0 with itself and mate mapped
-3970 + 0 singletons (0.14% : N/A)
-64084 + 0 with mate mapped to a different chr
-42093 + 0 with mate mapped to a different chr (mapQ>=5)
-
+33433 + 0 supplementary
+854364 + 0 duplicates
+854364 + 0 primary duplicates
+2384760 + 0 mapped (99.67% : N/A)
+2351327 + 0 primary mapped (99.66% : N/A)
+2359298 + 0 paired in sequencing
+1179649 + 0 read1
+1179649 + 0 read2
+2315704 + 0 properly paired (98.15% : N/A)
+2348546 + 0 with itself and mate mapped
+2781 + 0 singletons (0.12% : N/A)
+21406 + 0 with mate mapped to a different chr
+8143 + 0 with mate mapped to a different chr (mapQ>=5)
 ```
 
 Based on this, does it look like our alignment went well?
