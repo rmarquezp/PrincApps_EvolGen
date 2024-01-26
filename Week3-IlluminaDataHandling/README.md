@@ -152,41 +152,54 @@ You should now have a folder with the same name, and within it are several files
 <b>cds_from_genomic.fna:</b> The coding sequences within the above RNA (i.e. only the parts of mRNA that get translated to amino acids).<br>
 <b>protein.faa:</b> The protein sequences corresponding to the above CDS.<br>
 <br>
-
-using the program "bwa". The reference genome file is located in `/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa`.
+Now that we have an assembly, we can map our clean reads back to it using program [bwa](https://github.com/lh3/bwa). The first thing we need to do is create an <i>index</i> file for `bwa`. This is, as it name suggests, similar to the index at the end of a book: a file containing information about where different sequence motifs exist in the genome, which helps `bwa` find matches to each read much more quickly than if it systematically checked every chromosome for every read. <br><br>
+<b>Note:</b> This step takes a couple of hours to run, so it has been pre-run for you. If you were going to generate an index you would use:
 
 ```bash
-#Index the genome file. This only needs to be done once. It takes a few hours, so it has been done for you. 
-
-# bwa index /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa
-
-## Now map the reads back to the genome
-
-bwa mem -t 4 -o fileID.sam /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa fileID-trimmed-pair1.fastq fileID-trimmed-pair2.fastq
+bwa index ReferenceGenome.fna
 ```
-The mapped reads in our output file are organized in the order in which there were sequenced. We can save a considerable amount of space by 1. organizing them according to the regions of the genome that they map back to, and 2. compressing the file. We can achieve this using the program "samtools". In addition, we will create an <i>index</i> file, which allows programs to quickly access specific regions of our file without reading it all in first. 
+Instead, you can copy all the files comprising the index from our shared class folder into your current directory (note that we refer to the current directory as `.`. 
+```bash
+cp /scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/ReferenceGenomes/GCF_033115175.1_mLepTim1.pri_genomic.* .
+```
+Finally, we can map the reads back to the genome with `bwa` (keep going with the lab as it runs).
+```bash
+bwa mem GCF_033115175.1_mLepTim1.pri_genomic.fna -t 4 -o fileID.sam  fileID-trimmed-pair1.fastq fileID-trimmed-pair2.fastq
+```
+As `bwa` runs, observe the output. You will notice that it first reads in a chunk of reads, and then after a couple of minutes it outputs the results of mapping them as: `candidate unique pairs for (FF, FR, RF, RR): (##, ##, ##, ##)`. These numbers correspond to the numer of read pairs that map in each of the possible different orientations. For instance orientation FR is the case where the first read in the pair aligns "forwards" with the genome and the other one aligns in the reverse orientation,  FF the case where they both align forwards, RR both backwards, etc... The image below illustrates the four possible orientations. 
+
+<img src="../Images/ReadOrientations.png">
+
+<b>Question 5:</b> With what frequency do you observe each orientation? Is this how you would expect your data to behave? Explain.
+<br><br>
+
+`bwa` should take abour 30 minutes to complete. In the interest of time, feel free to cancel the run by typing `ctrl+c`, and use `cp` to copy a pre-generated output file located at `/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W3/SRR11020214.sam` to your current directory. 
+<br><br>
+Since aligners (such as `bwa`) write their output files "as they go", and (like any piece of software) can have small bugs, they can sometimes leave information that is "untidy" or that doesn't make sense to other programs used in downstream analyses. With this in mind, it is advisable to "proofread" our aligned (`.sam`) file before we continue. This can be quickly done using [samtools](https://www.htslib.org/doc/samtools.html). 
+```bash
+samtools fixmate -m -@ 4 -O BAM fileID.sam fileID.fixed.bam
+```
+Note that we passed four flags to `samtools`: `-@ 4` tells it to use 4 cores, `-O BAM` tells it to output hte fiel in `.bam` format, which is a compressed version of `.sam`, and `-m` tells it to add a score for how well a read pair maps to the genome, in addition to the scores for each individual read assigned by `bwa`. This will become relevant in a couple of steps. 
+<br><br>
+The mapped reads in our file are organized in the order in which there were sequenced. We can save a considerable amount of space by organizing them according to the regions of the genome that they map back to. Having all reads that map to the same genomic region in the same place also makes downstream analyses much quicker. We can achieve this using the program "samtools".  
 
 ```bash
-samtools sort -O BAM -o fileID.sorted.bam fileID.sam
-samtools index fileID.sorted.bam
-#We can remove the unsorted file
-
-rm fileID.sam
+samtools sort -@ 4 -O BAM -o SRR11020214.sorted.bam SRR11020214.fixed.bam
 ```
 The resulting file (`fileID.sorted.bam`) contains the mapping information for all of our reads. Lets have a look at what this file contains. Since it is a pretty large file (we mappend over 1 million reads!), we can just print the first five lines.
-
 ```bash
 samtools view fileID.sorted.bam | head -n 5 
 
  
-SRR11020240.450129	163	PVJM010000001.1	5412	60	150M	=	5460	198	GCAAACTGGTTAAGCCACTATGGAAGTCTGTCTGGAGATTCCTCAGAAACCTGAATATAACCCTACCATACAACCCAGCCATACCTCTCCTTGGAATTTACCCAAAGGAAATTAAATTGGCAAACAAAAAAGCTGTCTGCACATTAATAT	AAAF<JFJJJJJJJJJJJFJJJJJFJJJFJJJJJJJJJJJJJJJJJJJAJJJJJFFJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJFJFFJJFFFFJJJJ	NM:i:0	MD:Z:150	MC:Z:150M	AS:i:150	XS:i:128	XA:Z:PVJM010200518.1,-755,150M,5;PVJM010242128.1,-656,150M,6;
-SRR11020240.979244	163	PVJM010000001.1	5412	60	150M	=	5460	198	GCAAACTGGTTAAGCCACTATGGAAGTCTGTCTGGAGATTCCTCAGAAACCTGAATATAACCCTACCATACAACCCAGCCATACCTCTCCTTGGAATTTACCCAAAGGAAATTAAATTGGCAAACAAAAAAGCTGTCTGCACATTAATAT	AAAFFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ	NM:i:0	MD:Z:150	MC:Z:150M	AS:i:150	XS:i:128	XA:Z:PVJM010200518.1,-755,150M,5;PVJM010242128.1,-656,150M,6;
-SRR11020240.450129	83	PVJM010000001.1	5460	60	150M	=	5412	-198	ACCTGAATATAACCCTACCATACAACCCAGCCATACCTCTCCTTGGAATTTACCCAAAGGAAATTAAATTGGCAAACAAAAAAGCTGTCTGCACATTAATATTTATTGCAGCTCAATTCACAATAGCTGAGACCTGGAACCAATCCAAAT	FFFA7F<<AFA-<JJFJJJJFJ<JAJJJJJFJJJJAA<J<JJJJJJJFJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJAF-JJJFF7JJJJJFJJJJJJJJJJJJJJJJJJJJJJFFFJJJJJJJJJJJJJJJJJJJJJJJFFJJFFAAA	NM:i:1	MD:Z:113T36	MC:Z:150M	AS:i:145	XS:i:125	XA:Z:PVJM010021171.1,-4762,150M,5;PVJM010077295.1,+8871,150M,5;PVJM010080142.1,-5293,150M,6;
-SRR11020240.979244	83	PVJM010000001.1	5460	60	150M	=	5412	-198	ACCTGAATATAACCCTACCATACAACCCAGCCATACCTCTCCTTGGAATTTACCCAAAGGAAATTAAATTGGCAAACAAAAAAGCTGTCTGCACATTAATATTTATTGCAGCTCAATTCACAATAGCTGAGACCTGGAACCAATCCAAAT	JJJJFJJJJJJJJJJJJJJJFFJJAJFJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJFFFAA	NM:i:1	MD:Z:113T36	MC:Z:150M	AS:i:145	XS:i:125	XA:Z:PVJM010077295.1,+8871,150M,5;PVJM010021171.1,-4762,150M,5;PVJM010080142.1,-5293,150M,6;
-SRR11020240.419008	99	PVJM010000001.1	9848	60	150M	=	9943	245	TTATATTATTGGCCCTATTTTGCTTCTGCAATGAATTTCATTGCCTGCATTGTAAAATCAGCAGGCAGCAAAGTTTCTGCTAATGATTTAATATACTGTCTGATCAGTTTGGACAAAAGTCATAGTAAGAACTACAAGGCAATTTTATCG	AAFF-AFJJAJJJFJJJJJJJA7-FJJJJJJJJJJJJJJJ<JJFJJAFJJJJFJJFJJJJ<FFJJFJJJJJJJAJJJFFJJJJJAJ--AFJJJJJJJJJJJJJJJJ-FJ-7<FJ<JJJJAFJ7JJJ-F7FFAJJJFJJ7FJAFFJJ-F--	NM:i:2	MD:Z:106T42A0	MC:Z:150M	AS:i:144	XS:i:22
-
+SRR11020214.1054455     147     NC_084827.1     126     0       5S15M1D116M     =       168     -90     CTTCCCCCTAACCCCAACCCAACCCCTCACCCTTACCCTAACCCACACCCTCACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTACCCCTAACCCTAACCCTAACCCTAACCCTAACCCTA  A---7-777---7--7-7---7-77---7A------<<-7-F77---A77----<---7-7---AAFFJF7<<F-<A-F-<--F<----<---<-AA7-7-AFFF--JJFFFFJJJJJFJ7JFJJJFFA<-AFAAA  NM:i:8  MD:Z:9T5^T7A5A10T0A5A48A35      AS:i:89 XS:i:89 MQ:i:0  MC:Z:143M       ms:i:3848
+SRR11020214.505749      147     NC_084827.1     143     0       3S144M  =       154     -133    CCTACCCCTCACCCTAACCCTACCCCTAACCCTACCCCTAACCCTAACCCTACCCCTAACCCTCCCCCTCACCCTACCCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCT       AF)AAJA7))-FAA7-F<JF<-FFFA---<JF7--AA7---<JA---FFFF7-JFF77-7JA7--FFF7--AJA---7AA---JFA<--FJF-7-AFF--AFJJJJJJJJJJJJJJJJJJJJJJJJJJJJFJJJJJJJJJJJFFFAA       NM:i:8  MD:Z:6A12A11A17A10A0A4A6A70     AS:i:104        XS:i:107        MQ:i:0  MC:Z:150M       ms:i:5905
+SRR11020214.838407      147     NC_084827.1     143     0       3S126M  =       164     -105    CCTACCCCTAACCCCACCCCCAACCCCAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCT JA---F77---F-7-A-7F7---JFA-A-JJF-<-JF7-A<JFF7AAJFF<--JFF-<-JJA-A-JJF-F7JJJFF-JJJFF7JJJFA<JJJFFFJJJFJFJJJJFFJJJJJJJJJJJFJJJJJFFFAA NM:i:4  MD:Z:11T1A3T5T102       AS:i:106        XS:i:111        MQ:i:0  MC:Z:129M       ms:i:5232
+SRR11020214.911280      147     NC_084827.1     143     0       4S118M  =       155     -106    CCCTACCCCTAACCCTACCCCTACCCCTACCCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACC        A7F7A-7-77--F-<A-<7-A-7-<77---F-<---A-JAFJJJA--AJAA---JFJAA<JJJFAFJJFF--JJJF<FJJJJ<FJJJJAFJJJJFFJJJJJFJJJJJFJJJJJFJJJFFAAA        NM:i:3  MD:Z:13A5A5A92  AS:i:103        XS:i:110        MQ:i:0  MC:Z:124M       ms:i:5013
+SRR11020214.925008      147     NC_084827.1     143     0       3S126M  =       164     -105    CCCACCCCTACCCCTAACCCTACCCCTAACCCCACCCCTAACCCTAACCCTAACCCCAACCCTACCCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCTAACCCT A7---JJ7---JFA-<-FA7-7-JJ<-7-JA7-7-JJA7--JFA-A-JF<-7-JF7-<-JFA-7-JF<-A7JJF-<-JJFAA-JJFFJAJJJJFFJJJFJ7JJJJJJJJFFJFJJJFJFJJJJJFFFAA NM:i:6  MD:Z:7A11A9T1A21T7A64   AS:i:96 XS:i:99 MQ:i:0  MC:Z:129M       ms:i:5212
 ```
 As you can see, our file is a tab-separated table with lots of mapping information. For example, column 1 contains the read name, column 3 the chromosome to which our read mapped, and column 4 the position at which it mapped. Further columns include the sequence, its quality values, and other metrics related to alignment. Column 2 is of special interest, as it contains a code that summarizes a lot of this information. These codes are known as flags. A useful resource to interpret them can be found [here](https://broadinstitute.github.io/picard/explain-flags.html).
+
+
 
 Samtools also allows us to see all the reads mapped to a particular region of the genome. For example, lets look at the first five reads mapping to the chromosome labelled as "PVJM010000002.1", between bases 10,000 and 20,000
 
