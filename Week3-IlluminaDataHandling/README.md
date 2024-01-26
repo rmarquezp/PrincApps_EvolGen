@@ -291,7 +291,8 @@ colnames(chr10_depth)<-c("Chr","Pos","Depth") #name the columns
 # Plot
 plot(chr10_depth$Pos, chr10_depth$Depth, type="l", col="dodgerblue", lwd=0.5, xlab="Position (bp)", ylab="Coverage")
 
-#Agouti is located roughly between 101.7Mb and 102.0Mb from the start of the chromosome (1Mb=1,000,000bp). Lets zoom into a region around this interval (say 95Mb to 105Mb) by passing an "xlim" argument to the plot function.
+#Agouti is located roughly between 101.7Mb and 102.0Mb from the start of the chromosome (1Mb=1,000,000bp).
+#Lets zoom into a region around this interval (say 95Mb to 105Mb) by passing an "xlim" argument to the plot function.
 plot(chr10_depth$Pos, chr10_depth$Depth, type="l", col="dodgerblue", lwd=0.5, xlab="Position (bp)", ylab="Coverage", xlim=c(9.5e7, 1.05e8))
 ```
 <b>Question 7a:</b> Include your plot in your report. Does it look like what you'd expect for data targeting <i>Agouti</i>? Explain. 
