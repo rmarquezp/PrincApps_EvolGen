@@ -58,6 +58,17 @@ for(i in 2:100){
   ```
 <b>Question 1:</b> What do the lines `freqs<-table(alleles)/50` and `p_vec[i]<-freqs[1]` do?
 <br><br>
+<!---
+<details>
+
+<summary> Click here to see the answer </summary>
+
+<b>Answer 1:</b> `freqs<-table(alleles)/50` dalculates allele frequencies by counting the number of individuals with each allele type with the `table()` command, and dividing by the population size to obtain allele frequencies. Frequencies get saved into a vector called `freqs`.
+<br>
+`p_vec[i]<-freqs[1]` saves the freqquency of the red allele (i.e. $p$) to the vector with allele frequencies for each generation. 
+
+</details>
+--->
   Finally, lets plot our allele frequencies over time (generations 1-100). 
   
   ```R
