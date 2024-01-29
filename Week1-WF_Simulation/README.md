@@ -100,7 +100,7 @@ Note that instead of sampling all alleles and counting them, this time we sample
 
 <summary> Click here to see the answer </summary>
 
-<b>Answer 2:</b> The number of trails corresponds to the population size, as these are the number of "attempts" at making it to the next generation. The probability of success is $1/2N$ (or $1/N$ in the haploid case), since all individuals have the same chances at making it to the next generation. 
+<b>Answer 2:</b> The number of trails corresponds to the population size, as these are the number of "attempts" at making it to the next generation. The probability of "success" is the probaility that a copy of the focal allele makes it to the next generation, which is given by that allele's frequency in the current generation. 
 </details>
 --->
 
