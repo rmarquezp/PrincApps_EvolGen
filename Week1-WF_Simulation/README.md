@@ -95,6 +95,16 @@ Note that instead of sampling all alleles and counting them, this time we sample
 
 <b>Question 2:</b> What do the number of trials and probability of success correspond to in the Wright-Fisher model?
 
+<!---
+<details>
+
+<summary> Click here to see the answer </summary>
+
+<b>Answer 2:</b> The number of trails corresponds to the population size, as these are the number of "attempts" at making it to the next generation. The probability of success is $1/2N$ (or $1/N$ in the haploid case), since all individuals have the same chances at making it to the next generation. 
+</details>
+--->
+
+
 Lets test out our function. It should output a vector with allele frequencies for each generation. 
 ```R
 drift1<-drift_traj(N=25, p0=0.64, ngen=50)
@@ -136,6 +146,9 @@ for(i in 1:nsim){
 <br>
 <b>Question 3:</b> Please paste your plot in your report. Does it look like you would expect given what you know about genetic drift? 
 <br><br>
+
+
+
 Now lets see how well our simulations match some theoretical expectations.
 <br>
 Although allele frequencies will deviate widely from the initial conditions in each independent simulation <i>on average</i> we expect p to remain constant <i>across simulations</i>. Lets check if this holds
