@@ -173,6 +173,8 @@ $$H_t=H_{0}\Big(1-\frac{1}{2N}\Big)^{t}$$
 <br>
 Plot the observed and expected heterozygocity at each generation. Do the expected and observed heterozygocities match?
 <br><br>
+
+<!---
 <details>
 
 <summary> Click here to see how to calculate observed and expeted heterozygocity at a specific generation in R (<b>try to solve it on your own first :-)</b>) </summary>
@@ -206,7 +208,7 @@ Calculate expected heterozygocity at t = 25 and 50
   [1] 0.2163833
 ```
 </details>
-
+--->
 ## Wright Fisher with Mutation
   
 As we've discussed in the past under the model studied in the previous section one allele is always expected to become fixed at some point. This would predict that most natural populations should be genetically invariant, which is clearly not the case. In reality, as genetic drift eliminates genetic variants, mutation adds new ones to the population. To incorporate mutation into our model we can add two parameters, *u* and *v*, which represent the mutation rate from red to yellow and yellow to red, respecively.
