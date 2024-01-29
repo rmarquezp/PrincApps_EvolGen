@@ -236,10 +236,10 @@ p_vec[1] <- p0
 <b>Question 5a:</b> Run (and plot) a few simulations using the following parameters.
 
 ```R
-p1=0.25
+p1=0.15
 ngen=200
 N=100
-u=0.0005
+u=0.0002
 v=0.0007
 ```
 
