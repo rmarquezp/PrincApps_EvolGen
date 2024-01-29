@@ -131,7 +131,7 @@ Note that we are passing four flags to skewer: `-t 4` specifies that it should u
 
 <b>Question 4:</b> Run `fastqc` on these new files. This should generate two new html files. Download them to the desktop and check them out. Was the adapter contamination removed? How do you know? Feel free to include figures. 
 
-## Read Mapping
+## Downloading a Reference Assembly
 
 Now that we have high-quality, uncontaminated read files, we can map them back to a reference genome. So our next step is, of course, downloading a suitable reference. For this practical, we are going to be using the genome assembly for the European hare, which is closely related to our focal Snowshoe hares. Genome assemblies can usually be found in NCBI's [Datasets](http://www.ncbi.nlm.nih.gov/datasets) repository. Go to this website, and in the search bar prompting "Enter a species" type "<i>Lepus europaeus</i>". You should now be looking at a summary of all the data available on NCBI for this species. Scroll down to the "Genome" section, and click on the link below "Reference Genome". This will take you to the record of the European hare's current reference genome assembly. You will find a lot of useful inforamtion here, but for now we are just concerned with downloading the assembly. The "download" button allows you to download the genome and its associated files (e.g. annotation, predicted protein sequences) manually to your computer. However, we can use the `curl` command, which is used to download files from the internet, to downlaod the genome assembly directly to Greatlakes. Conveniently, GenBank provides a web address from which we can download. You can see it by clicking the "curl" link.
 
@@ -152,6 +152,8 @@ You should now have a folder with the same name, and within it are several files
 <b>cds_from_genomic.fna:</b> The coding sequences within the above RNA (i.e. only the parts of mRNA that get translated to amino acids).<br>
 <b>protein.faa:</b> The protein sequences corresponding to the above CDS.<br>
 <br>
+
+## Read Mapping
 Now that we have an assembly, we can map our clean reads back to it using program [bwa](https://github.com/lh3/bwa). The first thing we need to do is create an <i>index</i> file for `bwa`. This is, as it name suggests, similar to the index at the end of a book: a file containing information about where different sequence motifs exist in the genome, which helps `bwa` find matches to each read much more quickly than if it systematically checked every chromosome for every read. <br><br>
 <b>Note:</b> This step takes a couple of hours to run, so it has been pre-run for you. If you were going to generate an index you would use:
 
