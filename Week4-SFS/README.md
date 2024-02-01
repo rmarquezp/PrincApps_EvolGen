@@ -6,7 +6,7 @@ As we discussed in lecture, the site frequency spectrum (SFS; also known as alle
 
 ## Known genotypes and ancestral states
 
-Let's begin with the easiest possible case: The file called "W4Matrix.txt" contains data simulated under tha standard neutral coalescent model $(\theta=300)$ at 1,000 sites across a hypothetical genome. We've also assumed that these sites are very far from one another along the genome, to the point where they recombine freely. This means each site is part of a locus with a different genealogy. Since our theoretical expectation for the SFS, $\eta_i=\frac{\theta}{i}$, is <i>across all possible genealogies</i>, then these data should closely resemble the expectation. Download this file to your computer. 
+Let's begin with the easiest possible case: The file called "W4Matrix.txt" contains data simulated under tha standard neutral coalescent model $(\theta=5000)$ across a hypothetical chromosome of similar length to the human chromosome 1 (250,000,000bp long). We've also assumed that these sites have a very high rate of recombination between them, so that most (or all) segregating sites do not share a genealogy with other sites. Since our theoretical expectation for the SFS, $\eta_i=\frac{\theta}{i}$, is <i>across all possible genealogies</i>, then these data should closely resemble the expectation. Download this file to your computer. 
 <br><br>
 Since we know the ancestral states, calculating the SFS for this dataset is quite easy. We just need to count the number of derived alleles at each site, and tabulate our counts. We can do this in R:
 
@@ -14,25 +14,40 @@ Since we know the ancestral states, calculating the SFS for this dataset is quit
 # Read in the file. You may need to add the path to your data matrix file. 
 genotypes=read.table("W4Matrix.txt")
 
-# Generate counts. 
-#Since we score derived alleles as 1 and ancestrals as 0, we can quickly count the derived alleles by adding all the genotypes at each site.
-#The colSums() function gives the sum for each column of the matrix
-counts=colSums(genotypes)
+# Quickly count the number of rows and columns 
+nrow(genotypes)
+ncol(genotypes)
+```
+<b>Question 1:</b> How many individuals are in our matrix? How many sites?
+<br><br>
+On to calculating the SFS. Since we score derived alleles as 1 and ancestrals as 0, we can quickly count the number of derived allele copies at each site by summing over each site's genotypes. We can use the `colSums()` function, which gives the sum for each column of a matrix or data frame. We can then use the `table` function to generate counts for each mutation pattern (i.e. number of derived alleles) across sites. 
 
-#Use the table() function to tabulate our results
+```R
+counts=colSums(genotypes)
 SFS=table(counts)
 
 ## Plot!
 barplot(SFS, xlab="Derived Allele count", ylab="Number of Sites", col="black")
 ```
 
-How does the SFS look? Does it appear to follow the theoretical expectation? We can assess this visaully by plotting them alongside each other. 
+How does the SFS look? Does it appear to follow the theoretical expectation? We can assess this visaully by plotting our observed and expected SFS alongside each other. The first step is generating our expected SFS.
 
+<b>Question 2:</b> How would you obtain the expected SFS? Recall $\theta=5,000$.
+<!---
+<details>
+
+<summary> Click here to see the answer </summary>
 ```R
-# First create a matrix with observed and expected SFS together. Recall Theta=300
-ObsExp=matrix(c(300/1:19,SFS), nrow=2, byrow=T)
+expSFS=5000/1:19
+```
+</details>
+--->
+Now lets plot our observed and expected SFS alongside each other. 
+```R
+expSFS="insert your code here"
+ObsExp=matrix(c(expSFS,SFS), nrow=2, byrow=T)
 
-## Plot
+## Plot. Real good match!
 barplot(ObsExp, beside=T, col=c("grey15", "grey65"), xlab="Derived Allele count", ylab="Number of Sites", names=1:19)
 legend("topright", c("Expected", "Observed"), fill=c("grey15", "grey65"))
 ```
