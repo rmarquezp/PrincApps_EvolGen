@@ -232,32 +232,41 @@ freq=read_delim("outgroup.mafs.gz", col_names=T, delim='\t')
 head(freq) #Should have 7 columns
 
 # Find sites where the minor allele freq. is very small (i.e. effectively zero), and where both individuals were genotyped
-# Note1: the allele frequency is called knownEM, since it was estimated from genotype likelihoods using an algorithm called "Expectation Maximization"
-# Note2: since these are "maximum-likelihood" allele frequency estimates, we never get a frequency of 0, since there is always a very small probability of that site nt being fixed. THis is why we chose sites with very low allele frequencies (i.e. less than 0.001). 
 
 fixed=which(freq$knownEM<0.001 & freq$nInd==2)
 
+# Note1: the allele frequency is called knownEM, since it was estimated from genotype likelihoods using an algorithm called "Expectation Maximization"
+# Note2: since these are "maximum-likelihood" allele frequency estimates, we never get a frequency of 0, since there is always a very small probability of that site nt being fixed. THis is why we chose sites with very low allele frequencies (i.e. less than 0.001). 
+
 #Create a new table that includes only the sites we identified as fixed and write out as a file called. we only need the chromosome and position of these sites, so we only write out the first two columns.
+
+
 fixedSites=freq[fixed,]
 write.table(fixedSites[,1:2], file="OutgroupFixedSites.txt", quote=F, row.names=F, col.names=F, sep='\t')
 
 #End R session
+
 q()
 ```
-Our "good" sites are now in a file called `OutgroupFixedSites.txt`
-<br><br>
-<b>Question 4:</b> In your own words, explain how we defined what the ancestral allele is at each site, and how we chose the sites where we can do this .
+Our "good" sites are now in a file called `OutgroupFixedSites.txt`. To help Angsd access these regions quicnkly we need to, again, create an index. 
+```
+angsd sites index OutgroupFixedSites.txt
+```
+
+<b>Question 4:</b> In your own words, explain how we defined what the ancestral allele is at each site, and how we chose the sites where we can do this confidently.
 
 <b>SFS Estimation using Maximum Likelihood</b>
 
-It is finally time to estimate our SFS frequencies. The first step is to go over all the genotyped sites and calculate the likelihood of all possible SFS at each site.
+It is finally time to estimate our SFS frequencies. The first step is to go over all our sites and calculate the likelihood of each site belonging to each possible SFS bin.
 
 ```bash
-angsd -b "$lists"/outgroup.filelist -ref $ref -rf chr1-3.txt -GL 1 -out outgroup -doMajorMinor 1 -doMaf 1 -P 4 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
+angsd -b "$lists"/ingroup.filelist -GL 1 -anc $ancestral -ref $ref -sites OutgroupFixedSites.txt -rf chr1-3.txt -dosaf 1 -out L_amer -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 ```
+In addition to the flags you have already seen, there are a couple of new ones. <br><br>
 
-
-
+The `-anc` specifies the file containing the "ancestral" genome.<br>
+   `-sites` points to a file containing the sites to which our analysis will be restricted.<br>
+   `-dosaf` asks Angsd to generate allele counts at each site and estimate their likelihood for each SFS bin.
 <br><br>
    The command will take about 30 minutes to run. Since you may not want to wait this long, feel free to cancel the run (`ctrl+C`) and copy the output of this step into your directory: `cp /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/L_amer.saf.* .`
    
