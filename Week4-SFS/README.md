@@ -76,7 +76,7 @@ n=20
 Theta_W=sum(SFS)/sum(1/1:(n-1))
   
 > Theta_W
-[1] 281.8696
+[1] 5020.38
 ```
 --->
 
@@ -107,7 +107,7 @@ So overall it seems like our Theta estimators are relatively close to the expect
 
 ## Using Real Data
   
-Now lets estimate teh SFS from some real data. We will again use the snowshoe hare sequences that we worked with on Week 3. In the interest of time, the reads for 6 snowshoe hares and two individuals from outgroup species (more on this below) have already been mapped back to the snowshoe hare genome. The procedure used for this was very similar to what we did on Week 3. Below is an example of the code used for one file, in case you find it useful.
+Now lets estimate teh SFS from some real data. We will again use data from the snowshoe hare system that we worked with on Week 3, but instead of using sequences enriched  for the region around a single gene, we will use sequences enriched for the entire exome. In the interest of time, the reads for 6 snowshoe hares and two individuals from outgroup species (more on this below) have already been mapped back to the snowshoe hare genome. The procedure used for this was very similar to what we did on Week 3. Below is an example of the code used for one file, in case you find it useful.
 <br><br>
 <b>Download, trim, and QC reads</b>
   
@@ -165,7 +165,7 @@ Fortunately, there is a pretty good phylogeny of hares available, and exome-enri
 
 <img src="../Images/HareTree.png" width="500">
    
-Reads from one individual of each species have already been mapped to the European hare genome as detailed above. 
+Reads from one individual of each species have already been mapped to the European hare genome as detailed above. A single individual was used in teh interest of time. However, when available, it is advisable to use multiple individuals per outgroup species. 
 <br><br>
 
 Sign into Greatlakes as we did last time, create a directory named `Week4`, move into it (`cd Week4`) and request a job. This time around we will need some more memory, and we'll again ask for 4 cores. 
@@ -177,37 +177,50 @@ salloc --account eeb401s002w24_class --time 1:30:00 --mem 48G --tasks-per-node 4
 Lets first load the necessary modules, and create some variables to make our code tidyer. The variables just include the long <i>paths</i> to the folders where many of our files of interest will be found. 
 
 ```bash
-   module load Bioinformatics angsd R
+module load Bioinformatics angsd samtools R
 
 ## Set some directories as variables
 
 ref=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/ReferenceGenomes/GCF_033115175.1_mLepTim1.pri_genomic.fna
 lists=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W4/lists
-bams=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W4/
+bams=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W4/bams
 
 ```
 Type `ls $bams`. What do you see in there?
 <br><br>
 
-As mentioned above, the first step is to make our best guess about ancestral alleles. We can use read mappings from our outgroup to do this, and generate an "ancestral" genome sequence in `Angsd`. This "ancestral" genome looks just like the actual European hare reference genome, but has our best guess for the ancestral allele at each position. All Angsd does is go site by suite along the reference and pick the most frequent base across our outgroup samples at each site. This procedure takes around 15 minutes with our two outgroup samples, and only needs to be run once, so it has already been run for you using the code below.  
+As mentioned above, the first step is to make our best guess about ancestral alleles. We can use read mappings from our outgroup to do this, and generate an "ancestral" genome sequence in `Angsd`. This "ancestral" genome looks just like the actual European hare reference genome, but has our best guess for the ancestral allele at each position. All Angsd does is go site by suite along the reference and pick the most frequent base across our outgroup sample reads at each site. This procedure takes around 15 minutes with our two outgroup samples, and only needs to be run once, so it has already been run for you using the code below.  
 
 ```
 angsd -b "$lists"/outgroup.filelist -ref $ref -doCounts 1 -doFasta 2 -out ancestral -P 4
+samtools faidx ancestral.fa
 ``` 
+The first command should save a file called `ancestral.fa`, for which we then create an <i>index</i> using `samtools`. The index of a fasta file is just a that table allows programs to access specific regions of the fasta quickly (i.e. without reading the entire file first). To make using this file easier create a variable with its path.
+```
+ancestral=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W4/ancestral.fa
+```
+Finally, before begining SFS estimation we need to find the specific sites where we trust our ancestral state inferences. I have defined these sites as those where: both outgorup individuals (which are each from a different species) are homozygotes for the same base. An easy way to find these sites is to calculate allele frequencies for our outgroup across the genome, and identify sites that are fixed (i.e. minor allele frequency = 0), and genotyped for  both individuals.
+<br><br>
+In the interest of time, we will only use data from the first three chromosomes. To ask `Angsd` to do this, we need use a <i>regions file</i>, which is just a list of the chromosomes we want to focus on. Copy it to your current directory using `cp /scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W4/chr1-3.txt .`. 
+<br><br>
+Now estimate allele frequencies:
+```bash
+angsd -b "$lists"/outgroup.filelist -ref $ref -rf chr1-3.txt -GL 1 -out outgroup -doMajorMinor 1 -doMaf 1 -P 4 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 
+<b>SFS Estimation using Maximum Likelihood</b>
 
-OK, time to estimate our SFS frequencies. The first step is to go over all the genotyped sites and calculate the likelihood of all possible SFS at each site.
+It is finally time to estimate our SFS frequencies. The first step is to go over all the genotyped sites and calculate the likelihood of all possible SFS at each site.
 
 ```bash
-angsd -b "$lists"/ingroup.filelist -GL 1 -anc ancestral.fa -ref $ref -sites OutgroupFixedSites.txt -rf OutgroupFixed_chr.txt -dosaf 1 -out L_amer -baq 1 -C 50 -minMapQ 20 -minQ 20 -remove_bads 1 -only_proper_pairs 1 -doMajorMinor 1 -doHWE 1 -minHWEpval 0.001
+angsd -b "$lists"/outgroup.filelist -ref $ref -rf chr1-3.txt -GL 1 -out outgroup -doMajorMinor 1 -doMaf 1 -P 4 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 ```
 
 Lets unpack this command a little. <br><br>
 
 The `-b` flag tells Angsd to use the bam files in a list that can be found at "$lists"/ingroup.filelist<br>
-   `-GL` specifies the specific equation to ge used for genotypel likelihood calculations. <br>
-   `-anc` provides our "ancestral" reference geomne.<br>
    `-ref` provides the reference geomne to which we mapped our reads.<br>
+   `-GL` specifies the specific equation to ge used for genotypel likelihood calculations. <br>
+   `-doMajorMinor` .<br>
    `-sites` points to a file that contains information on the sites that were identical between both outgroup species, and asks Angsd to onoy look at these sites. <br>
    `-rf` gives a file with the regions that include the "good" sites (see previous flag). This speeds up the process by letting Angsd know where to look for these sites. <br>
    `-dosaf 1` tells Angsd to calculate site allele frequencies and their associated likelihoods.<br>
