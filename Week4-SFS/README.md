@@ -268,25 +268,26 @@ The `-anc` specifies the file containing the "ancestral" genome.<br>
    `-sites` points to a file containing the sites to which our analysis will be restricted.<br>
    `-dosaf` asks Angsd to generate allele counts at each site and estimate their likelihood for each SFS bin.
 <br><br>
-   The command will take about 30 minutes to run. Since you may not want to wait this long, feel free to cancel the run (`ctrl+C`) and copy the output of this step into your directory: `cp /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/L_amer.saf.* .`
-   
-   Now that we have our counts, we can try to find the most likely SFS. Angsd comes with an auxiliary program that maximizes the likelihood of the SFS, called realSFS. We can ask it to run for at most 200 iterations while trying to find the best SFS. 
+Now that we have our counts, we can try to find the most likely SFS. Angsd comes with an auxiliary program that finds the maximum-likelihood SFS given the counts and likelihoods we estimated previously, called `realSFS`. 
    
    ```bash 
-   realSFS -maxIter 200 L_amer.saf.idx > L_amer.ml.sfs.txt
+   realSFS L_amer.saf.idx > L_amer.ml.sfs.txt
    ```
-Download the file called L_amer.ml.sfs.txt to the desktop as we did last time. You can read it into R using `sfs<-scan("L_amer.ml.sfs.txt"), and plot it as we did above. Note that this SFS has 13 entries, as it includes values for fixed sites both at the ancestral (first entry) and derived (last entry) allele. You may want to plot values 2-12. <br>
+Download the file called L_amer.ml.sfs.txt to the desktop as we did last time. You can read it into R using `sfs<-scan("L_amer.ml.sfs.txt"), and plot it as we did above. Note that this SFS has 13 entries, as it includes values for fixed sites both at the ancestral (first entry) and derived (last entry) allele. You should focus on values 2-12, which correspond to $\eta_1 - \eta_{11}$. <br>
 <br>
-How does the SFS look? Does it seem real?
+
+<b>Question 5a:</b> Plot your SFS. Does it seem to match the expected SFS under the standard neutral model?<br> 
+Hint:You can plot the expected SFS by estimating $\theta$ from your observed SFS, and using it to generate the expected SFS. $\theta_W$ and $\theta_{\pi}$ usually work best for this.<br>
+<b>Question 5b:</b> Calculate the three $\theta\ estimators that we have covered in class. How do they compare? How would you explain the differences, both in terms of SFS shape and biologically?
 <br><br>
    <b>What if we can't confidently infer the ancestral allele</b><br><br>
    
-   I'm sure you can imagine several situations in which infering ancestral bases confidently may be difficult or problematic. In those cases, we can use a version of the SFS often called the <i>folded</i> or <i>minor</i> allele frequency spectrum. It is still a frequency spectrum, but uses the frequency of the minor (ie least comon) allele, regardless of which one is ancestral. Therefore, for n samples it goes from 1 to (n/2), instead of 1 to n. We can obtain this spectrum from the unfolded (ie. regular) SFS by just adding $\eta_i+\eta_{n-i}$. For example, for 10 samples, sites with 1 derived alleles get added to sites with 9 derived alleles, since in both cases the least common allele is at frequency 0.1. <br><br>
+   I'm sure you can imagine several situations in which infering ancestral bases confidently may be difficult or problematic. As mentioned in class, in those cases, we can use a version of the SFS often called the <i>folded</i> or <i>minor</i> allele frequency spectrum. It is still a frequency spectrum, but uses the frequency of the minor (ie least comon) allele, regardless of which one is ancestral. Therefore, for n samples it goes from 1 to (n/2), instead of 1 to n. We can obtain this spectrum from the unfolded (ie. regular) SFS by just adding $\eta_i+\eta_{n-i}$. For example, for 10 samples, sites with 1 derived alleles get added to sites with 9 derived alleles, since in both cases the least common allele is at frequency 0.1. <br><br>
    
-   We can easily produce a folded spectrum on reafSFS by just adding the `-fold 1` flag. 
+   We can easily estimate a folded spectrum on reafSFS by just adding the `-fold 1` flag. 
    
    ```bash
    
-  realSFS -maxIter 200 -fold 1 L_amer.saf.idx > L_amer.ml.folded.sfs.txt
+  realSFS -fold 1 L_amer.saf.idx > L_amer.ml.folded.sfs.txt
 ```
-   Does this look better?
+   <b>Question 6:</b> Plot your unfolded and folded SFS alongside each other. Does the latter look like the folded version of the former? Explain. 
