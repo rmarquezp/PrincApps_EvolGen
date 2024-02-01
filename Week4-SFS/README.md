@@ -107,42 +107,58 @@ So overall it seems like our Theta estimators are relatively close to the expect
 
 ## Using Real Data
   
-Now lets estimate teh SFS from some real data. We will again use the snowshoe hare sequences that we worked with on Week 3. In the interest of time, the reads for 6 snowshoe hares and two individuals from outgroup species (more on this below) have already been mapped back to the snowshoe hare genome. The procedure used for this was very similar to what we did on Week 3, with the only difference being that duplicated reads were marked after mapping, so that the programs that we will use in downstream analyses know to treat duplicates as such. Below is an example of the code used for one file:
+Now lets estimate teh SFS from some real data. We will again use the snowshoe hare sequences that we worked with on Week 3. In the interest of time, the reads for 6 snowshoe hares and two individuals from outgroup species (more on this below) have already been mapped back to the snowshoe hare genome. The procedure used for this was very similar to what we did on Week 3. Below is an example of the code used for one file, in case you find it useful.
+<br><br>
+<b>Download, trim, and QC reads</b>
   
   ``` bash
   
-module load Bioinformatics sratoolkit bwa samtools picard-tools
-  
-## Download file
-  
-prefetch SRR11020246; fasterq-dump SRR11020246
-  
-## Quality-trim the reads
-  
-skewer -o SRR11020246 -t 4 SRR11020246_1.fastq SRR11020246_2.fastq
-  
-## Map and sort. Note that we are doing both steps in a single line of code. 
-ref=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/LepAme_RefGenome_GCA_004026855.1.fa
+#Set variables for the number of threads, memory, and sample name
+threads=8
+mem=2G
+sample=SRR6485258
 
-bwa mem -t 8 $ref SRR11020246-trimmed-pair1.fastq SRR11020246-trimmed-pair2.fastq | samtools sort -O BAM -@  4 -o SRR11020246.sorted.bam
+#Download and dump reads. Note how we gave it more memory and threads so it goes faster
+prefetch $sample
+fasterq-dump -m $mem -e $threads $sample
 
-  
-## Add some info to the file prior to duplicate marking 
-PicardCommandLine AddOrReplaceReadGroups I=SRR11020246.sorted.bam O=SRR11020246.sorted.RG.bam SORT_ORDER=coordinate RGLB="$ref" RGPU=NONE RGSM=SRR11020246 RGID=SRR11020246 RGPL=Illumina VALIDATION_STRINGENCY=LENIENT
+## Clean reads
+../software/skewer/skewer -o $sample -t $threads -q 30 -l 36 "$sample"_1.fastq "$sample"_2.fastq
 
+#Always good manners to compress our files
+gzip "$sample"-trimmed-pair1.fastq & gzip "$sample"-trimmed-pair2.fastq
 
-# Mark duplicates
-PicardCommandLine MarkDuplicates I=SRR11020246.sorted.RG.bam O=SRR11020246.sorted.deduped.bam M=SRR11020246.dupMetrics.txt AS=true CREATE_INDEX=true MAX_FILE_HANDLES=1000 VALIDATION_STRINGENCY=LENIENT REMOVE_DUPLICATES=false
+## fastqc
 
-# Remove intermediate files
-rm SRR11020246.sorted.RG.bam
-rm SRR11020246.sorted.bam
+fastqc --threads $threads "$sample"-trimmed-pair*.fastq.gz
+
+``` 
+<b>Map back to the genome</b> (if reads look nice and clean). 
+
+```bash
+#!/bin/bash
+
+module load Bioinformatics bwa samtools
+
+threads=8
+sample=SRR6485258
+
+#set variable for the reference genome
+ref=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/ReferenceGenomes/GCF_033115175.1_mLepTim1.pri_genomic.fna
+
+#Map. Note how instead of running each step separately we "pipe" the output of one command into the next using the | symbol.
+#This saves time and storage space, since the computer doesn't need to write intermediate files. 
+
+bwa mem -t $threads $ref "$sample"-trimmed-pair1.fastq.gz "$sample"-trimmed-pair2.fastq.gz | samtools fixmate -m - - | samtools sort -@ $threads - | samtools markdup -@ $threads -O bam - "$sample".sort.mkdup.bam
+
+samtools index "$sample".sort.mkdup.bam
+samtools flagstat "$sample".sort.mkdup.bam > $sample.flagstat.txt
 ```
 <br><br><br>
    
- We are now ready to go. Sign into the Greatlakes cluster as we did last time, create a directory named `Week4`, move into it (`cd Week4`) and request a job. This time around we will need some more memory. 
+All of our samples had >99% read mapping and relatively low (~5-10%) duplication levels. We are now ready to go. Sign into the Greatlakes cluster as we did last time, create a directory named `Week4`, move into it (`cd Week4`) and request a job. This time around we will need some more memory, and we'll again ask for 4 cores. 
 ```bash
-salloc --account eeb401s002f22_class --time 1:30:00 --mem 48G --tasks-per-node 1
+salloc --account eeb401s002w24_class --time 1:30:00 --mem 48G --tasks-per-node 4
 ```
    
 <b> What is the ancestral allele though?</b>
