@@ -56,19 +56,21 @@ $$\hat{\theta}_{FL}=\eta_1$$
 ```R
 Theta_FL=SFS[1]
 
-> ThetaFL
-[1] 309
+Theta_FL
+[1] 5088
 ```
 
-Pretty close, now lets calculate Watterson's estimator, which is equal to the number of segregating sites controlled by sample size:
+Pretty close! Now lets calculate Watterson's estimator, which is equal to the number of segregating sites controlled by sample size:
 
 $$\hat{\theta}_{W} = \frac{S}{\sum\frac{1}{i}} = \frac{\sum \eta_i}{\sum\frac{1}{i}}$$ 
 
-Try to write this one out on your own. What answer do you get?
+<b>Question 3:</b> Try to write this one out on your own. Provide your code and answer in your report. 
 
 <details>
-   <summary> Click here to see the answer</summary>
+   <summary> Click here to see the answer (without code)</summary>
+   $$\theta_W=5020.38$$
 
+<!---
 ```R
 n=20
 Theta_W=sum(SFS)/sum(1/1:(n-1))
@@ -76,15 +78,16 @@ Theta_W=sum(SFS)/sum(1/1:(n-1))
 > Theta_W
 [1] 281.8696
 ```
+--->
 
 </details>
-  
+
 Finally, lets calculate Tajima's estimator. Try to do this one on your own as well. It is a bit more complicated, since you'll have to use a loop, but it is worth giving it a try. 
 ```math
 \hat{\theta}_{\pi}= \frac{\sum d_{i,j}}{n(n-1)\big{/}2}=\frac{\sum i(n-i)\eta_i}{n(n-1)\big{/}2}
 ```
 <details>
-   <summary> Click here to see the answer</summary>
+   <summary> Click here to see the answer (with code)</summary>
 
 ```R
 n=20
@@ -94,13 +97,13 @@ for(i in 1:(n-1)){dist[i]=i*(n-i)*SFS[i]}
 
 Theta_pi=sum(dist)/((n*(n-1)/2))
   
-> Theta_pi
-[1] 277.1421
+Theta_pi
+[1] 4969.742
 ```
 
 </details>
 
-So overall it seems like our Theta estimators are relatively close to the expected value. 
+So overall it seems like our Theta estimators are relatively close to the expected value. It is nice when simulations behave like the model that generated them :-).  
 
 ## Using Real Data
   
