@@ -189,7 +189,7 @@ bams=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W4/bams
 Type `ls $bams`. What do you see in there?
 <br><br>
 
-As mentioned above, the first step is to make our best guess about ancestral alleles. We can use read mappings from our outgroup to do this, and generate an "ancestral" genome sequence in `Angsd`. This "ancestral" genome looks just like the actual European hare reference genome, but has our best guess for the ancestral allele at each position. All Angsd does is go site by suite along the reference and pick the most frequent base across our outgroup sample reads at each site. This procedure takes around 15 minutes with our two outgroup samples, and only needs to be run once, so it has already been run for you using the code below.  
+As mentioned above, the first step is to make our best guess about ancestral alleles. We can use read mappings from our outgroup to do this, and generate an "ancestral" genome sequence in `Angsd`. This "ancestral" genome looks just like the actual European hare reference genome, but has our best guess for the ancestral allele at each position. All Angsd does is go site by suite along the reference and pick the most frequent base across our outgroup sample reads at each site. This procedure takes around 15 minutes with our two outgroup samples, and only needs to be run once, so it has already been run for you using the code below (i.e. *don't run the code below*).  
 
 ```
 angsd -b "$lists"/outgroup.filelist -ref $ref -doCounts 1 -doFasta 2 -out ancestral -P 4
@@ -201,11 +201,52 @@ ancestral=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W4/a
 ```
 Finally, before begining SFS estimation we need to find the specific sites where we trust our ancestral state inferences. I have defined these sites as those where: both outgorup individuals (which are each from a different species) are homozygotes for the same base. An easy way to find these sites is to calculate allele frequencies for our outgroup across the genome, and identify sites that are fixed (i.e. minor allele frequency = 0), and genotyped for  both individuals.
 <br><br>
-In the interest of time, we will only use data from the first three chromosomes. To ask `Angsd` to do this, we need use a <i>regions file</i>, which is just a list of the chromosomes we want to focus on. Copy it to your current directory using `cp /scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W4/chr1-3.txt .`. 
-<br><br>
+In the interest of time, we will only use data from the first three chromosomes. To ask `Angsd` to do this, we need use a <i>regions file</i>, which is just a list of the chromosomes we want to focus on. Copy it to your current directory using 
+```
+cp /scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W4/chr1-3.txt . 
+```
 Now estimate allele frequencies:
 ```bash
 angsd -b "$lists"/outgroup.filelist -ref $ref -rf chr1-3.txt -GL 1 -out outgroup -doMajorMinor 1 -doMaf 1 -P 4 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
+```
+Lets unpack this command a little. <br><br>
+
+The `-b` flag tells Angsd to use the bam files in a list that can be found at "$lists"/outgroup.filelist<br>
+   `-ref` provides the reference geomne to which we mapped our reads.<br>
+   `-GL` specifies the specific equation to ge used for genotypel likelihood calculations. <br>
+   `-doMajorMinor` asks Angsd to identify the major (i.e. most common) and minor (i.e. least common) allele at each site.<br>
+   `-doMaf` asks Angsd to estimate allele frequencies. <br>
+   `-rf` gives a file with the regions that we will focus on. <br>
+   `-out` Specifies the name of the output files.<br>
+   <br>
+After this there are multiple flags aimed at removing data that isn't in great shape, for example by setting minimum base and mapping quality thesholds, removing reads that don't map too well, and removing read pairs that don't map to the same chromosome.
+
+Now, we can use `R` to process our allele frequency data. The `Angsd` output is probably several million rows long, so we will be using the package `readr`, which helps R process big datasets more efficiently.
+<br><br>
+To start an `R` session on the cluster simply type `R` and hit enter. Once that opens run the following commands:
+```R
+library(readr)
+
+freq=read_delim("outgroup.mafs.gz", col_names=T, delim='\t')
+
+head(freq) #Should have 7 columns
+
+# Find sites where the minor allele freq. is very small (i.e. effectively zero), and where both individuals were genotyped
+# Note1: the allele frequency is called knownEM, since it was estimated from genotype likelihoods using an algorithm called "Expectation Maximization"
+# Note2: since these are "maximum-likelihood" allele frequency estimates, we never get a frequency of 0, since there is always a very small probability of that site nt being fixed. THis is why we chose sites with very low allele frequencies (i.e. less than 0.001). 
+
+fixed=which(freq$knownEM<0.001 & freq$nInd==2)
+
+#Create a new table that includes only the sites we identified as fixed and write out as a file called. we only need the chromosome and position of these sites, so we only write out the first two columns.
+fixedSites=freq[fixed,]
+write.table(fixedSites[,1:2], file="OutgroupFixedSites.txt", quote=F, row.names=F, col.names=F, sep='\t')
+
+#End R session
+q()
+```
+Our "good" sites are now in a file called `OutgroupFixedSites.txt`
+<br><br>
+<b>Question 4:</b> In your own words, explain how we defined what the ancestral allele is at each site, and how we chose the sites where we can do this .
 
 <b>SFS Estimation using Maximum Likelihood</b>
 
@@ -215,18 +256,7 @@ It is finally time to estimate our SFS frequencies. The first step is to go over
 angsd -b "$lists"/outgroup.filelist -ref $ref -rf chr1-3.txt -GL 1 -out outgroup -doMajorMinor 1 -doMaf 1 -P 4 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 ```
 
-Lets unpack this command a little. <br><br>
 
-The `-b` flag tells Angsd to use the bam files in a list that can be found at "$lists"/ingroup.filelist<br>
-   `-ref` provides the reference geomne to which we mapped our reads.<br>
-   `-GL` specifies the specific equation to ge used for genotypel likelihood calculations. <br>
-   `-doMajorMinor` .<br>
-   `-sites` points to a file that contains information on the sites that were identical between both outgroup species, and asks Angsd to onoy look at these sites. <br>
-   `-rf` gives a file with the regions that include the "good" sites (see previous flag). This speeds up the process by letting Angsd know where to look for these sites. <br>
-   `-dosaf 1` tells Angsd to calculate site allele frequencies and their associated likelihoods.<br>
-   `-out` Specifies the name of the output files.<br>
-   <br>
-   After this there are multiple flags aimed at removing data that isn't in great shape, for example by setting minimum base quality thesholds, using only sites that don't deviate too much from HWE, or removing reads that don't map too well. 
 
 <br><br>
    The command will take about 30 minutes to run. Since you may not want to wait this long, feel free to cancel the run (`ctrl+C`) and copy the output of this step into your directory: `cp /scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/L_amer.saf.* .`
