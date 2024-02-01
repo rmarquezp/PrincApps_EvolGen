@@ -107,7 +107,11 @@ So overall it seems like our Theta estimators are relatively close to the expect
 
 ## Using Real Data
   
-Now lets estimate teh SFS from some real data. We will again use data from the snowshoe hare system that we worked with on Week 3, but instead of using sequences enriched  for the region around a single gene, we will use sequences enriched for the entire exome. In the interest of time, the reads for 6 snowshoe hares and two individuals from outgroup species (more on this below) have already been mapped back to the snowshoe hare genome. The procedure used for this was very similar to what we did on Week 3. Below is an example of the code used for one file, in case you find it useful.
+Now lets estimate teh SFS from some real data. We will again use data from the snowshoe hare system that we worked with on Week 3, but instead of using sequences enriched  for the region around a single gene, we will use sequences enriched for the entire exome. 
+
+<b>Question 4:</b> Last practical we used sequences enriched for the region surrounding the <i>Agouti</i> gene, which is involved in the molt snowshoehares experience when changing between their white winter coat and brown summer coat. Different <i>Agouti</i> alleles are associated with the ability to molt coats. Would these data be a good choice if we wanted to interpret the SFS based on the Wright Fisher (or other neutral) model?
+
+In the interest of time, the reads for 6 snowshoe hares and two individuals from outgroup species (more on this below) have already been mapped back to the snowshoe hare genome. The procedure used for this was very similar to what we did on Week 3. Below is an example of the code used for one file, in case you find it useful.
 <br><br>
 <b>Download, trim, and QC reads</b>
   
@@ -253,7 +257,7 @@ Our "good" sites are now in a file called `OutgroupFixedSites.txt`. To help Angs
 angsd sites index OutgroupFixedSites.txt
 ```
 
-<b>Question 4:</b> In your own words, explain how we defined what the ancestral allele is at each site, and how we chose the sites where we can do this confidently.
+<b>Question 5:</b> In your own words, explain how we defined what the ancestral allele is at each site, and how we chose the sites where we can do this confidently.
 
 <b>SFS Estimation using Maximum Likelihood</b>
 
@@ -276,9 +280,9 @@ Now that we have our counts, we can try to find the most likely SFS. Angsd comes
 Download the file called L_amer.ml.sfs.txt to the desktop as we did last time. You can read it into R using `sfs<-scan("L_amer.ml.sfs.txt"), and plot it as we did above. Note that this SFS has 13 entries, as it includes values for fixed sites both at the ancestral (first entry) and derived (last entry) allele. You should focus on values 2-12, which correspond to $\eta_1 - \eta_{11}$. <br>
 <br>
 
-<b>Question 5a:</b> Plot your SFS. Does it seem to match the expected SFS under the standard neutral model?<br> 
+<b>Question 6a:</b> Plot your SFS. Does it seem to match the expected SFS under the standard neutral model?<br> 
 Hint:You can plot the expected SFS by estimating $\theta$ from your observed SFS, and using it to generate the expected SFS. $\theta_W$ and $\theta_{\pi}$ usually work best for this.<br>
-<b>Question 5b:</b> Calculate the three $\theta\ estimators that we have covered in class. How do they compare? How would you explain the differences, both in terms of SFS shape and biologically?
+<b>Question 6b:</b> Calculate the three $\theta\ estimators that we have covered in class. How do they compare? How would you explain the differences, both in terms of SFS shape and biologically?
 <br><br>
    <b>What if we can't confidently infer the ancestral allele</b><br><br>
    
@@ -290,4 +294,4 @@ Hint:You can plot the expected SFS by estimating $\theta$ from your observed SFS
    
   realSFS -fold 1 L_amer.saf.idx > L_amer.ml.folded.sfs.txt
 ```
-   <b>Question 6:</b> Plot your unfolded and folded SFS alongside each other. Does the latter look like the folded version of the former? Explain. 
+   <b>Question 7:</b> Plot your unfolded and folded SFS alongside each other. Does the latter look like the folded version of the former? Explain. 
