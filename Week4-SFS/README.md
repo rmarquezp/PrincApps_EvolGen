@@ -44,7 +44,7 @@ expSFS=5000/1:19
 --->
 Now lets plot our observed and expected SFS alongside each other. 
 ```R
-expSFS="insert your code here"
+expSFS=[insert your code here]
 ObsExp=matrix(c(expSFS,SFS), nrow=2, byrow=T)
 
 ## Plot. Real good match!
