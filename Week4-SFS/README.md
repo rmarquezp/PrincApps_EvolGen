@@ -282,7 +282,7 @@ Download the file called L_amer.ml.sfs.txt to the desktop as we did last time. Y
 
 <b>Question 6a:</b> Plot your SFS. Does it seem to match the expected SFS under the standard neutral model?<br> 
 Hint:You can plot the expected SFS by estimating $\theta$ from your observed SFS, and using it to generate the expected SFS. $\theta_W$ and $\theta_{\pi}$ usually work best for this.<br>
-<b>Question 6b:</b> Calculate the three $\theta\ estimators that we have covered in class. How do they compare? How would you explain the differences, both in terms of SFS shape and biologically?
+<b>Question 6b:</b> Calculate the three $\theta estimators that we have covered in class. How do they compare? How would you explain the differences, both in terms of SFS shape and biologically?
 <br><br>
    <b>What if we can't confidently infer the ancestral allele</b><br><br>
    
