@@ -68,7 +68,7 @@ library(ape)
 tree=read.nexus("MI_Covid.aln.100random.tre")
 plot(tree, direction="downwards", show.tip.label=F)
 ```
-<b>Question 3:</b> What do you see? Does this coincide with the skyline plot? Explain your reasoning
+<b>Question 3:</b> What do you see? Does this coincide with the skyline plot? Explain your reasoning.
 <br>
 <!---  
 <details>
@@ -81,14 +81,14 @@ plot(tree, direction="downwards", show.tip.label=F)
 --->
 ## Estimating Parameters from the SFS
 
-We will now switch gears and move on to demographic inference using the SFS produced from genotypes at multiple loci across the genome. For this we will focus on a population of Monarch butterflies (<i>Danaus plexippus</i>), from the state of Hawaii. This population is thought to have recently become established int the Hawaiian islands after dispersing from mainland North America. 
+We will now switch gears and move on to demographic inference using the SFS produced from genotypes at multiple loci across the genome. For this we will focus on a population of Monarch butterflies (<i>Danaus plexippus</i>), from the state of Hawaii. This population is thought to have recently become established int the Hawaiian islands after dispersing from mainland North America. Zhan et al ([2014](https://www.nature.com/articles/nature13812#Sec19)) sequenced whole genomes of several individuals from this population, which were used to estimate an SFS as we did in the Week 4 practical. You can find the estimated SFS on Canvas (D_plexi.ml.sfs.txt). 
+
 <img src="https://dbg.org/wp-content/uploads/2016/10/Monarch.jpg" width="600">
 
-We will investigate their demographic history by fitting a piecewise 
+Before jumping into complex optimization algorithms, lets 
 
-<i>Drosophila sechellia</i>, a fruit fly species endemic to the Seychelles archipelago. This species is thought to have recently colonized the Seychelles, where it is abundant now, so we are interested in whether it has experienced a bottleneck in the process. To this end we will infer the SFS using Angsd and fastsimcoal2 for demographic inference. 
-<br><br>
-Log into greatlakes, and start a job that uses 8GB of memory and one task per node (ie. one processor). Now load the modules `Bioinformatics bcftools angsd`.
+We will investigate their demographic history by fitting a piecewise population size model with two population size changes, often referred to as the "bottleneck" model. 
+
 
 
 
