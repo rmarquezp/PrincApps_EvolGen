@@ -69,33 +69,28 @@ tree=read.nexus("MI_Covid.aln.100random.tre")
 plot(tree, direction="downwards", show.tip.label=F)
 ```
 <b>Question 3:</b> What do you see? Does this coincide with the skyline plot? Explain your reasoning.
-<br>
-<!---  
-<details>
-  <summary> Click here to see the tree</summary>
-  <img src="../Images/CovidGenealogy.png" width="600">
-  <br>
- The long branches towards the tips are what we'd expect under a pretty big expansion like the one on the skyline plot!. 
 
-</details>
---->
 ## Estimating Parameters from the SFS
 
 We will now switch gears and move on to demographic inference using the SFS produced from genotypes at multiple loci across the genome. For this we will focus on a population of Monarch butterflies (<i>Danaus plexippus</i>), from the state of Hawaii. This population is thought to have recently become established int the Hawaiian islands after dispersing from mainland North America. Zhan et al ([2014](https://www.nature.com/articles/nature13812#Sec19)) sequenced whole genomes of several individuals from this population, which were used to estimate an SFS as we did in the Week 4 practical. You can find the estimated SFS on Canvas (D_plexi.ml.sfs.txt). 
 
+<br>
 <img src="https://dbg.org/wp-content/uploads/2016/10/Monarch.jpg" width="600">
+<br>
 
 Before jumping into complex optimization algorithms, lets explore our SFS. Download the file, and plot it algonside the expected SFS (which you can calculate using e.g. $\theta_W$). 
 
 <b>Question 4a:</b> How do the observed and expected SFS compare? What does this suggest about the demographic history of our focal population?<br>
 <b>Question 4b:</b> Use the observed SFS to caculate the numerator of Tajima's D. Does it agree with your results from 4a? Explain.
 
-<b>Parameter estimation in fastsimcoal</b>
+<b>Setting up a fastsimcoal run</b>
 
 We will now investigate further the demographic history of the Hawaiian <i>D. plexippus</i> by fitting a piecewise population size function with two instantaneous changes, often referred to as a "bottleneck" model. Our specific model, illustrated below, has five parameters: The population sizes in the present ($N_{CUR}$), durring the bottleneck ($N_{BOT}$), and before the bottleneck ($N_{A}$), and the times when population changed ($T_{BOT}$ and $T_{ENDBOT}$).
+
 <br>
 <img src="../Images/FSC_BOT.png" width="300">
 <br>
+
 The first thing we need to do is to convert our SFS to a format that fastsimcoal can read. This entails 1. adding a header, and 2, moving all sites in the "fixed derived" category to "fixed ancestral". This is done because in fastsimcoal simulations any mutation that is fixed must have ocurred prior to the MRCA of the sample, and is therefore considered ancestral. As this is a simple procedure, it has been done for you already. Below is the resulting file:
 
 ```
@@ -151,7 +146,10 @@ Finally, we need to give the algorithm some rules to optimize the likelihood of 
 0 RESENDBOT = NANC/NBOT hide
 1 TENDBOT   = TBOT+100  hide
 ```
-This file tells the algorithm the limits within which to sample our parameters (which are 10-100K for all the pop. sizes and 10-10K for the time to bottleneck), and specifies complex parameters, such as those that represent rations between parameters, or sumations of parameters. Notice, for example, how we specified $RES_{BIOT}$ and $RES_{ENDBOT}$ as ratios of population sizes. The last line of the file specifies that the time when the bottleneck began (or when it ended thinking backwards from the present) is 100 generations before (or after thinking backwards) the end (or begining) of the bottleneck. 
+This file tells the algorithm the distributions from which to sample our initial parameters (which are uniform between 10-100K for all the pop. sizes and 10-10K for the time to bottleneck), and specifies complex parameters, such as those that represent rations between parameters, or sumations of parameters. Notice, for example, how we specified $RES_{BIOT}$ and $RES_{ENDBOT}$ as ratios of population sizes. The last line of the file specifies that the time when the bottleneck began (or when it ended thinking backwards from the present) is fixed at 100 generations before (or after thinking backwards) the end (or begining) of the bottleneck. We do this, because it is often difficult to estimate both the duration and $N_e$ for a bottleneck event. Since branch lengths and coalescence rates depend on $N_e$, we could get very similar genealogies durring a a short, drastic, bottleneck and a long, milder one.  Instead, we can fix the duration, and estimate the <i>bottleneck intensity</i>, which can be expressed as the ratio of duration to effective population size: $I_B=\frac{T_B}{2{N_e}_B}$. 
+<br><br>
+
+<b> Running the parameter optimization</b>
 
 
 
