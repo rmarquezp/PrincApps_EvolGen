@@ -92,9 +92,10 @@ Before jumping into complex optimization algorithms, lets explore our SFS. Downl
 
 <b>Parameter estimation in fastsimcoal</b>
 
-We will now investigate further the demographic history of the Hawaiian <i>D. plexippus</i> by fitting a piecewise population size function with two instantaneous changes, often referred to as a "bottleneck" model. Our specific model has five parameters: The population sizes in the present ($N_{CUR}$), durring the bottleneck ($N_{BOT}$), and before the bottleneck ($N_{A}$), and the times when population changed ($T_{BOT}$ and $T_{ENDBOT}$).
-
-
+We will now investigate further the demographic history of the Hawaiian <i>D. plexippus</i> by fitting a piecewise population size function with two instantaneous changes, often referred to as a "bottleneck" model. Our specific model, illustrated below, has five parameters: The population sizes in the present ($N_{CUR}$), durring the bottleneck ($N_{BOT}$), and before the bottleneck ($N_{A}$), and the times when population changed ($T_{BOT}$ and $T_{ENDBOT}$).
+<br>
+<img src="../Images/FSC_BOT.png" width="300">
+The first thing we need to do is to convert our SFS to a format that fastsimcoal can read. 
 
 
 
