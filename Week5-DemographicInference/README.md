@@ -34,11 +34,12 @@ In the "Site Model" tab we will specify our mutation model (also known as a mode
 To specify this model on BEAUTi change the "Subst Model" item to "HKY", and endet "4" in the number of Gamma categories.<br> 
 
 <img src="/Images/SiteModelTab.png">
+
 <b>Question 1:</b> Why would an infinite-sites model not be a very good fit for this situation?
-<br>
-<br>The "Clock Model" tab deals with how we will callibrate our tree so that branches are in units of time. This can be done in two main ways: Either setting some of the nodes/tips to specific dates to estimate the mutation rate and the ages of the remaining nodes, or by assuming a mutation rate. We will use the mutation rate reported by Castillo Morales and collaborators ([2021](https://doi.org/10.1093/gbe/evab196)), who estimated a rate of ~0.0015 mutations per site per year (that is FAST!). Since months are a more appropriate time scale for our analyses, we will use $0.0015/12=0.000125$ mutations per site per month. Enter this rate into the text box. 
+
+<br>The "Clock Model" tab deals with how we will callibrate our tree so that branches are in units of time. This can be done in two main ways: Either setting some of the nodes/tips to specific dates to estimate the mutation rate and the ages of the remaining nodes, or by assuming a mutation rate. We will use the mutation rate reported by Castillo Morales and collaborators ([2021](https://doi.org/10.1093/gbe/evab196)), who estimated a rate of ~0.0015 mutations per site per year (that is FAST!). Since months are a more appropriate time scale for our analyses, we will use $\frac{0.0015}{12}=0.000125$ mutations per site per month. Enter this rate into the text box. 
   <br><br>
-We will be optimizing the parameters in our tree model using an algorithm known as Markov CHain Monte Carlo (MCMC), which is a Bayesian method. HTerefore, we must specify some of our prior beliefs about the data. WHile the analysis is running, we will briefly discuss this algorithm as a class. We can use most of the default priors, excepr for the one regarding the tree structure. The default is a Yule model, which describes a branching process more appropriate for modelling speciation than coalescence (ie. it is more adequate for phylogenetics). We will use a "Coalescent Bayesian Skyline," which models a coalescent genealogy with varying population size. 
+We will be optimizing the parameters in our tree model using an algorithm known as Markov CHain Monte Carlo (MCMC), which relies on Bayesian statistics. Therefore, we must specify some of our prior beliefs about our system. While the analysis is running, we will briefly discuss this algorithm as a class. We can use most of the default priors, excepr for the one regarding the tree structure. The default is a Yule model, which describes a branching process more appropriate for modelling speciation than coalescence (ie. it is more adequate for phylogenetics). We will use a "Coalescent Bayesian Skyline," which models a coalescent genealogy with varying population size. 
   <br><br>
   Finally, the "MCMC" tab deals with the technical aspects of our optimization algorithm. The default number of iterations (labelled as "Chain length" is 10,000,000. In the itnerest of time we will only run 5,000,000. Change the chain length to 5,000,000, and save you configuration file using File -> Save. 
   <br><br>
@@ -54,27 +55,22 @@ While the analysis runs, we will briefly go over how an MCMC algorith works.
   
   <b> Building the Skyline Plot</b>
 <br><br>
-When the analysis finishes running, open Tracer and load the log file from your run (e.g. `MI_Covid.aln.100random.log`). After your file loads, you should see the parameters of your model and some statistics regarding how well their ran durring the MCMC. We will briefly discuss the meaning of these parameters as a class before proceeding to generate our skyline plot. Once that is done, on the top menu bar go to "Analysis -> Bayesian Skyline Reconstruction". A new dialog box will open. On the "Trees Log" window select the "trees" file from your BEAST run (e.g. `MI_Covid.aln.100random.trees`). Leave teh rest of fields as defaults, except for the last text box, which asks for the age of the youngest sample. For the purposes of htis lab, we can enter an age of 9.5 months (ie. mid-September), to reflect the fact that our samples were collected throughout the month of September. Click "OK" and wait for the analysis to complete. A plot should appear. 
+When the analysis finishes running, open Tracer and load the log file from your run (e.g. `MI_Covid.aln.100random.log`). After your file loads, you should see the parameters of your model and some statistics regarding how well their ran durring the MCMC. We will briefly discuss the meaning of these parameters as a class before proceeding to generate our skyline plot. Once that is done, on the top menu bar go to "Analysis -> Bayesian Skyline Reconstruction". A new dialog box will open. On the "Trees Log" window select the "trees" file from your BEAST run (e.g. `MI_Covid.aln.100random.trees`). Leave teh rest of fields as defaults, except for the last text box, which asks for the age of the youngest sample. For the purposes of this lab, we can enter an age of 1.8 months (ie. late January), to reflect the fact that our samples were collected throughout the month of September. Click "OK" and wait for the analysis to complete. A plot should appear. 
 <br><br>
-What does the plot suggest about the history of Covid-19 in Michigan over the last few months? 
-<details>
-  <summary> Click here to see the plot</summary>
-  <img src="../Images/CovidSkyline.png" width="600">
-  There is a clear ~50-fold population expansion around the first few weeks of August. What may have happened around this time?
-</details>
-<br>
+<b>Question 2:</b> What does the plot suggest about the history of Covid-19 in Michigan over the last few months? How would you interpret this from a biological (e.g. epidemiological) perspective? Include your plot on the report. 
+
   <b> Obtaining the Genealogy </b> 
 <br><br>
 Lets now look at the genealogy of our samples. Being a Bayesian method, BEAST produces a set of "credible" trees. We can summarize these sets into a single "averaged" estimate using the TreeAnnotator program, also distributed with BEAST. Open this program, load your trees file, and pick a name for your new summary tree file. Leave the rest of fields as default and hit the "Run" button. Once the program is finished, you should find the tree fiel in your work directory. We can plot this tree in R.
   
 ```R
 library(ape)
-tree=read.nexus(""MI_Covid.aln.100random.tre")
+tree=read.nexus("MI_Covid.aln.100random.tre")
 plot(tree, direction="downwards", show.tip.label=F)
 ```
-What do you see? Does this coincide with the skyline plot?
+<b>Question 3:</b> What do you see? Does this coincide with the skyline plot? Explain your reasoning
 <br>
-  
+<!---  
 <details>
   <summary> Click here to see the tree</summary>
   <img src="../Images/CovidGenealogy.png" width="600">
@@ -82,12 +78,17 @@ What do you see? Does this coincide with the skyline plot?
  The long branches towards the tips are what we'd expect under a pretty big expansion like the one on the skyline plot!. 
 
 </details>
+--->
+## Estimating Parameters from the SFS
 
-<!---## Estimating Parameters from the SFS
+We will now switch gears and move on to demographic inference using the SFS produced from genotypes at multiple loci across the genome. For this we will focus on a population of Monarch butterflies (<i>Danaus plexippus</i>), from the state of Hawaii. This population is thought to have recently become established int the Hawaiian islands after dispersing from mainland North America. 
+<img src="https://dbg.org/wp-content/uploads/2016/10/Monarch.jpg" width="600">
 
-Lets now switch gears and move on to demographic inference using teh SFS produced from genotypes at multiple loci across the genome. For this we will be using data collected from <i>Drosophila sechellia</i>, a fruit fly species endemic to the Seychelles archipelago. This species is thought to have recently colonized the Seychelles, where it is abundant now, so we are interested in whether it has experienced a bottleneck in the process. To this end we will infer the SFS using Angsd and fastsimcoal2 for demographic inference. 
-# <br><br>
-# Log into greatlakes, and start a job that uses 8GB of memory and one task per node (ie. one processor). Now load the modules `Bioinformatics bcftools angsd`. -->
+We will investigate their demographic history by fitting a piecewise 
+
+<i>Drosophila sechellia</i>, a fruit fly species endemic to the Seychelles archipelago. This species is thought to have recently colonized the Seychelles, where it is abundant now, so we are interested in whether it has experienced a bottleneck in the process. To this end we will infer the SFS using Angsd and fastsimcoal2 for demographic inference. 
+<br><br>
+Log into greatlakes, and start a job that uses 8GB of memory and one task per node (ie. one processor). Now load the modules `Bioinformatics bcftools angsd`.
 
 
 
