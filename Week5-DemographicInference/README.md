@@ -85,9 +85,15 @@ We will now switch gears and move on to demographic inference using the SFS prod
 
 <img src="https://dbg.org/wp-content/uploads/2016/10/Monarch.jpg" width="600">
 
-Before jumping into complex optimization algorithms, lets 
+Before jumping into complex optimization algorithms, lets explore our SFS. Download the file, and plot it algonside the expected SFS (which you can calculate using e.g. $\theta_W$). 
 
-We will investigate their demographic history by fitting a piecewise population size model with two population size changes, often referred to as the "bottleneck" model. 
+<b>Question 4a:</b> How do the observed and expected SFS compare? What does this suggest about the demographic history of our focal population?<br>
+<b>Question 4b:</b> Use the observed SFS to caculate the numerator of Tajima's D. Does it agree with your results from 4a? Explain.
+
+<b>Parameter estimation in fastsimcoal</b>
+
+We will now investigate further the demographic history of the Hawaiian <i>D. plexippus</i> by fitting a piecewise population size function with two instantaneous changes, often referred to as a "bottleneck" model. Our specific model has five parameters: The population sizes in the present ($N_{CUR}$), durring the bottleneck ($N_{BOT}$), and before the bottleneck ($N_{A}$), and the times when population changed ($T_{BOT}$ and $T_{ENDBOT}$).
+
 
 
 
