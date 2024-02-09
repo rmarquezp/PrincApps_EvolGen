@@ -132,7 +132,7 @@ Each line specifies one or a set of related parameters. Note than in some cases 
 The last line is where we specify the type of data we want to simulate. In this case we're asking fastsimcoal to generate an expected site frequency spectrum (FREQ). It won't simulate loci because it uses trees to do so, and assumes free recombination between simulated sites. The OUTEXP parameter tells it to output the expected SFS. 
 <br><br>
 
-Finally, we need to give the algorithm some rules to optimize the likelihood of our model. Tis file is called an "estimation" file. 
+Finally, we need to give the algorithm some rules to optimize the likelihood of our model. This file is called an "estimation" file. 
 ```
 // Priors and rules file
 // *********************
@@ -151,6 +151,7 @@ Finally, we need to give the algorithm some rules to optimize the likelihood of 
 0 RESENDBOT = NANC/NBOT hide
 1 TENDBOT   = TBOT+100  hide
 ```
+This file tells the algorithm the limits within which to sample our parameters (which are 10-100K for all the pop. sizes and 10-10K for the time to bottleneck), and specifies complex parameters, such as those that represent rations between parameters, or sumations of parameters. Notice, for example, how we specified $RES_{BIOT}$ and $RES_{ENDBOT}$ as ratios of population sizes. The last line of the file specifies that the time when the bottleneck began (or when it ended thinking backwards from the present) is 100 generations before (or after thinking backwards) the end (or begining) of the bottleneck. 
 
 
 
