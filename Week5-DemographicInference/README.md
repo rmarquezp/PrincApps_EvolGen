@@ -95,7 +95,65 @@ Before jumping into complex optimization algorithms, lets explore our SFS. Downl
 We will now investigate further the demographic history of the Hawaiian <i>D. plexippus</i> by fitting a piecewise population size function with two instantaneous changes, often referred to as a "bottleneck" model. Our specific model, illustrated below, has five parameters: The population sizes in the present ($N_{CUR}$), durring the bottleneck ($N_{BOT}$), and before the bottleneck ($N_{A}$), and the times when population changed ($T_{BOT}$ and $T_{ENDBOT}$).
 <br>
 <img src="../Images/FSC_BOT.png" width="300">
-The first thing we need to do is to convert our SFS to a format that fastsimcoal can read. 
+<br>
+The first thing we need to do is to convert our SFS to a format that fastsimcoal can read. This entails 1. adding a header, and 2, moving all sites in the "fixed derived" category to "fixed ancestral". This is done because in fastsimcoal simulations any mutation that is fixed must have ocurred prior to the MRCA of the sample, and is therefore considered ancestral. As this is a simple procedure, it has been done for you already. Below is the resulting file:
+
+```
+ 1 observations
+d0_0	d0_1	d0_2	d0_3	d0_4	d0_5	d0_6	d0_7	d0_8	d0_9	d0_10	d0_11	d0_12	d0_13	d0_14	d0_15	d0_16
+139679872.99	2002381.74	959381.49	609912.91	425813.46	320652.49	246962.37	194461.29	159662.21	129788.50	110476.09	96031.53	81025.83	72690.43	68135.44	69975.22	0.00
+```
+Next we need to specify our model of evolution. This is done through a filed called a "tempalte" file. THe syntax of this file is relatively straightforward, so we will not go very deep into it in the interest of time. That being said, if you use this software in the future for your own research I strongly recommend reading its (very informative) manual to understand the details of its operation. The template file looks like this: 
+
+```
+//Number of population samples (demes)
+1
+//Population effective sizes (number of genes)
+NCUR
+//Sample sizes
+16
+//Growth rates	: negative growth implies population expansion
+0
+//Number of migration matrices : 0 implies no migration between demes
+0
+//historical event: time, source, sink, migrants, new size, new growth rate, migr. matrix 
+2  historical event 
+TBOT 0 0 0 RESBOT 0 0
+TENDBOT 0 0 0 RESENDBOT 0 0
+//Number of independent loci [chromosome] 
+1 0
+//Per chromosome: Number of linkage blocks
+1
+//per Block: data type, num loci, rec. rate and mut rate + optional parameters
+FREQ 1 0 2.9e-9 OUTEXP
+```
+Each line specifies one or a set of related parameters. Note than in some cases we have specified numbers (e.g. number of populations, number of samples), while in other we've specified variable names. The latter are the parameters that we want to estimate. Nor instance, we've specified the current efective population size as $NCUR$. The key part of this file is the "historical event" section, where we describe the history of our simulated populations. These are described as detailed in the first line of this section. Basically, we specify the time at which something happened, and then describe what happened. In this case we have two events that happened at times $T_{BOT}$ and $T_{ENDBOT}$. In both cases, we specified "0" for the first three fields, which are used to describe migration events (source population, sink population, migration rate), we then specified a that at this time, the new population size is $RES_{BOT}$ or $RES_{ENDBOT}$ times smaller than the previous size. Finally, we also added zeros to parameters specifying growth rates and migration matrices. As you may imagine, we specified all thoise zeros because these parameters don't apply to our simulation (i.e. we have one population that grows instantaneously and doesnt give/receive migrants).<br><br>
+
+The last line is where we specify the type of data we want to simulate. In this case we're asking fastsimcoal to generate an expected site frequency spectrum (FREQ). It won't simulate loci because it uses trees to do so, and assumes free recombination between simulated sites. The OUTEXP parameter tells it to output the expected SFS. 
+<br><br>
+
+Finally, we need to give the algorithm some rules to optimize the likelihood of our model. Tis file is called an "estimation" file. 
+```
+// Priors and rules file
+// *********************
+
+[PARAMETERS]
+//#isInt? #name   #dist.#min  #max
+//all Ns are in number of haploid individuals
+1  NCUR  unif 10  100000 output
+1  NANC  unif 10  100000 output
+1  NBOT  unif 10  100000 output
+1  TBOT  unif 10  10000 output
+[RULES]
+
+[COMPLEX PARAMETERS]
+0 RESBOT    = NBOT/NCUR hide
+0 RESENDBOT = NANC/NBOT hide
+1 TENDBOT   = TBOT+100  hide
+```
+
+
+
 
 
 
