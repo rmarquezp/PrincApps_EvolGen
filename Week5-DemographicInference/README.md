@@ -2,7 +2,6 @@ Demographic Inference
 ==========
 
 The evolutionary history of a lineage is often marked by changes in population size. Therefore, estimating historical demographic changes can be a highly informative approach for evolutionary biologists. Coalescent theory provides a powerful framework for this, since the rate of coalescence depends on the (effective) population size. Today we will be impleenting two a widely-used approaches for demographic inference that rely strongly the coalescence theory: The "skyline" plot, and maximum likelihood parameter estimation via coalescent simulations. You will need to have installed some software on your local computer: <a href="https://www.beast2.org/" >BEAST2</a>, a very powerful suite of programs for the inference and analysis of evolutionary trees, and <a href="https://github.com/beast-dev/tracer/releases/tag/v1.7.2" >Tracer</a>, used to visualize the results of Bayesian MCMC analysis. If you haven't please install them. In addition, we will be using  <a href="http://cmpg.unibe.ch/software/fastsimcoal28/" >fastsimcoal2</a>, which is a very powerful coalescent simulator that also implements an algorithm for simulation-based maximum likelihood estimation. It is already on Greatlakes. 
-<!---The third one is already on greatlakes. --->
 
 ## Skyline plot
 
@@ -98,7 +97,7 @@ The first thing we need to do is to convert our SFS to a format that fastsimcoal
 d0_0	d0_1	d0_2	d0_3	d0_4	d0_5	d0_6	d0_7	d0_8	d0_9	d0_10	d0_11	d0_12	d0_13	d0_14	d0_15	d0_16
 139679872.99	2002381.74	959381.49	609912.91	425813.46	320652.49	246962.37	194461.29	159662.21	129788.50	110476.09	96031.53	81025.83	72690.43	68135.44	69975.22	0.00
 ```
-Next we need to specify our model of evolution. This is done through a filed called a "tempalte" file. THe syntax of this file is relatively straightforward, so we will not go very deep into it in the interest of time. That being said, if you use this software in the future for your own research I strongly recommend reading its (very informative) manual to understand the details of its operation. The template file looks like this: 
+Next we need to specify our model of evolution. This is done through a filed called a "tempalte" file. The syntax of this file is relatively straightforward, so we will not go very deep into it in the interest of time. That being said, if you use this software in the future for your own research I strongly recommend reading its (very informative) manual to understand the details of its operation. The template file looks like this: 
 
 ```
 //Number of population samples (demes)
@@ -124,7 +123,7 @@ FREQ 1 0 2.9e-9 OUTEXP
 ```
 Each line specifies one or a set of related parameters. Note than in some cases we have specified numbers (e.g. number of populations, number of samples), while in other we've specified variable names. The latter are the parameters that we want to estimate. Nor instance, we've specified the current efective population size as $NCUR$. The key part of this file is the "historical event" section, where we describe the history of our simulated populations. These are described as detailed in the first line of this section. Basically, we specify the time at which something happened, and then describe what happened. In this case we have two events that happened at times $T_{BOT}$ and $T_{ENDBOT}$. In both cases, we specified "0" for the first three fields, which are used to describe migration events (source population, sink population, migration rate), we then specified a that at this time, the new population size is $RES_{BOT}$ or $RES_{ENDBOT}$ times smaller than the previous size. Finally, we also added zeros to parameters specifying growth rates and migration matrices. As you may imagine, we specified all thoise zeros because these parameters don't apply to our simulation (i.e. we have one population that grows instantaneously and doesnt give/receive migrants).<br><br>
 
-The last line is where we specify the type of data we want to simulate. In this case we're asking fastsimcoal to generate an expected site frequency spectrum (FREQ). It won't simulate loci because it uses trees to do so, and assumes free recombination between simulated sites. The OUTEXP parameter tells it to output the expected SFS. 
+The last line is where we specify the type of data we want to simulate. In this case we're asking fastsimcoal to generate an expected site frequency spectrum (FREQ). It won't simulate loci because it uses trees to generate the expected SFS, and assumes free recombination between simulated sites. Finally, we provide a mutation rate for calculating the binomial term in the SFS likelihood function, and OUTEXP parameter to tell fastsimcoal to output the expected SFS. Keightley et al. ([2014](https://doi.org/10.1093/molbev/msu302)) estimated the spontaneous mutation rate per generation to be $2.9\times10^{-9} in <i>Heliconius melpomene</i>, so we can use that estimate. 
 <br><br>
 
 Finally, we need to give the algorithm some rules to optimize the likelihood of our model. This file is called an "estimation" file. 
@@ -151,8 +150,32 @@ This file tells the algorithm the distributions from which to sample our initial
 
 <b> Running the parameter optimization</b>
 
+Now that we have our data and instructions, it is time to run the fastsimcoal optimization. Log into greatlakes and request a job with 4Gb of memory and 8 cores. Once there create a directory for this week's work, and copy the following files into it:
 
+```
+/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W5/D.plexiPopBot_DAFpop0.obs
+/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W5/D.plexiPopBot.tpl
+/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W5/D.plexiPopBot.est
+```
+Once you have the files in your directory, run the following command.
 
+```
+/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/software/fsc28_linux64/fsc28 -t D.plexiPopBot.tpl -n 100000 -d -e D.plexiPopBot.est -M -q -L 150 -c 8
+```
+Lets unpack what we told fastsimcoal to do.<br><br>
+
+`-t` and `-e` Pass the template and estimation files, respectively.<br>
+`-n` specifies how many simulations are run to estimate the expected SFS for a given set of parameters.<br>
+`-d` specifies that we are using an unfolded (i.e. derived allele) SFS, as opposed to a folded (minor allele) SFS.<br>
+`-M` asks fastsimcoal to perform maximum likelihood estimation.<br>
+`-L 150` specifies that 150 optimization iterations will be performed.<br>
+`-c 8` specifies that 8 cores will be used.<br>
+`-q` asks fastsimcoal to utput a limited (i.e. quiet) amount of indormation as it runs.<br>
+
+Watch the likelihood values as iterations run. <br>
+<b>Question 5:</b> Does it look like the optimization ran for enough iterations to find a good solution? Explain. 
+
+Once the optimization finishes, you can find your maximum likelihood estimates inside a folder . 
 
 
 
