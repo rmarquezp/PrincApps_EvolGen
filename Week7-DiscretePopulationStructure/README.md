@@ -100,27 +100,28 @@ legend("bottomleft", c("Barcelos", "Manaus", "PF"), pt.bg=1:3, pch=21)
 ```
 <b>Question 4a:</b> In your own words, explain how we conducted PCA on our genotype data, and what the purpose of each step was. <br>
 <b>Question 4b:</b> Include your PC plot in the report. Does there seem to be genetic structure between sampled localities? <br>
+<b>Question 4c:</b> Plot PC3 and PC4, do you gain any additional information with respect to genetic structure? <br>
 
 
 ## Admixture Proportions
 
-As we talked in class, we can use the Hardy-Weinberg expectations to assign individuals, or fractions of their genomes, toto one of a pre-defined number of hypothetical ancestral populations. This excercise is often known as estimating admixture proportions, as the probability of assigning an individual to a particular ancestral population can be interpreted as the proportion of its genome that descends from such population. This is a usefull tool to understand genetic structure, as it provides a comparison of the genetic makeup of individuals. The most commonly used way to estimate admixture proportions is the so called "STRUCTURE" model, named after the first program to implement it. Today we will use a variation of this model implemented in the program NGSadmix, which uses genotype likelihoods as imput, thus accounting for technical uncertainty.<br>
+As we talked in class, we can use the Hardy-Weinberg expectations to assign individuals, or fractions of their genomes, to one of a pre-defined number of hypothetical ancestral populations. When using models that allow for admixture, this excercise is often known as estimating admixture proportions, since the parameters of interest, ${q_i}_j$ (the fraction of individual $i$'s genotypes tassigned ancestral population $j$) can be interpreted as the proportion of its genome that descends from each population. This is a usefull tool to understand genetic structure, as it provides a comparison of the genetic makeup of individuals. The most commonly used way to estimate admixture proportions is the family of models often referred to as "STRUCTURE" model, named after the first program to implement it. Today we will use a variation of this model implemented in the program NGSadmix, which uses genotype likelihoods as imput.<br>
 <br>
 Lets run NGSadmix assuming $k=2$ ancestral populations. 
 ```bash
-$softwareDir/ngsAdmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 2 -outfiles  All_hermathena_K2
+$softwareDir/NGSadmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 2 -outfiles  All_hermathena_K2
 ```
-NGSadmix will fit the STRUCTURE model using maximum likelihood, and produce two files, one called `All_hermathena_K2.qopt`, which is a table with the assignment probabilities (or admixture proportions) of each individual to the two hypothetical populations., and one called `All_hermathena_K2.fopt.gz`, which  contains the best-fitting allele frequencies for the hypothetical ancestral populations. <br><br>
+NGSadmix will fit the STRUCTURE model using maximum likelihood, and produce two files, one called `All_hermathena_K2.qopt`, which is a table with the admixture proportions of each individual to the two hypothetical populations, and one called `All_hermathena_K2.fopt.gz`, which  contains our best guess for what the allele frequencies would have been at each site for the hypothetical ancestral populations. <br><br>
 
-Download the All_hermathena_K2.qopt file to your computer and run the code below in R to plot it:
+Download the All_hermathena_K2.qopt file to your computer and run the code below in R to plot it. Note that the entries are in the same order as the population table. 
 
 ```R
 admix=read.table("All_hermathena_K2.qopt")
 barplot(t(admix), col=c("coral","cyan"), ylab="Admixture Proportion")
 ```
-How does this result compare with what you obtained with PCA? Can you think of ways to explain the similarities and/or differences between both methods? Submit your image on Canvas for discussion as a class. <br><br>
+<b>Question 5:</b>How does this result compare with what you obtained with PCA? Can you think of ways to explain the similarities and/or differences between both methods?. <br><br>
 <br><br>
-The number hypothetical populations to which we assign individuasl in STRUCTURE-type analyses need to be assumed prior to running the anlysis. WIth this in mind, it is alywas usefult to explore the behavior of our data under multiple values of $k$. Try to run NGSadmix for $k=1\text{and}3$ by yourself and plotting the results. What do you observe? How does this compare with the results frem PCA? 
+The number hypothetical populations to which we assign individuasl in STRUCTURE-type analyses need to be assumed prior to running the anlysis. With this in mind, it is alywas useful to explore multiple values of $k$. Try to run NGSadmix for $k=$1–4 by yourself and plotting the results. What do you observe? How does this compare with the results frem PCA? 
 
 <details>
   <summary> Click here to see the code</summary>
