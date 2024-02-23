@@ -93,11 +93,19 @@ PC <- as.data.frame(eig$vectors)
 colnames(PC) <- gsub("V", "PC", colnames(PC))
 for(i in 1:length(colnames(PC))){colnames(PC)[i]=paste(colnames(PC)[i]," (",PropVar[i],"%)",sep="")}
 
-## Finally, plot PC1 vs PC2. Note that we are using the locality of each sample to specify its color. 
-## This is a quick trick to color points by some category. 
+## Before plotting lets quickly create a vector with the colors for each point by looping through the locality information
+cols=c()
 
-plot(PC[,1:2], bg=as.factor(pop$Loc), pch=21)
-legend("bottomleft", c("Barcelos", "Manaus", "PF"), pt.bg=1:3, pch=21)
+for(i in 1:nrow(pop)){
+	if(pop$Loc[i]=="Barcelos"){cols[i]="purple"}
+	if(pop$Loc[i]=="Manaus"){cols[i]="red"}
+	if(pop$Loc[i]=="PresidsenteFigueiredo"){cols[i]="yellow"}
+}
+
+## Finally, plot PC1 vs PC2 
+
+plot(PC[,1:2], bg=cols, pch=21)
+legend("topright", c("Barcelos", "Manaus", "PF"), pt.bg=c("purple","red","yellow"), pch=21)
 ```
 <b>Question 4a:</b> In your own words, explain how we conducted PCA on our genotype data, and what the purpose of each step was. <br>
 <b>Question 4b:</b> Include your PC plot in the report. Does there seem to be genetic structure between sampled localities? <br>
