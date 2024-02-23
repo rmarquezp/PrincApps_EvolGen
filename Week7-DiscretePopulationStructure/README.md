@@ -74,7 +74,7 @@ A very common first step when exploring the degree of genetic structure in a dat
 We can use our genotype likelihoods file to generate a covariance matrix using `PCAngsd`, a python program that conducts PCA based off of genotype likelihoods. 
 
 ```bash
-/home/marquezr/.local/bin/pcangsd -b All_hermathena_GenLik.beagle.gz -t 8 -o All_hermathena
+pcangsd -b All_hermathena_GenLik.beagle.gz -t 8 -o All_hermathena
 ```
 
 PCAngsd will output a file called `All_hermathena.cov`, which contains our covariance matrix. We can now use this matrix to conduct PCA in R. Download the covariance matrix to your local machine. You will also need a table with information on wach individual's population assignment, which is available on Canvas. We will use this table to color the PCA points according to their population assignment. This table <i>needs</i> to be in the same order as the list of bam files we passed to Angsd, to make sure samples are in the same order across output files.<br><br> 
