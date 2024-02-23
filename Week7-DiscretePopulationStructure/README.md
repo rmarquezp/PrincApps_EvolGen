@@ -21,6 +21,22 @@ softwareDir=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/so
 
 As we've discussed before, the nature of massively parallel sequencing data allows us to take into account genotype uncertainty by basing our inferences in genotype likelihoods (GLs) instead of assumed genotypes. Therefore, our first step will be to use our bam files to calculate the genotype likelihoods for each individual at each site. We will then use these GLs for for downstream analyses. We can do this en `Angsd`. To save time and storage space, we will ask Angsd to make a decision on whether a particular site is variable (this is called "calling SNPs"), and to only print out geontype likelihods at variable sites. We do so by the `-SNP_pval` flag. Angsd will then do a statistical test for whether each site's minor allele frequency is different from 0, and keep only sites with a p-value below what we specify. In this case we will use 0.01.<br>
 
+Also in the interest of time, we will focus on the 10 largest scaffolds. TO create a file with their names that Angsd can use, type 
+``nano largest_scaffolds.txt``
+This should open a text editor where you can paste the following text:
+```
+JAAIXJ010000013.1
+JAAIXJ010000015.1
+JAAIXJ010000056.1
+JAAIXJ010000100.1
+JAAIXJ010000188.1
+JAAIXJ010000321.1
+JAAIXJ010001126.1
+JAAIXJ010001769.1
+JAAIXJ010001804.1
+JAAIXJ010001853.1
+```
+Once you are done hit `ctrl+x` to exit. You may be asked whether you want to save. Type `Y` and hit enter to save the file. Now run `Angsd`.
 ```bash
 angsd -P 8 -b "$listDir"/All_hermathena.filelist -rf largest_scaffolds.txt -GL 1 -doCounts 1 -doMajorMinor 1 -doMaf 2 -SNP_pval 1e-2  -doGlf 2 -minInd 20 -out All_hermathena_GenLik -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 ```
