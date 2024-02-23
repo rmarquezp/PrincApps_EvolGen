@@ -22,7 +22,7 @@ softwareDir=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/so
 As we've discussed before, the nature of massively parallel sequencing data allows us to take into account genotype uncertainty by basing our inferences in genotype likelihoods (GLs) instead of assumed genotypes. Therefore, our first step will be to use our bam files to calculate the genotype likelihoods for each individual at each site. We will then use these GLs for for downstream analyses. We can do this en `Angsd`. To save time and storage space, we will ask Angsd to make a decision on whether a particular site is variable (this is called "calling SNPs"), and to only print out geontype likelihods at variable sites. We do so by the `-SNP_pval` flag. Angsd will then do a statistical test for whether each site's minor allele frequency is different from 0, and keep only sites with a p-value below what we specify. In this case we will use 0.01.<br>
 
 ```bash
-angsd -P 8 -b "$listDir"/All_hermathena.filelist -rf largest_scaffolds.txt -GL 1 -doCounts 1 -doMajorMinor 1 -doMaf 2 -SNP_pval 1e-2  -doGlf 2 -out All_hermathena_GenLik -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
+angsd -P 8 -b "$listDir"/All_hermathena.filelist -rf largest_scaffolds.txt -GL 1 -doCounts 1 -doMajorMinor 1 -doMaf 2 -SNP_pval 1e-2  -doGlf 2 -minInd 20 -out All_hermathena_GenLik -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 ```
 Note that, again, we are using the `-rf` flag to restrict our analyses to a few chromosomes (or scaffolds in this case, as the reference assembly is not at the chromosome level). This is due to time constraints, and generally we would want to use sites across the genome. Lets unpack the rest of flags:
 
@@ -31,6 +31,7 @@ Note that, again, we are using the `-rf` flag to restrict our analyses to a few 
 `-doCounts 1` Asks Angsd to count reads, which is needed for GL estimation.<br>
 `-doGlf` Specifies the output file format (more on that later),
 `-doMajorMinor 1` and `-doMaf 2` Ask Angsd to internally estimate allele frequencies. This is needed to call SNPs.<br>
+`-minInd 20` Restricts our analyses to sites where there is genotype information for at least 20 individuals (~75%).
 `-out All_hermathena_GenLik` specifies the name of the output files <br>
 The remaining flags turn on various quality filters.<br><br>
 <b>Question 1a:</b> Why is allele frequency estimation necessary to call SNPs?<br>
@@ -117,20 +118,22 @@ Download the All_hermathena_K2.qopt file to your computer and run the code below
 
 ```R
 admix=read.table("All_hermathena_K2.qopt")
-barplot(t(admix), col=c("coral","cyan"), ylab="Admixture Proportion")
+barplot(t(admix), col=c("coral","cyan"), ylab="Admixture Proportion", space=0)
 ```
-<b>Question 5:</b>How does this result compare with what you obtained with PCA? Can you think of ways to explain the similarities and/or differences between both methods?. <br><br>
-<br><br>
-The number hypothetical populations to which we assign individuasl in STRUCTURE-type analyses need to be assumed prior to running the anlysis. With this in mind, it is alywas useful to explore multiple values of $k$. Try to run NGSadmix for $k=$1–4 by yourself and plotting the results. What do you observe? How does this compare with the results frem PCA? 
+<b>Question 5a:</b>How does this result compare with what you obtained with PCA? Can you think of ways to explain the similarities and/or differences between both methods?. <br><br>
+<br>
+The number hypothetical populations to which we assign individuasl in STRUCTURE-type analyses need to be assumed prior to running the anlysis. With this in mind, it is alywas useful to explore multiple values of $k$. 
 
+<b>Question 5b:</b>Run NGSadmix for $k=$ 1–4 and plot the results. What do you observe? How does this compare with the results frem PCA? Do you gain additional information by considering multiple values of $k$?
+<!--
 <details>
   <summary> Click here to see the code</summary>
   
   ```bash
   
   #Run ngsADmix
-$softwareDir/ngsAdmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 3 -outfiles  All_hermathena_K3
-$softwareDir/ngsAdmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 4 -outfiles  All_hermathena_K4
+$softwareDir/NGSadmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 3 -outfiles  All_hermathena_K2
+$softwareDir/NGSadmix/NGSadmix -P 8 -likes All_hermathena_GenLik.beagle.gz -K 4 -outfiles  All_hermathena_K2
 ```
 
 <br><br>
@@ -154,10 +157,98 @@ barplot(t(admix4), col=c("black","cyan", "coral", "darkgreen"))
 ```
 
 <img src="../Images/NGSadmix.png" width="750" class="center">
+ </details>
+ -->
+
+## Estimating $F_{ST}$
+
+Now that we have an idea of the way in which our focal populations are structured, we can gauge the strength of this structure by calculating $F_{ST}$ between them. As we discussed in class, a comonly used estimator for bi-allelic SNPs was proposed by Hudson (1993), and formulated by Bhatia et al. (2013).
+```math
+F_{ST}=\frac{H_T-H_S}{H_T}=\frac{(\hat{p}_1-\hat{p}_2)^2-\frac{\hat{p}_1(1-\hat{p_1})}{n_1-1}-\frac{\hat{p_2}(1-\hat{p_2})}{n_2-1}}{\hat{p_1}(1-\hat{p_2})+\hat{p_2}(1-\hat{p_1})}
+```
+Where $\hat{p}_i$ and $n_i$ are the estimated allele frequency and number of samples in population $i$, respectively.<br><br>
+
+To use this estimator, we first need to estimate allele frequencies. As above, we can restrict our analyses to sites that are ploymorphic across our dataset We can obtaina  list of these files from the previously generated GL file.
+```bash
+zcat All_hermathena_GenLik.mafs.gz | cut -f 1,2,3,4 | tail -n +2 > variable_sites.txt
+angsd sites index variable_sites.txt
+
+head variable_sites.txt
+
+JAAIXJ010000013.1	29	C	T
+JAAIXJ010000013.1	53	A	G
+JAAIXJ010000013.1	63	C	A
+JAAIXJ010000013.1	114	A	G
+JAAIXJ010000013.1	128	A	G
+JAAIXJ010000013.1	219	T	C
+JAAIXJ010000013.1	272	G	A
+JAAIXJ010000013.1	351	T	C
+JAAIXJ010000013.1	428	G	A
+JAAIXJ010000013.1	502	A	G
+```
+Note that, in addition to the scaffold and position, our file now contains two additional columns. These include the minor and major alleles at each site, which tells `Angsd` to calculate the frequencies of these specific alleles at each site, instead of guessing which allele is minor from the frequencies, as we've done before. This is done so we estimate the frequency of the same allele across populations, and can therefore compare frequencies between populations.<br><br>
+
+Now lets calculate allele frequencies at each population.
+
+```bash
+angsd -P 8 -b  $listDir/barcelos.filelist -rf largest_scaffolds.txt -sites variable_sites.txt -ref $ref -GL 1 -out barcelos -doMajorMinor 3 -doMaf 1 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
+angsd -P 8 -b  $listDir/PF.filelist -rf largest_scaffolds.txt -sites variable_sites.txt -ref $ref -GL 1 -out PF -doMajorMinor 3 -doMaf 1 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
+angsd -P 8 -b  $listDir/manaus.filelist -rf largest_scaffolds.txt -sites variable_sites.txt -ref $ref -GL 1 -out manaus -doMajorMinor 3 -doMaf 1 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
+```
+Note that in this case we used `-doMajorMinor 3`to indicate that we want the major and minor allele to be those specified in the `-sites` file. 
+
+<b>Question 6:</b> Instead of providing a list of sites, we previously passed a `-SNP_pval` flag for `Angsd` to retain only variable sites. Would this also be a valid approach in this case?<br>
+
+Finally, open an `R` session to do $F_{ST} estimation. 
+
+```R
+
+## Read the data
+
+barcelos=read.table("barcelos.mafs.gz", h=T)
+PF=read.table("PF.mafs.gz", h=T)
+manaus=read.table("manaus.mafs.gz", h=T)
+
+## Write a function to implement Hudson's estimator
+
+Fst_Hud=function(p1,p2,n1,n2){
+	
+	N=((p1-p2)^2)-((p1*(1-p1))/(n1-1))-((p2*(1-p2))/(n2-1))
+	D=(p1*(1-p2))+(p2*(1-p1))
+
+#	Fst=mean(N/D, na.rm=T)
+# Fst=sum(N)/sum(D)
+	return(Fst)
+}
+```
+As we noted in class, there are several ways to summarizr $F_ST$ estimates across many sites. Two comon ones are the "average of ratios" and "ratio of averages" methods in which either $F_ST$ estimates per site are first computed and then averaged (average of ratios), or the numerators and denominators of all estimates are first averaged (or summed, the result is the same), and then divided by each other (ratio of averages). In the function above both methods are available.
+<br>
+<b>Question 7a:</b> Which one would you prefer? Why? Delete the `#` next to your estimator of choice before continuing. 
+Now lets actually do the estimation. 
+```R
+## Give the allele freq. talbes a unique row name for each marker. We will use this to select only sites with allele frequency estimations for each pair of populations.
+
+rownames(barcelos)=paste(barcelos$chromo,barcelos$position, sep="_")
+rownames(PF)=paste(PF$chromo,PF$position, sep="_")
+rownames(manaus)=paste(manaus$chromo,manaus$position, sep="_")
+
+## Now calculate Fst between Barcelos and PresidsenteFigueiredo
+
+#1. Get sites genotyped in both pops
+bar_PF_sites=intersect(rownames(barcelos),rownames(PF))
+
+#2 Extract p and n values at these sites
+p1_bPF=barcelos[bar_PF_sites,]$knownEM
+p2_bPF=PF[bar_PF_sites,]$knownEM
+
+n1_bPF=2*barcelos[bar_PF_sites,]$nInd
+n2_bPF=2*PF[bar_PF_sites,]$nInd
+
+#3. Calculate Fst
+Fst_Hud(p1=p1_bPF,p2=p2_bPF,n1=n1_bPF,n2=n2_bPF)
+```
+<b>Question 7b:</b> Perform $F_{ST}$ calculations for the other two pairs of populations (i.e. Manaus vs PF, Manaus vs Barcelos). Include the values in your results. 
 
 <b>Question X:</b> Does restricting our analyses to only variable sites seem appropriate? Explain. 
 
- </details>
-
-How does your plot look? How does it relate to PCA?
 
