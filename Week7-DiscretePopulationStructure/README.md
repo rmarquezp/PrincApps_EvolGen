@@ -245,7 +245,7 @@ Fst_Hud=function(p1,p2,n1,n2){
 	return(Fst)
 }
 ```
-As we noted in class, there are several ways to summarizr $F_ST$ estimates across many sites. Two comon ones are the "average of ratios" and "ratio of averages" methods in which either $F_ST$ estimates per site are first computed and then averaged (average of ratios), or the numerators and denominators of all estimates are first averaged (or summed, the result is the same), and then divided by each other (ratio of averages). In the function above both methods are available.
+As we noted in class, there are several ways to summarizr $F_{ST}$ estimates across many sites. Two comon ones are the "average of ratios" and "ratio of averages" methods in which either $F_{ST}$ estimates per site are first computed and then averaged (average of ratios), or the numerators and denominators of all estimates are first averaged (or summed, the result is the same), and then divided by each other (ratio of averages). In the function above both methods are available.
 <br>
 <b>Question 7a:</b> Which one would you prefer? Why? Delete the `#` next to your estimator of choice before continuing. 
 Now lets actually do the estimation. 
@@ -271,8 +271,12 @@ n2_bPF=2*PF[bar_PF_sites,]$nInd
 #3. Calculate Fst
 Fst_Hud(p1=p1_bPF,p2=p2_bPF,n1=n1_bPF,n2=n2_bPF)
 ```
-<b>Question 7b:</b> Perform $F_{ST}$ calculations for the other two pairs of populations (i.e. Manaus vs PF, Manaus vs Barcelos). Include the values in your results. 
+<b>Question 7b:</b> Perform $F_{ST}$ calculations for the other two pairs of populations (i.e. Manaus vs PF, Manaus vs Barcelos). Include the values in your results.<br><br>
 
-<b>Question X:</b> Does restricting our analyses to only variable sites seem appropriate? Explain. 
+<b>Question 8a:</b> Considering the results from your three analyses, would you say there is population structure between the sampled localities? 
+<b>Question 8b:</b> Notice on the map how the Barcelos and Manaus+PF populations are on oporite sides of the Japurá/Caquetá river. Based on your results, does this river seem to be influencing population connectivity?
+<b>Question 8c:</b> The $F_{ST}$ values obtained between populations in this study were unusually high in comparison to those observed between populations of closely related species. For instance, populations of <i> Heliconius erato </i> located thousands of kilometers away fro each other display $F_{ST}$ values around 0.1. The most diffeerentiated human populations have reported $F_{ST}\sim0.12$. How would you explain the very high $F_{ST}$ observed between very close <i>H. hermathena</i> populations? <b>Hint:</b> Read Massardo et al.'s paper for insight on other aspects of the genetic makeup and natural history of these populations. 
+
+<b>Question 9:</b> As you know, in this session we focused only on variable sites. Does this seem appropriate for the types of analyses we did? In other words, are we losing useful information in exchange for fast computation by doing htis?
 
 
