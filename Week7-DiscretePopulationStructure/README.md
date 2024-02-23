@@ -48,31 +48,38 @@ JAAIXJ010000013.1_53	0	2	0.999969	0.000031	0.000000	0.969698	0.030302	0.000000	0
 JAAIXJ010000013.1_63	1	0	0.999992	0.000008	0.000000	0.969698	0.030302	0.000000	0.999999	0.000001	0.000000	0.996109	0.003891	0.000000	0.998051	0.001949	0.000000	0.998051	0.001949	0.000000	0.969698	0.030302	0.000000	0.999939	0.000061	0.000000	0.999999	0.000001	0.000000	0.984616	0.015384	0.000000	0.984616	0.015384	0.000000	0.941178	0.058822	0.000000	0.969698	0.030302	0.000000	0.998051	0.001949	0.000000	0.999878	0.000122	0.000000	0.999512	0.000488	0.000000	0.992249	0.007751	0.000000	0.999756	0.000244	0.000000	0.999512	0.000488	0.000000	0.984616	0.015384	0.000000	0.969698	0.030302	0.000000	0.992249	0.007751	0.000000	0.969698	0.030302	0.000000	0.000103	0.999897	0.000000	0.800003	0.199997	0.000000	0.996109	0.003891	0.000000	0.999512	0.000488	0.000000
 ```
 As you can see, each row corresponds to a diffeerent site. The first three columns contain information about the site (position and alleles), and then there are three columns per individual, which contain genotype likelihoods. <br>
-<b>Question 2:</b> WHy are there three columns per individual por each site?<br><br>
+<b>Question 2:</b> Why are there three columns per individual por each site?<br><br>
 
 ## Principal Component Analysis
 
-A very common first step when exploring the degree of genetic structure in a dataset is conducting principal component analysis, or PCA. PCA is a widely used statistical technique for <i>dimensionality reduction</i>, a procedure by which a multivariate dataset is summarized by a smaller number of variables that encapsulate the major axes of variation present in the original dataset. In PCA this is achieved by using the covariances between variables to obtain a set of new, uncorrelated variables that summarize the data, which are called Principal Components. In other words, we start with a large number of somewhat correlated variables, and obtain a new set of uncorrelated variables, a few of which hopefully contain a large ammount of the variation present in the data. In the case of population genetics each locus in our dataset is a variable, and our goal is to go from thousands or millions of variables to 3-4 principal components that encapsulate the most relevant variation in the data. A more in-depth discussion of PCA is beyond the scope of this practical, but the [Wikipedia](https://en.wikipedia.org/wiki/Principal_component_analysis) entry for PCA is a very complete resource if you are interested in learning further. <br><br>
+A very common first step when exploring the degree of genetic structure in a dataset is conducting principal component analysis, or PCA. PCA is a widely used statistical technique for <i>dimensionality reduction</i>, a procedure by which a multivariate dataset is summarized by a smaller number of variables that encapsulate the major axes of variation present in the original dataset. In PCA this is achieved by using the covariances between observations (e.g. replicates of an experiment, or measured individuals) to project them along a a set of uncorrelated axes that summarize variation in data, which are called Principal Components. Mathematically this si done by <i>decomposing</i> a matrix containing the pairwise covariances between observations into eigenvectors, which represent the PCs, and eigenvalues, which represent the amount of variance in the data explained by each component. In the case of genetic data each locus in our dataset is a variable, and each individual an observation. We use genotypes (or GLs) to estimate the <i> genetic covariance</i> between individuals, and use it to distill variation in thousands or millions of variables to a few principal components. A more in-depth discussion of PCA is beyond the scope of this practical, but the [Wikipedia](https://en.wikipedia.org/wiki/Principal_component_analysis) entry for PCA is a very complete resource if you are interested in learning further. <br><br>
 
-Lets now use our genotype likelihoods file to run a PCA using `PCAngsd`, a python program that conducts PCA based off of genotype likelihoods. 
+We can use our genotype likelihoods file to generate a covariance matrix using `PCAngsd`, a python program that conducts PCA based off of genotype likelihoods. 
 
 ```bash
-python3 $softwareDir/pcangsd/pcangsd/pcangsd.py -b All_hermathena_GenLik.beagle.gz -t 8 -o All_hermathena
-pcangsd -b All_hermathena_GenLik.beagle.gz -t 8 -o All_hermathena
+/home/marquezr/.local/bin/pcangsd -b All_hermathena_GenLik.beagle.gz -t 8 -o All_hermathena
 ```
 
-PCAngsd will produce a file called `All_hermathena.cov`, which contains our covariance matrix. We can now use this matrix to conduct PCA in R. Download the covariance matrix to your local machine, and run the code below in R. YOu will also ned a table with information on wach individual's population assignment. We will use this table to color the PCA points according to their population assignment. I have previously ordered this table in the same order as the list of bam files we passed to Angsd, to make sure samples are in the same order across output files. 
-
+PCAngsd will output a file called `All_hermathena.cov`, which contains our covariance matrix. We can now use this matrix to conduct PCA in R. Download the covariance matrix to your local machine. You will also need a table with information on wach individual's population assignment, which is available on Canvas. We will use this table to color the PCA points according to their population assignment. This table <i>needs</i> to be in the same order as the list of bam files we passed to Angsd, to make sure samples are in the same order across output files.<br><br> 
+Lets explore our matrix in `R` first
 ```R
 ## Read in the data
-covar=read.table("All_hermathena.cov", stringsAsFact=F)
+covar=as.matrix(read.table("All_hermathena.cov"))
 pop=read.table("Individuals.txt", h=T)
 
+## Plot the matrix as a heatmap. Rows and columns are abeled by locality. Darker colors mean higher covariance.
+
+heatmap(covar,covar,Rowv = NA, Colv = NA, labCol=pop$Loc, labRow=pop$Loc,, margins=c(10,10))
+```
+<b>Question 3:</b> Based on the covariance matrix, would you say there is population structure in our data? Include your plot in your report.<br>
+
+Now lets decompose our matrix to obtain eigenvectors and eigenvalues. 
+```R
 #Decompose covariance matrix. This is where we actually do the PCA. 
 
 eig=eigen(covar, symm=TRUE)
 ```
-The `eig` object consists of a series of vectors, which are our principal components, and a series of associated variances, which correspond to the ammount of vriance each component is accounting for. The components are organized by the ammount of variance they explain. It is important to consider how much variation a PC explains when interpreting the results of PCA. To have this information handy, we can re-organize the `eig` object into a table with PCs on the columns, where the title of each PC contains information on the variance explained. 
+The `eig` object contains our eigenvectors and eigenvalues, organized by the ammount of variance they explain. It is important to consider how much variation a PC explains when interpreting the results of PCA. To have this information handy, we can re-organize the `eig` object into a table with PCs on the columns, where the title of each PC contains information on the variance explained. 
 ```R
 #Extract percentage of variance explained
 val=eig$val/sum(eig$val);
@@ -91,7 +98,8 @@ for(i in 1:length(colnames(PC))){colnames(PC)[i]=paste(colnames(PC)[i]," (",Prop
 plot(PC[,1:2], bg=as.factor(pop$Loc), pch=21)
 legend("bottomleft", c("Barcelos", "Manaus", "PF"), pt.bg=1:3, pch=21)
 ```
-How does your plot look? Do the different localities appear to be structured? Submit your plot on Canvas, we will discuss it as a class when everyone is done. 
+<b>Question 4a:</b> In your own words, explain how we conducted PCA on our genotype data, and what the purpose of each step was. <br>
+<b>Question 4b:</b> Include your PC plot in the report. Does there seem to be genetic structure between sampled localities? <br>
 
 
 ## Admixture Proportions
