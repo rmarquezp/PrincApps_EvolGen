@@ -273,8 +273,8 @@ Fst_Hud(p1=p1_bPF,p2=p2_bPF,n1=n1_bPF,n2=n2_bPF)
 ```
 <b>Question 7b:</b> Perform $F_{ST}$ calculations for the other two pairs of populations (i.e. Manaus vs PF, Manaus vs Barcelos). Include the values in your results.<br><br>
 
-<b>Question 8a:</b> Considering the results from your three analyses, would you say there is population structure between the sampled localities? 
-<b>Question 8b:</b> Notice on the map how the Barcelos and Manaus+PF populations are on oporite sides of the Japurá/Caquetá river. Based on your results, does this river seem to be influencing population connectivity?
+<b>Question 8a:</b> Considering the results from your three analyses, would you say there is population structure between the sampled localities?<br>
+<b>Question 8b:</b> Notice on the map how the Barcelos and Manaus+PF populations are on oporite sides of the Japurá/Caquetá river. Based on your results, does this river seem to be influencing population connectivity?<br>
 <b>Question 8c:</b> The $F_{ST}$ values obtained between populations in this study were unusually high in comparison to those observed between populations of closely related species. For instance, populations of <i> Heliconius erato </i> located thousands of kilometers away fro each other display $F_{ST}$ values around 0.1. The most diffeerentiated human populations have reported $F_{ST}\sim0.12$. How would you explain the very high $F_{ST}$ observed between very close <i>H. hermathena</i> populations? <b>Hint:</b> Read Massardo et al.'s paper for insight on other aspects of the genetic makeup and natural history of these populations. 
 
 <b>Question 9:</b> As you know, in this session we focused only on variable sites. Does this seem appropriate for the types of analyses we did? In other words, are we losing useful information in exchange for fast computation by doing htis?
