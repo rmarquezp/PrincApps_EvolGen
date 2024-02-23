@@ -5,35 +5,50 @@ Population structure is a universal feature of biological systems, and studying 
 
 <img src="../Images/H.hermathena.png" width="750" class="center">
 
-There are multiple subspecies of <i>H. hermathena</i> most of which have quite restricted and fragmented ranges in compariosn to other species of <i>Heliconius</i>. We will focus on <i>H. h. sabinae</i> and <i>H. h. sheppardi</i>, which inhabit the Northwestern Amazon and Japurá/Caquetá river basins (red, yellow, and purple dots in the map above). In today's practical we will explore the extent of population structure between sampled localities, and define a set of populations that meet the assumptions of discrete population structure models. 
+There are multiple subspecies of <i>H. hermathena</i> most of which have quite restricted and fragmented ranges in compariosn to other species of <i>Heliconius</i>. We will focus on <i>H. h. sabinae</i> and <i>H. h. sheppardi</i>, which inhabit the Northwestern Amazon and Japurá/Caquetá river basins (red, yellow, and purple dots in the map above). In today's practical we will explore the extent of population structure between these three localities under the assumptions of discrete population structure models. 
 
 ## Setup
 
-Today we will be working on Greatlakes, using data from the paper cited above. The data for today have already been downloaded, quality-trimmed, and mapped to the reference genome for <i>Heliconius melpomene</i> using the code from [Week 4](../Week4).<br><br>
-Log into the cluster, and request a job with 8 processors and 24 Gb RAM. Once the job starts load the `Bioinformatics` and `angsd` modules and create the following variables:
+Today we will be working on Greatlakes, using data from the paper cited above. The data for today have already been downloaded, quality-trimmed, and mapped to the reference genome for <i>Heliconius melpomene</i> using the approach described in [Week 3](../Week3-IlluminaDataHandling).<br><br>
+Log into the cluster, and request a job with 8 processors and 24 Gb RAM. Once the job starts load the `Bioinformatics`, `angsd`, `R`, and `python/3.11.5` modules, and create the following variables:
 ```bash
-ref=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/Hmel2.5/Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa
-listDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/heliconius_bams
-softwareDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/
+ref=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/ReferenceGenomes/GCA_013403705.1_ASM1340370v1_genomic.fna
+listDir=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W7/
+softwareDir=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/software
 ```
 
 ## Calculating genotype likelihoods
 
-First we will use our bam files to calculate the genotype likelihoods for each individual at each site, which we will then use for downstream analyses. We can do this en Angsd. For today's analyses we will not gain any information from invariable sites. Therefore, to save time and storage space, we can ask Angsd to make a decision on whether a particular site is variable (this is called "calling SNPs"), and to only print out geontype likelihods at variable sites. We do so by the `-SNP_pval` flag. Angsd will then do a statistical test for whether each site is variable, and keep only sites with a pvalue below what we specify. In this case we will use 0.0001.
+As we've discussed before, the nature of massively parallel sequencing data allows us to take into account genotype uncertainty by basing our inferences in genotype likelihoods (GLs) instead of assumed genotypes. Therefore, our first step will be to use our bam files to calculate the genotype likelihoods for each individual at each site. We will then use these GLs for for downstream analyses. We can do this en `Angsd`. To save time and storage space, we will ask Angsd to make a decision on whether a particular site is variable (this is called "calling SNPs"), and to only print out geontype likelihods at variable sites. We do so by the `-SNP_pval` flag. Angsd will then do a statistical test for whether each site's minor allele frequency is different from 0, and keep only sites with a p-value below what we specify. In this case we will use 0.01.<br>
 
 ```bash
-angsd -P 8 -b "$listDir"/All_hermathena.filelist -r Hmel201001o -GL 1 -doCounts 1 -doMajorMinor 1 -doMaf 2 -SNP_pval 1e-3  -doGlf 2 -out All_hermathena_GenLik -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
+angsd -P 8 -b "$listDir"/All_hermathena.filelist -rf largest_scaffolds.txt -GL 1 -doCounts 1 -doMajorMinor 1 -doMaf 2 -SNP_pval 1e-2  -doGlf 2 -out All_hermathena_GenLik -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 ```
-Note that, again, we are using the `-r` flag to restrict our analyses to a single chromosome, in this case in the interest of time. Lets unpack the rest of flags:
+Note that, again, we are using the `-rf` flag to restrict our analyses to a few chromosomes (or scaffolds in this case, as the reference assembly is not at the chromosome level). This is due to time constraints, and generally we would want to use sites across the genome. Lets unpack the rest of flags:
 
 `-P 8` Asks Angsd to use 8 processors.<br>
 `-GL 1` Specifies the genotype likelihood model to be used.<br>
 `-doCounts 1` Asks Angsd to count reads, which is needed for GL estimation.<br>
-`-doMajorMinor 1` and `-doMaf 2` Ask Angsd to internally estimate allele frequencies. This is needed to call SNPs, as we're testing whether the minor allele frequency at a site is different from 0.<br>
+`-doGlf` Specifies the output file format (more on that later),
+`-doMajorMinor 1` and `-doMaf 2` Ask Angsd to internally estimate allele frequencies. This is needed to call SNPs.<br>
 `-out All_hermathena_GenLik` specifies the name of the output files <br>
-The remaining flags turn on various quality filters. Can you guess (or remember) what most of them mean?<br>
+The remaining flags turn on various quality filters.<br><br>
+<b>Question 1a:</b> Why is allele frequency estimation necessary to call SNPs?<br>
+<b>Question 1b:</b> What do the `-only_proper_pairs 1`, `-minMapQ 20`, and `-minQ 20` flags do?<br>
 <br>
-Angsd should be done after a few minutes. How many sites did it end up retaining? We should now have a file named All_hermathena_GenLik.beagle.gz, which we will use to conduct PCA and estimate admixture proportions. 
+Angsd should be done after a few minutes.<br><br>
+<b>Question 2:</b> About what percentage of the sites analyzed are variable?<br><br>
+
+ We should now have a file named All_hermathena_GenLik.beagle.gz, which we will use to conduct PCA and estimate admixture proportions. Lets take a quick look inside:
+ ``` bash
+less All_hermathena_GenLik.beagle.gz
+marker		  allele1	allele2	 Ind0  	Ind0	Ind0	Ind1	Ind1	Ind1	Ind2	Ind2	Ind2	Ind3	Ind3	Ind3	Ind4	Ind4	Ind4	Ind5	Ind5	Ind5	Ind6	Ind6	Ind6	Ind7	Ind7	Ind7	Ind8	Ind8	Ind8	Ind9	Ind9	Ind9	Ind10	Ind10	Ind10	Ind11	Ind11	Ind11	Ind12	Ind12	Ind12	Ind13	Ind13	Ind13	Ind14	Ind14	Ind14	Ind15	Ind15	Ind15	Ind16	Ind16	Ind16	Ind17	Ind17	Ind17	Ind18	Ind18	Ind18	Ind19	Ind19	Ind19	Ind20	Ind20	Ind20	Ind21	Ind21	Ind21	Ind22	Ind22	Ind22	Ind23	Ind23	Ind23	Ind24	Ind24	Ind24	Ind25	Ind25	Ind25	Ind26	Ind26	Ind26
+JAAIXJ010000013.1_29	1	3	0.000000	1.000000	0.000000	0.000003	0.999995	0.000002	0.999756	0.000244	0.000000	0.888891	0.111109	0.000000	0.006342	0.993658	0.000000	0.000000	0.994943	0.005057	0.888891	0.111109	0.000000	0.992249	0.007751	0.000000	0.999024	0.000976	0.000000	0.941178	0.058822	0.000000	0.888891	0.111109	0.000000	0.800003	0.199997	0.000000	0.666633	0.333314	0.000053	0.992249	0.007751	0.000000	0.984616	0.015384	0.000000	0.996109	0.003891	0.000000	0.941178	0.058822	0.000000	0.999024	0.000976	0.000000	0.969698	0.030302	0.000000	0.888891	0.111109	0.000000	0.800003	0.199997	0.000000	0.800003	0.199997	0.000000	0.888891	0.111109	0.000000	0.998051	0.001949	0.000000	0.666633	0.333314	0.000053	0.888891	0.111109	0.000000	0.969698	0.030302	0.000000
+JAAIXJ010000013.1_53	0	2	0.999969	0.000031	0.000000	0.969698	0.030302	0.000000	0.999996	0.000004	0.000000	0.996109	0.003891	0.000000	0.992249	0.007751	0.000000	0.998051	0.001949	0.000000	0.969698	0.030302	0.000000	0.999512	0.000488	0.000000	0.999992	0.000008	0.000000	0.984616	0.015384	0.000000	0.984616	0.015384	0.000000	0.941178	0.058822	0.000000	0.941178	0.058822	0.000000	0.996109	0.003891	0.000000	0.999878	0.000122	0.000000	0.999024	0.000976	0.000000	0.969698	0.030302	0.000000	0.999512	0.000488	0.000000	0.996109	0.003891	0.000000	0.984616	0.015384	0.000000	0.969698	0.030302	0.000000	0.992249	0.007751	0.000000	0.941178	0.058822	0.000000	0.999024	0.000976	0.000000	0.800003	0.199997	0.000000	0.000000	1.000000	0.000000	0.998051	0.001949	0.000000
+JAAIXJ010000013.1_63	1	0	0.999992	0.000008	0.000000	0.969698	0.030302	0.000000	0.999999	0.000001	0.000000	0.996109	0.003891	0.000000	0.998051	0.001949	0.000000	0.998051	0.001949	0.000000	0.969698	0.030302	0.000000	0.999939	0.000061	0.000000	0.999999	0.000001	0.000000	0.984616	0.015384	0.000000	0.984616	0.015384	0.000000	0.941178	0.058822	0.000000	0.969698	0.030302	0.000000	0.998051	0.001949	0.000000	0.999878	0.000122	0.000000	0.999512	0.000488	0.000000	0.992249	0.007751	0.000000	0.999756	0.000244	0.000000	0.999512	0.000488	0.000000	0.984616	0.015384	0.000000	0.969698	0.030302	0.000000	0.992249	0.007751	0.000000	0.969698	0.030302	0.000000	0.000103	0.999897	0.000000	0.800003	0.199997	0.000000	0.996109	0.003891	0.000000	0.999512	0.000488	0.000000
+```
+As you can see, each row corresponds to a diffeerent site. The first three columns contain information about the site (position and alleles), and then there are three columns per individual, which contain genotype likelihoods. <br>
+<b>Question 2:</b> WHy are there three columns per individual por each site?<br><br>
 
 ## Principal Component Analysis
 
@@ -130,6 +145,8 @@ barplot(t(admix4), col=c("black","cyan", "coral", "darkgreen"))
 ```
 
 <img src="../Images/NGSadmix.png" width="750" class="center">
+
+<b>Question X:</b> Does restricting our analyses to only variable sites seem appropriate? Explain. 
 
  </details>
 
