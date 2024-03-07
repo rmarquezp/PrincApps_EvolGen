@@ -223,7 +223,7 @@ Note that in this case we used `-doMajorMinor 3`to indicate that we want the maj
 
 <b>Question 6:</b> Instead of providing a list of sites, we previously passed a `-SNP_pval` flag for `Angsd` to retain only variable sites. Would this also be a valid approach in this case?<br>
 
-Finally, open an `R` session to do $F_{ST} estimation. 
+Finally, open an `R` session to do $F_{ST}$ estimation. 
 
 ```R
 
