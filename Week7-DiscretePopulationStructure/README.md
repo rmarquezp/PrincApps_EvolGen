@@ -241,13 +241,13 @@ Fst_Hud=function(p1,p2,n1,n2){
 	D=(p1*(1-p2))+(p2*(1-p1))
 
 #	Fst=mean(N/D, na.rm=T)
-# Fst=sum(N)/sum(D)
+# 	Fst=sum(N)/sum(D)
 	return(Fst)
 }
 ```
 As we noted in class, there are several ways to summarizr $F_{ST}$ estimates across many sites. Two comon ones are the "average of ratios" and "ratio of averages" methods in which either $F_{ST}$ estimates per site are first computed and then averaged (average of ratios), or the numerators and denominators of all estimates are first averaged (or summed, the result is the same), and then divided by each other (ratio of averages). In the function above both methods are available.
 <br>
-<b>Question 7a:</b> Which one would you prefer? Why? Delete the `#` next to your estimator of choice before continuing. 
+<b>Question 7a:</b> Which one would you prefer? Why? Delete the `#` next to your estimator of choice and create the `Fst_Hud` function before continuing. 
 Now lets actually do the estimation. 
 ```R
 ## Give the allele freq. talbes a unique row name for each marker. We will use this to select only sites with allele frequency estimations for each pair of populations.
