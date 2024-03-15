@@ -92,7 +92,7 @@ As you can see, the `.tfam` file contains sample names, while `.tped` contains g
 ```bash
 plink --tfile nacanids_111indiv_unrel_noYNP_42Ksnps --dog --missing-genotype N --biallelic-only --geno 0.25 --maf 0.05 --bp-space 10000 --make-bed --out wolves_0.25mis_thinned
 ```
-<b>Question 3a:</b>Can you match the filters to the flags passed to `plink`? 
+<b>Question 3a:</b>Can you match the filters to the flags passed to `plink`?<br>
 <b>Question 3b:</b>Out of the ~42,000 sites genotyped, how many were retained after filtering? Write this down. You'll need it later.<br><br>
 
 Now that we have our file in the adequate format, we can run `Admixture`. It takes two arguments, the fenotype file, and the number of hypothetical ancestral populations from which our samples descend (i.e. $k$). 
@@ -168,8 +168,8 @@ Now lets use `plink` to run our PCA.
 ```
 plink --bfile wolves_0.25mis_thinned --dog --pca --out wolves_0.25mis_thinned_PCA
 ```
-This should produce two files `wolves_0.25mis_thinned_PCA.eigenvec` and `wolves_0.25mis_thinned_PCA.eigenvec`. Download these files to your computer. 
-<b>Question 5:</b> Given what we have learned about PCA and the previous lab, what do you think each of these files contains? 
+This should produce two files `wolves_0.25mis_thinned_PCA.eigenvec` and `wolves_0.25mis_thinned_PCA.eigenvec`. Download them to your computer.<br> 
+<b>Question 5:</b> Given what we have learned about PCA and the previous lab, what do you think each of these files contains (feel free to open them and take a look inside)? 
 
 Now in R lets plot our PC axes
 ```R
@@ -182,19 +182,25 @@ par(mar=c(4.5, 4.1, 2, 2.1))
 #Plot
 plot(vectors[,3],-vectors[,4], pch=21, bg=cols,xlab="PC1",ylab="–PC2")
 ```
-<b>Question 6:</b> Given what we have learned about PCA and the previous lab, what do you think each of these files contains? 
+<b>Question 6:</b> What does PCA tell you about the the geographic distrubtuion of genetic structure in our data? To address this it may be a good idea to plot other PC axes, and to plot PC axes against longitude and latitude. 
+
 
 ## Estimating Effective Migration Surfaces
 
-We can already say a few things about the geographic distrubtuion of genetic structure based on plotting admixture proportions on the map. However, population gentic theory lets us go further, and actually estimate parameters that explicitly incorporate geography. For example, `EEMS` uses genetic distances and sample coordinates to estimate <i> effective migration surfaces </i>, which can be seen as maps of gene flow, wehre we can identify areas of the map that may be allowing more or less migration than others. To run `EEMS` we need two things: A matrix of genetic distances, and the coordinates of our samples. We already have coordinates. To generate genetic distance matrix we can use the program `bed2diffs`, which is distributed with `EEMS`. All this program does is, for each pair of samples ($i$ and $j$) calculate the average genetic distance, $D_{ij}$ defined as
+We can already say a few things about the geographic distrubtuion of genetic structure based on comparing the results of non-spatial analyses with our sampling localities. However, population gentic theory lets us go further, and actually estimate parameters that explicitly incorporate geography. For example, `EEMS` uses genetic distances and sample coordinates to estimate <i> effective migration surfaces </i>, which can be seen as maps of gene flow, wehre we can identify areas of the map that may be allowing more or less migration than others. To run `EEMS` we need two things: A matrix of genetic distances, and the coordinates of our samples. We already have coordinates. To generate genetic distance matrix we can use the program `bed2diffs`, which is distributed with `EEMS`. All this program does is, for each pair of samples ($i$ and $j$) calculate the average genetic distance, $D_{ij}$ defined as
 
-$$Dij = \frac{1}{N_{ij}} \sum_{m=1}^{N_{ij}} (p_{i_m} - p_{j_m})^2$$
+$$Dij = \frac{1}{N_{ij}} \sum_{m=1}^{N_{ij}} (g_{i_m} - g_{j_m})^2$$
 
-Where $N_{ij}$ is the number of sites with data for both samples, and $p_{i_m}$ and $p_{j_m}$ are the allele frequencies of each population at site $m$. Conveniently, `bed2diffs` takes plink-formatted files as input. 
+Where $N_{ij}$ is the number of sites with data for both samples, and $g_{i_m}$ and $g_{j_m}$ are the genotypes of each individual at site $m$, measured as the number of copies of the minor allele. Homozygotes for the major allele have a genotype of 0, heterozygotes a genotype of 1, and homozygotes for the minor allele a genotype of 2. Conveniently, `bed2diffs` takes plink-formatted files as input. 
 
 ```bash
 "$software_dir"/eems/bed2diffs/src/bed2diffs_v1 --bfile wolves_0.25mis_thinned
 ```
+
+<b>Question 7:</b> Throughout the course we have usually eoncountered measures of genetic distance that do not exponentiate the difference between genotypes. For isntance we can express the familiar $\pi$ (pairwise genetic difference) between two samples as
+$$\pi_{i,j}=\frac{1}{N_{ij}} \sum_{m=1}^{N_{ij}} (g_{i_m} - g_{j_m})$$
+What effect does squaring the difference between genotypes have? 
+
 Now we're almost ready to run `EEMS`, we just need to do a bit of housekeeping. First, `EEMS` needs the coordinate and genetic distance files to have the same name (but different file extensions. Our files have different names,`wolves.coord`and `wolves_0.25mis_thinned.diffs`. Let's fix that. 
 
 ```bash
@@ -232,7 +238,8 @@ numBurnIter = 2500000
 numThinIter = 9999
 ```
 
-Can you tell what most of these arguments do? You may have noticed that the `mcmcpath` line points to a folder that doesn't exist yet. The code below creates it and runs `EEMS`. 
+<b>Question 8:</b> Can you tell what each of these arguments does? <br> 
+You may have noticed that the `mcmcpath` line points to a folder that doesn't exist yet. The code below creates it and runs `EEMS`. 
 
 ```bash 
 mkdir eems_mcmc
@@ -259,4 +266,9 @@ projection_mercator="+proj=merc +datum=WGS84"
 ## Generate eems figures, including the grid, the deme locations outer polygon, and coastline/boundaries. 
 eems.plots(mcmcpath="eems_mcmc",plotpath="./",longlat=T,add.demes=T,add.grid=T,add.outline=T,out.png=F, add.map=T, col.map="black", lwd.map=1, lwd.grid=0.5, min.cex.demes=0.75, max.cex.demes = 2, projection.in=projection_none, projection.out=projection_mercator)
 ```
-This will generate a series of pdf files that will be saved in your folder. Wait here and we will discuss them as a class. 
+This will generate a series of pdf files that will be saved in your folder. Take a moment to explore them. 
+
+<b>Question 9:</b> Based on these plots answer the following questions (include the plots you are referring to in your answers): Does the model seem to fit the data well? Is there a signature of isolation by distance in the data?
+<br>
+
+<b>Question 10:</b> Taking all the analyses together, what can you say about the forces shaping geogprahic distribution of genetic variation in this system? Are both discrete and continuous barriers to gene flow at play? If so, can you identify any such features on the map?
