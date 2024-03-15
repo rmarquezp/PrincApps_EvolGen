@@ -30,6 +30,7 @@ map_crop=crop(map,northNA) ##May throw a warning but seems to work fine regardle
 
 ## Load the sampling coordinates
 coords=read.table("wolves.coord")
+colnames(coords)=c("Lon","Lat")
 
 ## Plot the elevation layer
 plot(altitude_crop, xlim=northNA[1:2], ylim=northNA[3:4])
@@ -128,12 +129,17 @@ make.admix.pie.plot(admix.proportions = as.matrix(q2), coords = as.matrix(coords
 ```
 What can you say from these results? How does genetic variation seem to be structured in this system?<br><br>
 
-Use the code above to plot the results for other values of $k$, what do you see as the number of clusters increases? Wait here to discuss these results as a class.
-<--!
+<b>Question 5:</b>Use the code above to plot the results for other values of $k$, and include your plot in the report. What do you see as the number of clusters increases? 
+<!--
 <details> <summary> Click here to see the plot</summary>
 <img src="../Images/Wolves_admixture_k2-8.png" width="1000">  
 </details>
 --->
+
+## PCA with a map
+
+Principal component analysis is one of the most widely used ways to visualize genetic structure in a sample. Although we can't directly plot PC axes on a map, since they are not in units of longitude/latitude degrees, wa can take advantage of point colorinch schemes to connect our sampling coordinates to our PC plot (or any other plot for that matter). 
+
 ## Estimating Effective Migration Surfaces
 
 We can already say a few things about the geographic distrubtuion of genetic structure based on plotting admixture proportions on the map. However, population gentic theory lets us go further, and actually estimate parameters that explicitly incorporate geography. For example, `EEMS` uses genetic distances and sample coordinates to estimate <i> effective migration surfaces </i>, which can be seen as maps of gene flow, wehre we can identify areas of the map that may be allowing more or less migration than others. To run `EEMS` we need two things: A matrix of genetic distances, and the coordinates of our samples. We already have coordinates. To generate genetic distance matrix we can use the program `bed2diffs`, which is distributed with `EEMS`. All this program does is, for each pair of samples ($i$ and $j$) calculate the average genetic distance, $D_{ij}$ defined as
@@ -144,8 +150,6 @@ Where $N_{ij}$ is the number of sites with data for both samples, and $p_{i_m}$ 
 
 ```bash
 "$software_dir"/eems/bed2diffs/src/bed2diffs_v1 --bfile wolves_0.25mis_thinned
-
-#Note that we give the file name without its extension. This is common in some bioinformatics programs, such as plink
 ```
 Now we're almost ready to run `EEMS`, we just need to do a bit of housekeeping. First, `EEMS` needs the coordinate and genetic distance files to have the same name (but different file extensions. Our files have different names,`wolves.coord`and `wolves_0.25mis_thinned.diffs`. Let's fix that. 
 
@@ -191,7 +195,7 @@ mkdir eems_mcmc
 "$software_dir"/eems/runeems_snps/src/runeems_snps --params eems.config
 ```
 
-You should se the MCMC begin to run. Unfortunately, `EEMS` takes some time to run long enough MCMC chains to propperly optimize the model. In view of this, we can use results from a previous `EEMS` run. Download the `eems_mcmc.zip` from Canvas to your computer for plotting and extract its contents. You will also need to install the `rEEMSplots` package, which is distributedwith `EEMS` as well. To avoid having to install all of `EEMS` into your computer, you can download and extract rEEMSplots.zip from Canvas. Once you've donde this, change the R working directory to rEEMSplots using `setwd()`, and once there run the following command:
+You should se the MCMC begin to run. Unfortunately, `EEMS` takes some time to run long enough MCMC for chains to propperly optimize the model. In view of this, we can use results from a previous `EEMS` run. Download the `eems_mcmc.zip` from Canvas to your computer for plotting and extract its contents. You will also need to install the `rEEMSplots` package, which is distributedwith `EEMS` as well. To avoid having to install all of `EEMS` into your computer, you can download and extract rEEMSplots.zip from Canvas. Once you've donde this, change the R working directory to rEEMSplots using `setwd()`, and once there run the following command:
 
 ```R
 install.packages("rEEMSplots", repos = NULL, type = "source")
