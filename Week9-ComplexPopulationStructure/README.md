@@ -138,7 +138,51 @@ What can you say from these results? How does genetic variation seem to be struc
 
 ## PCA with a map
 
-Principal component analysis is one of the most widely used ways to visualize genetic structure in a sample. Although we can't directly plot PC axes on a map, since they are not in units of longitude/latitude degrees, wa can take advantage of point colorinch schemes to connect our sampling coordinates to our PC plot (or any other plot for that matter). 
+Principal component analysis is one of the most widely used ways to visualize genetic structure in a sample. Although we can't directly plot PC axes on a map, since they are not in units of longitude/latitude degrees, wa can take advantage of point colorinch schemes to connect our sampling coordinates to our PC plot (or any other plot for that matter). One way to do this is to create a <i>bidimensional</i> color palette based on our longitude and latitude, and use it to color points on the PC plot. This will result in points that are closer in geography having similar colors. To illustrate this, lets re-plot our map, this time with points colored according to Long/Lat. 
+
+```R
+library(pals)
+library(classInt)
+
+## First split up the coordinates in three bins
+bins=3
+breaklong=classIntervals(coords[,1], n=bins, style="equal")
+breaklat=classIntervals(coords[,2], n=bins, style="equal")
+
+# Now assign these bins to colors, first univariately and then combining both variables
+class_lon=findCols(breaklong)
+class_lat=findCols(breaklat)
+col_order=class_lat + bins*(class_lon-1)
+
+# Set the actual colors for each 2D bin
+cols=stevens.pinkblue()[col_order]
+
+## Now plot the map
+plot(altitude_crop, xlim=northNA[1:2], ylim=northNA[3:4],axes=F,box=F, legend=F)
+plot(map_crop, lwd=1, add=T, xlim=c(-175,-54), ylim=c(43,80))
+points(coords, pch=21, bg=cols, cex=0.75)
+```
+
+Now lets use `plink` to run our PCA. 
+
+```
+plink --bfile wolves_0.25mis_thinned --dog --pca --out wolves_0.25mis_thinned_PCA
+```
+This should produce two files `wolves_0.25mis_thinned_PCA.eigenvec` and `wolves_0.25mis_thinned_PCA.eigenvec`. Download these files to your computer. 
+<b>Question 5:</b> Given what we have learned about PCA and the previous lab, what do you think each of these files contains? 
+
+Now in R lets plot our PC axes
+```R
+## Read in eigenvectors
+vectors=read.table("wolves_0.25mis_thinned_PCA.eigenvec")
+
+## Reset plotting parameters (which we'd changed for the map)
+par(mar=c(4.5, 4.1, 2, 2.1))
+
+#Plot
+plot(vectors[,3],-vectors[,4], pch=21, bg=cols,xlab="PC1",ylab="–PC2")
+```
+<b>Question 6:</b> Given what we have learned about PCA and the previous lab, what do you think each of these files contains? 
 
 ## Estimating Effective Migration Surfaces
 
