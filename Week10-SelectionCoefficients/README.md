@@ -1,8 +1,13 @@
-Estimating selection coefficients from genotype frequency time series
+Single-locus selection
 ====================
+
+Intro bla bla bla
+
+## Estimating selection coefficients from genotype frequency time series
+
 Selection coefficients (usually denoted as $s$) describe the extent to which selection deviates allele frequencies from a given neutral model (e.g. Hardy-Weinberg or Wright-Fisher). As such, they are a very useful tool to gain insight on the strenth of selection experienced by genotypes (and the phenotypes that they code for) in a given environment. In  class we have derived multiple mathematical expressions for the allele frequency change over time and $s$. Today we will be looking at a common way to estimate $s$ from time-series data of genotype frequencies using these equations. In general, our approach will consist on fitting models of allele frequency change to data in order to find the best-fitting values of $s$. We will be working in R, using the packages `minpack.lm`.
 
-## Selection coefficients from haploid allele frequencies: The Omicron takeover
+### Selection coefficients from haploid allele frequencies: The Omicron takeover
 
 At the end of 2021 and beginning of 2022 the Delta variant of the SARS-Cov2 virus was the most prevalent strain worldwide. Around that time a new lineage named Omicron was first detected, and very quickly took over Delta and all other lineages, to the point where the overwhelming majority of viral strains recovered currently by surveilance efforts belong to the Omicron lineage. This fast takeover suggests that Omicron had a strong selective advantage over Delta. Our goal here will be to estimate the selective coefficient associated to Omicron's takeover.  
 <br><br>
@@ -117,10 +122,10 @@ exp=p0_exp/(p0_exp+((1-s_exp)^gen)*(1-p0_exp))
 <img src="../Images/OmicronFit.png" width="500" class="center">
 Great fit! It looks like even with our very simple model that assumed no mutation and infinite population size fits the data pretty well! 
 
-<!---## Estimating Selection Coefficients in Diploids
+### Estimating Selection Coefficients in Diploids
 Haploid genomes are very ameanable for popualtion genetic modelling, since having a single copy of each locus simplifies things quite a bit. Diploidy is, however, widespread in nature, so we will now use a similar strategy as above to estimate $s$ in a diploid system. We will be considering data of the peppered moth, <i>Biston betularia</i>, which is a moth that exhibits two different color morphs, consisting of individuals with light grey and very dark grey winds and body. 
 
 <img src="https://www.icr.org/i/wide/peppered_moth_wide.jpg" width="600" class="center">
 
 This color morph is controlled by a single locus, and 
--->
+
