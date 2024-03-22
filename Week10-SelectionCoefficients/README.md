@@ -39,35 +39,52 @@ legend(as.Date("2019-12-10"),1, c("Delta","Omicron"), col=c("cornflowerblue","da
 ```
 <img src="../Images/CovidFreqsTotal.png" width="500" class="center">
 
-The data clearly show the fluctuating cycles typical of viral strain evolution. The fact that Delta increased rapidly and then decreased implies that its selection coefficient has changed over time, being initially positive as the strain rose in frequency and negative as it declined. Since the models we have considered assume $s$ stays constant over time, and we are mainly interested in the replacement of Delta by Omicron, we need to crop our dataset so that it only includes a relevant time window. 
+The data clearly show the fluctuating cycles typical of viral strain evolution. <br>
+
+<b>Question 1:</b> Does the selection coefficient of the Delta variant relative to other strains appear to have been stable over time or has it changed?
+<details>
+<summary> Click here to see the answer</summary>
+<br>
+The fact that Delta increased rapidly and then decreased implies that its selection coefficient has changed over time, being initially positive as the strain rose in frequency and negative as it declined. 
+</details>
+
+Since the models we have considered assume $s$ stays constant over time, and we are mainly interested in the replacement of Delta by Omicron, we need to crop our dataset so that it only includes a relevant time window. <br>
+<br>
+<b>Question 2a:</b> Select a time window through which $s$ appears to have remained constant, and crop the data as detailed below to only include observations durring this time. 
 
 ```R
-# Create a new table with only the data collected after Oct. 15, 2021. 
-covidFreqs_crop=covidFreqs[covidFreqs$Date>as.Date("2021-10-15"),]
+# Create a new table with only the data between two dates. Secify them below in the following format: "YYY-MM-DD". FOr example, Mar 22, 2024 would be "2024-03-22" 
+minDate=as.Date("EARLIEST DATE")
+maxDate=as.Date("LATEST DATE")
+covidFreqs_crop=covidFreqs[covidFreqs$Date>minDate & covidFreqs$Date<maxDate,]
 
 # Plot new range
 plot(covidFreqs_crop$Date, covidFreqs_crop$DeltaFreq, type="b", xlab="Date", ylab="Strain Frequency", lwd=1.5, col="cornflowerblue", pch=16, cex=0.75)
 points(covidFreqs_crop$Date, covidFreqs_crop$OmicronFreq, type="b", lwd=1.5, col="darkorange", pch=16, cex=0.75)
 legend(as.Date("2022-06-30"),0.4, c("Delta","Omicron"), col=c("cornflowerblue","darkorange"), lwd=2, pch=16)
 ```
+<!---
 <img src="../Images/CovidPrunned.png" width="500" class="center">
-
-Do the data in this new range seem appropriate to analyze with the models we covered in class? Think about why (or why not) for a moment.
+--->
+<br>
+<b>Question 2b:</b> Do the data in this new range seem appropriate to analyze with the models we covered in class? Why or why not?
 <br><br>
 Before we estimate $s$ we need to re-express our time axis so that it starts (ie. has a value of 0) close to the benining of our focal time window, and we need to convert it from days to generations. Recently Hart and collaborators ([2022](https://doi.org/10.1016/S1473-3099(22)00001-9)) estimated the generation time for SARS-Cov2 strains Alpha and Delta to be 5.5 and 4.7 days. Since we don't have a specific estimate for Omicron, 5 days per generation seems like a sensible assumption.<br>
 <br>
-What does the generation time mean for a virus?
+<b>Question 3:</b> What does the generation time mean for a virus?
+<!--
 <details>
 <summary> Click here to see the answer</summary>
 <br>
 In viruses, the generation time can be seen as the time between someone getting infected and pasing the virus to another person. 
 </details>
+-->
 
 ```R
 #Create a new column with the dates converted to number of days after Oct 24
 covidFreqs_crop$DateNumeric=covidFreqs_crop$Date-covidFreqs_crop$Date[1]
 
-## Now transform that to number of generations assuming tGen = 5 days
+# Now transform that to number of generations assuming tGen = 5 days
 
 genT=5
 covidFreqs_crop$DateGen=as.numeric(covidFreqs_crop$DateNumeric/genT)
@@ -75,23 +92,28 @@ covidFreqs_crop$DateGen=as.numeric(covidFreqs_crop$DateNumeric/genT)
 Now it is finally time to estimate $s$. To do so, we will use non-linear least squares to fit the expression for the expected allele frequency under Hardy-Weinberg given initial frequency $p(0)$ and selection coefficient $s$. 
 $$p(t)=\frac{p(0)}{p(0)+(1-s)^t(1-p(0))}$$
 
-Run the code below. Note that instead of assuming $p(0)$ corresponds to the frequency at which we first observed Omicron, we are also estimating this parameter. This is because strains need to rise to some frequency before we actually detect them, so the frequency at which we first observe a strain is not likely to be its actual initial frequency, the value of which may be of interest. 
+Run the code below. Note that instead of assuming $p(0)$ corresponds to the frequency at which we first observed Omicron, we are also estimating this parameter. This is because strains need to rise to some frequency before we actually detect them, so the frequency at which we first observe a strain is not likely to be its actual initial frequency, the value of which may be of interest.
+
 ```R
 covFit=nlsLM(OmicronFreq~p0/(p0+((1-s)^DateGen)*(1-p0)), data=covidFreqs_crop, start=list(p0=1e-5, s=0.01), trace=T)
 ```
-Did everything go as expected? You have likely gotten a warning from R, stating that the algorithm ran for the pre-extablished maximum number of generations. This is not ideal, as it raises the possibility that our algorithm didn'd find parameter values that fit the model appropriately, but rather just ran for a pre-specified maximum ammount of iterations and stopped. How would you solve this?
+Did everything go as expected? You have likely gotten a warning from R, stating that the algorithm ran for the pre-extablished maximum number of generations. <br><br>
 
+<b>Question 4:</b> Should we keep the results of this model-fitting excersise? If no, what would you do differently to obtain more trustworthy results?
+<!--
+This is not ideal, as it raises the possibility that our algorithm didn'd find parameter values that fit the model appropriately, but rather just ran for a pre-specified maximum ammount of iterations and stopped. How would you solve this?
+-->
 <details>
-  <summary> Click here to see the (ie. my) answer</summary>
+  <summary> Click here to see code I used to solve this problem</summary>
 
-Since computational time is not an issue here, it is advisable that we run the algorithm for longer. To do so, we can specify a higher maximum number of iterations. 
+<!--Since computational time is not an issue here, it is advisable that we run the algorithm for longer. To do so, we can specify a higher maximum number of iterations. --->
 
 ```R
 covFit=nlsLM(OmicronFreq~p0/(p0+((1-s)^DateGen)*(1-p0)), data=covidFreqs_crop, start=list(p0=1e-5, s=0.01), trace=T, control=list(maxiter=500))
 ```
 </details>
-  
-OK, the model seems to have converged this time. Lets take a look at the estimated parameters. 
+ 
+Using the code above the model seems to have converged this time. Lets take a look at the estimated parameters. 
 ```R
 covFit
 
@@ -105,7 +127,9 @@ covFit
 # Number of iterations to convergence: 57 
 # Achieved convergence tolerance: 1.49e-08
 ```
-The morel estimated an initial allele frequency of $3\times10^{-7}$, and a selection coefficient of 0.6829. This is an incredibly high coefficient. Recall from lecture that we were using $s=0.1$ in examples of strong positive selection. Maybe this explains how Omicron took over the world in a few weeks! Now, before buying into our results, we should visualize how well the model with our estimated parameters fits the data. 
+<b>Question 5:</b> The model estimated an initial allele frequency of $3\times10^{-7}$. What is the estimate for the seelction coefficient? What does this number mean in terms of the selective advantage of Omicron over Delta in (rough) quantitative terms? Would this explain why Omicron took over the world in a few weeks?
+<br>
+Now, before buying definitively into our results, we should visualize how well the model with our estimated parameters fits the data. 
 ```R
 #First Get the expected genotype frequencies under the model
 
@@ -120,9 +144,9 @@ s_exp=coef(covFit)[2]
 exp=p0_exp/(p0_exp+((1-s_exp)^gen)*(1-p0_exp))
 ```
 <img src="../Images/OmicronFit.png" width="500" class="center">
-Great fit! It looks like even with our very simple model that assumed no mutation and infinite population size fits the data pretty well! 
+<b>Question 6:</b> How well does our very simple model that assumes no mutation and infinite population size fit the Omicron takeover?  
 
-### Estimating Selection Coefficients in Diploids
+### Estimating Selection Coefficients in Diploids: The Peppered Moth
 Haploid genomes are very ameanable for popualtion genetic modelling, since having a single copy of each locus simplifies things quite a bit. Diploidy is, however, widespread in nature, so we will now use a similar strategy as above to estimate $s$ in a diploid system. We will be considering data of the peppered moth, <i>Biston betularia</i>, which is a moth that exhibits two different color morphs, consisting of individuals with light grey and very dark grey winds and body. 
 
 <img src="https://www.icr.org/i/wide/peppered_moth_wide.jpg" width="600" class="center">
