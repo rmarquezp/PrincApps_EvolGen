@@ -145,6 +145,10 @@ s_exp=coef(covFit)[2]
 
 #Use parameters to calculate expected allele frequencies under the model
 exp=p0_exp/(p0_exp+((1-s_exp)^gen)*(1-p0_exp))
+
+#Plot!
+plot(gen, exp, type="l", col="darkorange", lwd=1.5, xlab="Generations", ylab="Omicron Frequency")
+points(covidFreqs_crop$DateGen, covidFreqs_crop$OmicronFreq, bg="darkorange", pch=21, cex=1)
 ```
 <img src="../Images/OmicronFit.png" width="500" class="center">
 <b>Question 6:</b> How well does our very simple model that assumes no mutation and infinite population size fit the Omicron takeover?  
@@ -240,14 +244,21 @@ pprimeTraj_fit <- function(p0,s, h, time){
 ```
 This function extracts the amount of time elapsed between the first and last observation and runs the recursion equation for this amount of time. Since we don't have data for all time points, it also extracts the expected allele frequencies at the specific time points present in our data. `nlsLM` can then run this function with many different combinations of $s$ and $p_0$ to try to find the ones that fit the data best.<br><br>
 
-We can now use our function to find the best-fitting parameter values.
+We can now use our function to find the best-fitting parameter values.<br> 
+<b>Question 9:</b> What value of $h$ would you use in this case? Why? Replace make sure to add it 
 ```
-fit_bbet=nlsLM(q~pprimeTraj_fit(p0=p0, s=s, h=1, time=Time), data=mothDat, start=list(p0=1e-5, s=0.01), trace=T, lower=c(p0=0,s=0), upper=c(p0=1, s=1))
+fit_bbet=nlsLM(q~pprimeTraj_fit(p0=p0, s=s, h=, time=Time), data=mothDat, start=list(p0=1e-5, s=0.01), trace=T, lower=c(p0=0,s=0), upper=c(p0=1, s=1))
 ```
 Note that in this case we gave it lower and upped bounds for parameter estimates to make sure we only consider estimates that make sense biologically. <br><br>
-<b>Question 9:</b> Try fitting the model without these bounds. Do the estiamtes you got make sense?
-<br>
-Finally, lets plot the light morph allele frequencies alongside the best-fitting 
+<b>Question 10:</b> Try fitting the model without these bounds. Do the estiamtes you got make sense?
+<br><br>
+Finally, lets plot the light morph allele frequencies alongside the best-fitting allele frequency trajectory:
+
+```R
+ML_traj=pprimeTraj(p0=coef(fit_bbet)[1], s=coef(fit_bbet)[2], h=1, ngen=max(mothDat$Year)-min(mothDat$Year))
+plot(mothDat$Year, mothDat$q, pch=16, xlab="Year", ylab="Recessive Allele Frequency (q)")
+points(min(mothDat$Year):max(mothDat$Year), ML_traj, type="l", col="cyan3", lwd=2)
+```
 
 
 
