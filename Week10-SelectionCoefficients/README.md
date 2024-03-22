@@ -1,10 +1,13 @@
+<!---
 Single-locus selection
 ====================
 
 Single-locus models that describe the trajectory of an allele under selection over time have played an important role in our understanding of how this force impacts genetic and phenotypic variation in biological systems. Today we will be using these models in two ways: First, we will use time-series data of genotype and phneotype frequencies to estimate selection coefficients from deterministic models of selection. Second, we will use simulations to evaluate the degree to which the theoretical results derived in class regarding the interaction of selection and drift, for which several symplifying assumptiosn were made, describe the behavior of a whright-fisher population under selection. 
 
 ## Estimating selection coefficients from genotype frequency time series
-
+--->
+Estimating selection coefficients from genotype frequency time series
+====================
 Selection coefficients (usually denoted as $s$) describe the extent to which selection deviates allele frequencies from a given neutral model (e.g. Hardy-Weinberg or Wright-Fisher). As such, they are a very useful tool to gain insight on the strenth of selection experienced by genotypes (and the phenotypes that they code for) in a given environment. In  class we have derived multiple mathematical expressions for the allele frequency change over time and $s$. Today we will be looking at a common way to estimate $s$ from time-series data of genotype frequencies using these equations. In general, our approach will consist on fitting models of allele frequency change to data in order to find the best-fitting values of $s$. We will be working in R, using the packages `minpack.lm`.
 
 ### Selection coefficients from haploid allele frequencies: The Omicron takeover
@@ -147,9 +150,82 @@ exp=p0_exp/(p0_exp+((1-s_exp)^gen)*(1-p0_exp))
 <b>Question 6:</b> How well does our very simple model that assumes no mutation and infinite population size fit the Omicron takeover?  
 
 ### Estimating Selection Coefficients in Diploids: The Peppered Moth
-Haploid genomes are very ameanable for popualtion genetic modelling, since having a single copy of each locus simplifies things quite a bit. Diploidy is, however, widespread in nature, so we will now use a similar strategy as above to estimate $s$ in a diploid system. We will be considering data of the peppered moth, <i>Biston betularia</i>, which is a moth that exhibits two different color morphs, consisting of individuals with light grey and very dark grey winds and body. 
+Haploid genomes are very ameanable for popualtion genetic modelling, since having a single copy of each locus simplifies the connection between genotype and phenotype quite a bit. Diploidy is, however, widespread in nature, so we will now use a similar strategy as above to estimate $s$ in a diploid system. We will be considering data of the peppered moth, <i>Biston betularia</i>, which exhibits two different color morphs: light grey and very dark grey wings and body. From crossing experiments and genome-wide association studies, it is known that the dark morph arises from the insertion of a transposable element upstream of the gene <i>cortex</i>, which results in an overmelanization of the body. A single copy of this insertion results in considerable melanization, so this allele can be considered dominant over the less melanized allele. 
 
 <img src="https://www.icr.org/i/wide/peppered_moth_wide.jpg" width="600" class="center">
 
-This color morph is controlled by a single locus, and 
+In the late 1840s around the end of the Industrial Revolution in Britain, biologists noticed the melanic morph of <i> B. betularia</i> for the first time, existing at low frequencies. By the turn of the century, the vast majority of moths observed in Britain were melanic, leading biologists to argue that this morph had a selective advantage over its grey counterpart in the environmental conditions created by industrialization. Specifically, they hypothesized that environmental pollution had both reduced the population of tree-bark lichens, and deposited black soot on surfaces, drastically reducing the availability of grey surfaces upon which grey moths could perch while camouflaged. Melanic moths, on the other hand, were well camouflaged on the new sooty surfaces. <br><br>
+
+As the British economy shifted into post-industrialism, air polution was greatly reduced, both due to stronger emission regulations and the fact that the "dirtier" industry was outsourced to other countires. As this happened, a re-surgence of the grey morph was observed: Between the late 1960s and the early 2000s the frequency of the melanic morph dropped to very low levels. This ocurred independently in multiple cities in the UK and US (including Detroit!). The peppered moth therefore became an banner exaple of Darwinian evolution (i.e. positive selection): As conditions changed, the phenotypic (and genetic) makeup of populations evolved to match them. <br><br>
+
+How strong does selection need to be for us to observe such a textbook example? Lets find out. On Canvas you will find a file with the morph frecuencies for <i>B. betularia</i> captured in Leeds, England between 1967 and 2003. Load it into R and calculate the morph frecuencies:
+
+```R
+# Load
+mothDat=read.table("B_bet.tsv",h=T)
+
+#Calculate frequencies
+mothDat$FreqCarbonaria=mothDat$carbonaria/(mothDat$carbonaria+mothDat$typica)
+mothDat$FreqTypica=mothDat$typica/(mothDat$carbonaria+mothDat$typica)
+
+#Plot! 
+par(mfrow=c(1,2))
+plot(mothDat$Year, mothDat$FreqCarbonaria, pch=16, xlab="Year", ylab="Frequency of Melanic Morph", ylim=c(0,1))
+plot(mothDat$Year, mothDat$FreqTypica, pch=21, bg="grey", xlab="Year", ylab="Frequency of Light Morph", ylim=c(0,1))
+```
+
+Although selection is acting on phenotypes, our models deal with allele frequency change over time. Therefore, wee need to obtail allele frequencies from our phenotype data. <br><br>
+
+<b>Question 7:</b> Assuming this trait is controlled by a single locus with two alleles, and that the melanic morph is fully dominant over the light morph, use the genotype frequencies to calculate the frequency of the "light" allele. Explain your reasoning. 
+
+<details>
+  <summary> Click here to see code I used to do this</summary>
+
+```R
+mothDat$q=sqrt(mothDat$FreqTypica)
+```
+</details>
+
+Now we have a time series of allele frequency change over time. All we need is a way to calculate the expected allele frequency series given a specific $s$ and $p_0$ in order to find the best-fitting values of these two parameters. As we saw in lecture, such an expression cannot be derived analytically in the diploid case. We can, however, obtain an expression for the change due to selection in a single generation:
+
+$$ p_{(t+1)}=\frac{p^2+pq(1-hs)}{1-2pqhs-q^2s}$$
+
+Where $p$ is the allele frequency at generation $t$ and $q=(1-p)$. <br><br>
+
+With this equation, we can write what is known as a *recursion*, which in our case is basically a short computer program to numerically evaluate the change in allele frequency over many generations by repeatedly applying the expression for change over one generation.  
+```R
+pprimeTraj <- function(p0,s, h, ngen){
+
+	ps=numeric(ngen+1)
+	ps[1]=p0
+
+	for(i in 2:(ngen+1)){
+		p=ps[i-1]
+		q=1-p
+		wbar=1-2*p*q*h*s-q^2*s
+		pp=(p^2+(1-h*s)*p*q)/wbar
+		ps[i]=pp
+	}
+	names(ps)=0:ngen
+	return(ps)
+}
+
+## Run an example recursion
+rec=pprimeTraj(p0=0.01,s=0.2,h=0,ngen=50)
+rec
+         0          1          2          3          4          5          6          7          8          9         10         11         12         13         14         15         16         17         18 
+0.01000000 0.01243812 0.01545215 0.01916824 0.02373500 0.02932486 0.03613404 0.04438021 0.05429714 0.06612497 0.08009560 0.09641300 0.11522923 0.13661880 0.16055525 0.18689502 0.21537340 0.24561549 0.27716182 
+        19         20         21         22         23         24         25         26         27         28         29         30         31         32         33         34         35         36         37 
+0.30950476 0.34212908 0.37454966 0.40634080 0.43715415 0.46672545 0.49487196 0.52148373 0.54651153 0.56995394 0.59184506 0.61224386 0.63122542 0.64887410 0.66527846 0.68052752 0.69470827 0.70790403 0.72019342 
+        38         39         40         41         42         43         44         45         46         47         48         49         50 
+0.73164985 0.74234131 0.75233046 0.76167471 0.77042660 0.77863401 0.78634061 0.79358610 0.80040664 0.80683510 0.81290141 0.81863280 0.82405410
+
+## Plot it
+plot(0:50, rec, pch=16, xlab="Generations", ylab="Allele Frequency")
+```
+<b>Question 8:</b> Take a moment to look over the above function and its output. Can you tell what it does? Briefly explain how this function produces a time series of allele frequencies under selection. 
+<br>
+To actually fit a recursion, we need to have a function that produces the expected allele frequency at the specific time points that we have sampled. .  
+
+
 
