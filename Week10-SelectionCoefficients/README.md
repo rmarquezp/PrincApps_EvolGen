@@ -1,7 +1,7 @@
 Single-locus selection
 ====================
 
-Intro bla bla bla
+Single-locus models that describe the trajectory of an allele under selection over time have played an important role in our understanding of how this force impacts genetic and phenotypic variation in biological systems. Today we will be using these models in two ways: First, we will use time-series data of genotype and phneotype frequencies to estimate selection coefficients from deterministic models of selection. Second, we will use simulations to evaluate the degree to which the theoretical results derived in class regarding the interaction of selection and drift, for which several symplifying assumptiosn were made, describe the behavior of a whright-fisher population under selection. 
 
 ## Estimating selection coefficients from genotype frequency time series
 
