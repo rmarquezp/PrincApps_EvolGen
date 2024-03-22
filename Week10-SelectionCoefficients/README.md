@@ -255,7 +255,10 @@ Note that in this case we gave it lower and upped bounds for parameter estimates
 Finally, lets plot the light morph allele frequencies alongside the best-fitting allele frequency trajectory:
 
 ```R
+#Run the recursion using the best-fitting parameter values
 ML_traj=pprimeTraj(p0=coef(fit_bbet)[1], s=coef(fit_bbet)[2], h=1, ngen=max(mothDat$Year)-min(mothDat$Year))
+
+#Plot!
 plot(mothDat$Year, mothDat$q, pch=16, xlab="Year", ylab="Recessive Allele Frequency (q)")
 points(min(mothDat$Year):max(mothDat$Year), ML_traj, type="l", col="cyan3", lwd=2)
 ```
