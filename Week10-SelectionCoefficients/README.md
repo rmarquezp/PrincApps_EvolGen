@@ -224,8 +224,30 @@ rec
 plot(0:50, rec, pch=16, xlab="Generations", ylab="Allele Frequency")
 ```
 <b>Question 8:</b> Take a moment to look over the above function and its output. Can you tell what it does? Briefly explain how this function produces a time series of allele frequencies under selection. 
+<br><br>
+To actually fit a recursion, we need to have a function that produces the expected allele frequency at the specific time points that we have sampled. The function below runs our pprimeTraj but specifically for a dataset like ours.  
+
+```R
+pprimeTraj_fit <- function(p0,s, h, time){
+
+	ngen=max(time)-min(time)
+	exp_traj=pprimeTraj(p0=p0, s=s, h=h, ngen=ngen)
+	
+	names(exp_traj)=min(time):max(time)
+	exp_traj=exp_traj[names(exp_traj)%in%time]
+	return(exp_traj)
+}
+```
+This function extracts the amount of time elapsed between the first and last observation and runs the recursion equation for this amount of time. Since we don't have data for all time points, it also extracts the expected allele frequencies at the specific time points present in our data. `nlsLM` can then run this function with many different combinations of $s$ and $p_0$ to try to find the ones that fit the data best.<br><br>
+
+We can now use our function to find the best-fitting parameter values.
+```
+fit_bbet=nlsLM(q~pprimeTraj_fit(p0=p0, s=s, h=1, time=Time), data=mothDat, start=list(p0=1e-5, s=0.01), trace=T, lower=c(p0=0,s=0), upper=c(p0=1, s=1))
+```
+Note that in this case we gave it lower and upped bounds for parameter estimates to make sure we only consider estimates that make sense biologically. <br><br>
+<b>Question 9:</b> Try fitting the model without these bounds. Do the estiamtes you got make sense?
 <br>
-To actually fit a recursion, we need to have a function that produces the expected allele frequency at the specific time points that we have sampled. .  
+Finally, lets plot the light morph allele frequencies alongside the best-fitting 
 
 
 
