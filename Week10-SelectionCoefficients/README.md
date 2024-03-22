@@ -9,9 +9,9 @@ Selection coefficients (usually denoted as $s$) describe the extent to which sel
 
 ### Selection coefficients from haploid allele frequencies: The Omicron takeover
 
-At the end of 2021 and beginning of 2022 the Delta variant of the SARS-Cov2 virus was the most prevalent strain worldwide. Around that time a new lineage named Omicron was first detected, and very quickly took over Delta and all other lineages, to the point where the overwhelming majority of viral strains recovered currently by surveilance efforts belong to the Omicron lineage. This fast takeover suggests that Omicron had a strong selective advantage over Delta. Our goal here will be to estimate the selective coefficient associated to Omicron's takeover.  
+At the end of 2021 and beginning of 2022 the Delta variant of the SARS-Cov2 virus was the most prevalent strain worldwide. Around that time a new lineage named Omicron was first detected, and very quickly took over Delta and all other lineages, to the point where the overwhelming majority of viral strains recovered in 2022 by surveilance efforts belonged to the Omicron lineage. This fast takeover suggests that Omicron had a strong selective advantage over Delta. Our goal here will be to estimate the selective coefficient associated to Omicron's takeover.  
 <br><br>
-The data we will be using was downloaded this week grom the Global Initiative on Sharing Avian Influenza Data (GISAID), a repository that compiles and maintains surveilance data on several infectious diseases. Download it from Canvas and read it into R. 
+The data we will be using was downloaded in late 2022 from the Global Initiative on Sharing Avian Influenza Data (GISAID), a repository that compiles and maintains surveilance data on several infectious diseases. Download it from Canvas and read it into R. 
 
 ```R
 covidFreqs=read.table("DeltaOmicron.tsv",  h=T)
