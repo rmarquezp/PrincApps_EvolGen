@@ -198,7 +198,7 @@ Where $N_{ij}$ is the number of sites with data for both samples, and $g_{i_m}$ 
 ```
 
 <b>Question 7:</b> Throughout the course we have usually eoncountered measures of genetic distance that do not exponentiate the difference between genotypes. For isntance we can express the familiar $\pi$ (pairwise genetic difference) between two samples as
-$$\pi_{i,j}=\frac{1}{N_{ij}} \sum_{m=1}^{N_{ij}} |{g_{i_m} - g_{j_m}|$$
+$$\pi_{i,j}=\frac{1}{N_{ij}} \sum_{m=1}^{N_{ij}} |g_{i_m} - g_{j_m}|$$
 What effect does squaring the difference between genotypes have? 
 
 Now we're almost ready to run `EEMS`, we just need to do a bit of housekeeping. First, `EEMS` needs the coordinate and genetic distance files to have the same name (but different file extensions. Our files have different names,`wolves.coord`and `wolves_0.25mis_thinned.diffs`. Let's fix that. 
