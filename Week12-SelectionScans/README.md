@@ -22,8 +22,8 @@ Whole-genome resequencing data from 18 <i>H. h. vereatta</i>, 7 <i>H. h. duckei<
 To begin, log into the cluster, request an interactive job with 12 processors and 24 Gb RAM, and once it is assigned  load the `Bioinformatics` `samtools`, and `angsd` modules and create the usual variables:
 
 ```bash
-ref=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/Hmel2.5/Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa
-listDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/heliconius_bams
+ref=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/ReferenceGenomes/Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa
+listDir=/scratch/eeb401s002w24_class_root/eeb401s002w24_class/shared_data/W12
 ```
 
 ## Signatures of selection between populations
