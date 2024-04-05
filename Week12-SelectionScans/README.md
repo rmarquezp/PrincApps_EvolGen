@@ -120,15 +120,17 @@ rect(cortex[1],-1.5,cortex[2],-1.2,col="grey65", border=NA)
 text(1.42e6,-1,"cortex")
 
 ```
-<b>Question 4:</b> How would you explain the patterns observed? Does it look like the <i>cortex</i> alleles frequent in <i>H. h. vereatta</i> sweep to high frequency in the recent past? Explain your reasoning. 
+<b>Question 4:</b> Estimate and plot the same statistics as above for <i>H. h. duckei</i>.
+<b>Question 5:</b> How would you explain the patterns observed? Does it look like the <i>cortex</i> alleles frequent in <i>H. h. vereatta</i> swept to high frequency in the recent past? Explain your reasoning. 
 
 ## Where did these alleles come from? 
 
-The resemblance between Our main goal today will be to evaluate the extent of gene flow between <i>H. h. vereatta</i> and <i>H. erato</i>, both at genome-wide and localized scales. We will do so in the framework of the four-taxon tree below:
+The resemblance between <i>H. h. vereatta</i> and <i>H. erato</i>, together with the fact that barriers to geneflow between <i>Heliconius</i> species tend to be porous, raises the possibility that the loss of hindwing stripes may be due to introgression. The last part of today's practical will assess support for this hypothesis. To do so, we can evaluate the extent of gene flow between <i>H. h. vereatta</i> and <i>H. erato</i>, both at genome-wide and localized scales. We will do so in the framework of the four-taxon tree below:
 
 <img src="../Images/hermathena_four-taxon.png" width="450" class="center">
 
-The first step will be to calculate allele frequencies at each of our three focal populations, as well as in our multi-species outgroup. However, before this, we can 1. identify sites that are 1. variable (i.e. call SNPs), and 2. biallelic across our system, as these are the only informative sites for our analysis. We can do this by estimating allele frequencies across the system in Angsd. In the itnerest of time we will limit our analyses to chromosome 15 using the `-r` flag as we've done before. 
+The first step will be to calculate allele frequencies at each of our three focal populations, as well as in our multi-species outgroup. However, before this, we can 1. identify sites that are 1. variable (i.e. call SNPs), and 2. biallelic across our system, as these are the only informative sites for our analysis. We can do this by estimating allele frequencies across the system in `angsd`. In the itnerest of time we will, again, limit our analyses to chromosome 15.
+
 ```bash
 angsd -P 12 -b $listDir/hermathena_introgression.filelist -r Hmel215003o -ref $ref -GL 1 -out AllPops -doMajorMinor 4 -minInd 25 -doMaf 1 -SNP_pval 1e-3 -skipTriallelic -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 ```
@@ -163,13 +165,13 @@ The next step is to calculate allele frequencies at our combined outgroup, and u
 angsd -P 12 -b  $listDir/outgroup.filelist -r Hmel215003o -sites variable_sites.MAF.txt -ref $ref -GL 1 -out outgroup -doMajorMinor 3 -minInd 3 -doMaf 1 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 ```
 
-Download the resulting file (`outgroup.mafs.gz`) to your computer and open R, or open an R console direclty on the culster by loading the module `R`, and typing `R` into the terminal (I recommend the second option). In R we can chose sites for which the <i>H. melpomene</i> reference allele is fixed in the outgroup.
+Open an R session direclty on the culster to chose sites for which the <i>H. melpomene</i> reference allele is fixed in the outgroup.
 ```R
 ### Load data
 freqs=read.table("outgroup.mafs.gz", h=T)
 
-### Pick sites with allele frequencies below 0.01 (Why don't be pick those with allele frequency equal to zero?)
-fixed=which(freqs$knownEM<0.01)
+### Pick sites with allele frequencies below 0.005 
+fixed=which(freqs$knownEM<0.005)
 
 ## Check number of sites
 length(fixed)
@@ -178,7 +180,7 @@ length(fixed)
 fixed_tab=freqs[fixed,]
 write.table(fixed_tab[,1:4], file="polarized_sites.MAF.txt", quote=F, row.names=F, col.names=F)
 ```
-If you were working locally copy the output file back to the cluster, and index it with Angsd as we did a few momments ago. <br><br>
+<b>Question 5:<b/> Why don't be pick those with allele frequency equal to zero (but instead use those with maf<0.005>?
 
 Now we-re ready to estimate allele frequencies at each of our focal populations. 
 
