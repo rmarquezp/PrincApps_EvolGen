@@ -7,8 +7,7 @@ Selection most often acts on phenotypes, yet only genotypes are transferred acro
 <img src="../Images/H.hermathena.png" width="750" class="center">
 
 
-Has  <i>H. h. vereatta</i>'s distinct hindwing pigmentation arisen due to recent selection? Todaw we will be exploring the spatial distribution of multiple measures of genetic variation across the 
-
+Has  <i>H. h. vereatta</i>'s distinct hindwing pigmentation arisen due to recent selection? Todaw we will be exploring the spatial distribution of multiple measures of genetic variation across the genomes of htese butterflies.
 
 
 ## The Data
@@ -18,17 +17,56 @@ We will use data from three focal populations: We will first focus on <i>H. h. v
 
 <img src="../Images/MassardoPhylo.png" width="350" class="center">
 
-Whole-genome resequencing data from 18 <i>H.h. vereatta</i>, 7 <i>H. h. duckei</i>, 6 <i>H. erato</i>, 2 <i>H. charitonia</i>, and 2 <i>H. telesiphe</i> were downloaded from the SRA, trimmed, and mapped to the <i>H. melpomene</i> reference genome as we have done previously. Note that we are using a different reference genome than the last time we analyzed <i>H. hermathena</i> data. This is for two reasons: First, the <i>H. melpomene</i> reference has nearly-complete sequences of all of this species's chromosomes (the <i>H. hermathena</i> reference does not), which makes the visualization of patterns along entire chromosomes easier. Second, since we are using a multi-species dataset, some smaples will be considerably more closely related to the reference than others, which can result in systematically better read mapping for some populations than others, which in turn can bias estimations of between-population genetic parameters. <i>H. melpomene</i> is equally distant from all our focal and outgroup species, which amelliorates this type of <i>reference bias</i>.<br><br>
+Whole-genome resequencing data from 18 <i>H. h. vereatta</i>, 7 <i>H. h. duckei</i>, 6 <i>H. erato</i>, 2 <i>H. charitonia</i>, and 2 <i>H. telesiphe</i> were downloaded from the SRA, trimmed, and mapped to the <i>H. melpomene</i> reference genome as we have done previously. Note that we are using a different reference genome than the last time we analyzed <i>H. hermathena</i> data. This is for two reasons: First, the <i>H. melpomene</i> reference has nearly-complete sequences of all of this species's chromosomes (the <i>H. hermathena</i> reference does not), which makes the visualization of patterns along entire chromosomes easier. Second, since we are using a multi-species dataset, some smaples will be considerably more closely related to the reference than others, which can result in systematically better read mapping for some populations than others, which in turn can bias estimations of between-population genetic parameters. <i>H. melpomene</i> is equally distant from all our focal and outgroup species, which amelliorates this type of <i>reference bias</i>.<br><br>
 
-To begin, log into the cluster, request an interactive job with 12 processors and 24 Gb RAM, and once it is assigned  load the `Bioinformatics` and `angsd` modules and create the usual variables:
+To begin, log into the cluster, request an interactive job with 12 processors and 24 Gb RAM, and once it is assigned  load the `Bioinformatics` `samtools`, and `angsd` modules and create the usual variables:
 ```bash
 ref=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/Hmel2.5/Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa
 listDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/heliconius_bams
 ```
 
-## Identifying a region of interest
+## Signatures of selection within a population
 
-Our main goal today will be to evaluate the extent of gene flow between <i>H. h. vereatta</i> and <i>H. erato</i>, both at genome-wide and localized scales. We will do so in the framework of the four-taxon tree below:
+In lecture we elaborated on several predictions regarding variation at several within-population statistics, such as $\pi$, Tajima's $D$ and Fay and Wu's $H$ across a stretch of DNA that has experienced a recent selective sweep. We will start by examining these statistics between our <i>H. h. vereatta</i> and <i>H. h. duckei</i> samples.<br><br>
+
+All of the statistics we will be exploring today can be derived from the site frequency spectrum (SFS). Most of them can be calculated from either folded or unfolded SFS, except for Fay and Wu's $H$. Considering the advantages of this specific statistic for detecting selective sweeps, it is worth using an unfolded SFS. Therefore, our first step will be to generate an ancestral pseudoreference using our outgroup samples.
+
+```
+angsd -b "$listDir"/outgroup.filelist -ref $ref -doCounts 1 -doFasta 2 -out ancestral -P 12
+samtools faidx ancestral.fa
+```
+<b>Question 1:</b> Why do we need an unfolded SFS to calculate Fay and Wu's $H$?
+
+Now that we have our ancestral reference, we can go ahead and generate per-site allele counts. In the interest of time, we will be focusing only on data from Chromosome 15, where we already know there are interesting patterns (see [Massardo et al. 2020](https://bmcbiol.biomedcentral.com/articles/10.1186/s12915-020-00797-1)). However, in real life we would usually want to analyze the entire genome. 
+
+```
+angsd -b "$listDir"/vereatta.filelist -r Hmel215003o -GL 1 -anc ancestral.fa -ref $ref -dosaf 1 -out vereatta -baq 1 -minMapQ 20 -minQ 20
+```
+Since estimating the SFS for a large number small (e.g. 10Kb) window of the chromosome from genotype likelihoods may be challenging, and take a very long time, Angsd uses the genome-wide SFS (or chromosome-wide in this case) to guide its inferences (see more in [Korneliussen et al. 2013](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-289)). Lets quickly estimate it:
+
+```
+realSFS -P 12 vereatta.saf.idx > vereatta.ml.sfs
+```
+Finally, lets use our per-site counts and global SFS to 1. calculate per-site probabilities for each $\theta$ estimator, and 2. run a sliding window over chromosome 15 to and calculate the various $\theta$ estimators and their derived statistics. 
+
+```
+realSFS saf2theta vereatta.saf.idx -sfs vereatta.ml.sfs -outname vereatta
+thetaStat do_stat vereatta.thetas.idx  -win 10000 -step 5000  -outnames vereatta.thetasWindow
+```
+<b>Question 2:</b> Birefly explain what a sliding window analysis consists of. Can you tell what the window size and step length are in the code above?
+
+Once this is done, download the files with extension `.pestPG` to your computer for plotting using the R code below:
+
+
+
+
+## Signatures of selection between populations
+
+Fst from the SFS as well. 
+
+## Where did these alleles come from? 
+
+The resemblance between Our main goal today will be to evaluate the extent of gene flow between <i>H. h. vereatta</i> and <i>H. erato</i>, both at genome-wide and localized scales. We will do so in the framework of the four-taxon tree below:
 
 <img src="../Images/hermathena_four-taxon.png" width="450" class="center">
 
