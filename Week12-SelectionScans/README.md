@@ -1,22 +1,24 @@
-Testing for Gene Flow Between Populations
+Scanning the Genome for Signatures of Selection
 ==================
 
-The relationship between evolutionary relationships and patterns of genetic variation observed in a group of (partially) isolated populations can be very informative about the history of divergence and gene flow among them. In today's practical we will be evaluating the levels of gene flow between recently diverged species of the genus <i>Heliconius</i>, and its relationship with color pattern variation in this group. We will again be focusing on <i>Heliconius hermathena</i>. Within this species, most population exhibit a red stripe on the forewing, accompanied by thinner yellow stripes on both the forewing and hindwing. The sole exception to this pattern is the subspecies <i>H.h. vereatta</i>, which lacks the thinner yellow stripe. This coloration is almost identical to that displayed by the co-ocurring <i>H. erato</i> and <i>H. melpomene</i>, suggesting that these three species are mimicking each other's colorations, which serve to warn potential predators about the butterflies' cyanogenic toxins. <br>
+Selection most often acts on phenotypes, yet only genotypes are transferred across multiple generations. Because of this, identifying regions of the genome that have experienced selection is an important application of evolutionary genetics. In today's practical we will be looking for regions that show signatures of selection in a population of <i>Heliconius hermathena</i>, which appears to have experienced a recent change in its color pattern, possibly mediated by selection. Most <i>H. hermathena</i> populations exhibit a red stripe on the forewing, accompanied by thinner yellow stripes on both the forewing and hindwing. The sole exception to this pattern is the subspecies <i>H. h. vereatta</i>, which lacks the thinner yellow stripe. This coloration is almost identical to that displayed by the co-ocurring <i>H. erato</i> and <i>H. melpomene</i>, suggesting that these three species are mimicking each other's colorations, which serve to warn potential predators about the butterflies' cyanogenic toxins. <br>
 <br>
 
 <img src="../Images/H.hermathena.png" width="750" class="center">
 
 
-Could this resemblance be due to hybridization between closely related populations leading to the horizontal transfer of coloration genes between lineages? Today we will be exploring this possibility based on patterns of allelic variation and their concordance/discordance with pre-established species trees. 
+Has  <i>H. h. vereatta</i>'s distinct hindwing pigmentation arisen due to recent selection? Todaw we will be exploring the spatial distribution of multiple measures of genetic variation across the 
+
+
 
 ## The Data
 
-We will use data from three focal populations: <i>H. h. vereatta</i>, its close neighbor <i>H. h. duckei</i>, which displays <i>H. hermathena</i>'s hallmanrk yellow wing pigmentation, and <i>H. erato</i>, which is closely related to <i>H. hermathena</i> and co-occurs with <i>H. h. vereatta</i>, which makes an interesting suspect in the context of hybridization associated with coloration similarities. In addition, we will use an outgroup to identify ancestral alleles.  which will be composed of individuals from two closely-related species: <i>H. charitonia</i> and <i>H. telesiphe</i>.Using combining multiple outgroup species allows us to better identify ancestral alleles.
+We will use data from three focal populations: We will first focus on <i>H. h. vereatta</i>, its close neighbor <i>H. h. duckei</i>, which displays <i>H. hermathena</i>'s hallmanrk yellow wing pigmentation. <i>Heliconius</i> butterflies are well-known for their incomplete species barriers, which allow closely related species to exchange alleles in sympatry. Therefore, we will also keep <i>H. erato</i> in mind, as it is closely related to <i>H. hermathena</i> and co-occurs with <i>H. h. vereatta</i>, with whom it shares a striking resemblance in terms of coloration. In addition, we will use an outgroup to identify ancestral alleles,  which will be composed of individuals from two closely-related species: <i>H. charitonia</i> and <i>H. telesiphe</i>. Combining multiple outgroup species allows us to better identify ancestral alleles.
 <br><br>
 
 <img src="../Images/MassardoPhylo.png" width="350" class="center">
 
-Whole-genome resequencing data from 14 <i>H.h. vereatta</i>, 8 <i>H. h. duckei</i>, 5 <i>H. erato</i>, 2 <i>H. charitonia</i>, and 2 <i>H. telesiphe</i> were downloaded from the SRA, trimmed, and mapped to the <i>H. melpomene</i> reference genome as specified in the Week 2 practical. <br><br>
+Whole-genome resequencing data from 18 <i>H.h. vereatta</i>, 7 <i>H. h. duckei</i>, 6 <i>H. erato</i>, 2 <i>H. charitonia</i>, and 2 <i>H. telesiphe</i> were downloaded from the SRA, trimmed, and mapped to the <i>H. melpomene</i> reference genome as we have done previously. Note that we are using a different reference genome than the last time we analyzed <i>H. hermathena</i> data. This is for two reasons: First, the <i>H. melpomene</i> reference has nearly-complete sequences of all of this species's chromosomes (the <i>H. hermathena</i> reference does not), which makes the visualization of patterns along entire chromosomes easier. Second, since we are using a multi-species dataset, some smaples will be considerably more closely related to the reference than others, which can result in systematically better read mapping for some populations than others, which in turn can bias estimations of between-population genetic parameters. <i>H. melpomene</i> is equally distant from all our focal and outgroup species, which amelliorates this type of <i>reference bias</i>.<br><br>
 
 To begin, log into the cluster, request an interactive job with 12 processors and 24 Gb RAM, and once it is assigned  load the `Bioinformatics` and `angsd` modules and create the usual variables:
 ```bash
@@ -24,7 +26,7 @@ ref=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes
 listDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/heliconius_bams
 ```
 
-## Allele frequency estimation
+## Identifying a region of interest
 
 Our main goal today will be to evaluate the extent of gene flow between <i>H. h. vereatta</i> and <i>H. erato</i>, both at genome-wide and localized scales. We will do so in the framework of the four-taxon tree below:
 
