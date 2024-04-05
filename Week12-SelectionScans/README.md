@@ -20,6 +20,7 @@ We will use data from three focal populations: We will first focus on <i>H. h. v
 Whole-genome resequencing data from 18 <i>H. h. vereatta</i>, 7 <i>H. h. duckei</i>, 6 <i>H. erato</i>, 2 <i>H. charitonia</i>, and 2 <i>H. telesiphe</i> were downloaded from the SRA, trimmed, and mapped to the <i>H. melpomene</i> reference genome as we have done previously. Note that we are using a different reference genome than the last time we analyzed <i>H. hermathena</i> data. This is for two reasons: First, the <i>H. melpomene</i> reference has nearly-complete sequences of all of this species's chromosomes (the <i>H. hermathena</i> reference does not), which makes the visualization of patterns along entire chromosomes easier. Second, since we are using a multi-species dataset, some smaples will be considerably more closely related to the reference than others, which can result in systematically better read mapping for some populations than others, which in turn can bias estimations of between-population genetic parameters. <i>H. melpomene</i> is equally distant from all our focal and outgroup species, which amelliorates this type of <i>reference bias</i>.<br><br>
 
 To begin, log into the cluster, request an interactive job with 12 processors and 24 Gb RAM, and once it is assigned  load the `Bioinformatics` `samtools`, and `angsd` modules and create the usual variables:
+
 ```bash
 ref=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes/Hmel2.5/Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa
 listDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/heliconius_bams
@@ -31,8 +32,9 @@ Regions of the genome repsonsible for between-group phenotypic differenfes are e
 
 We have previously estimated $F_{ST}$ by calculating maximum-likelihood allele frequencies and then using those to estimate $F_{ST}$. Although this is a perfectly good way to do so, `angsd` has built-in functions for $F_{ST}$ estimation, which we will be using today. 
 
+```bash
+aa
 ```
-
 ## Signatures of selection within populations
 
 In lecture we elaborated on several predictions regarding variation at several within-population statistics, such as $\pi$, Tajima's $D$ and Fay and Wu's $H$ across a stretch of DNA that has experienced a recent selective sweep. To evaluate whether the allele frequency differences observed between color morphs are the product of recent selection, we can calculate these statistics across Crh. 15 for our <i>H. h. vereatta</i> and <i>H. h. duckei</i> samples.<br><br>
