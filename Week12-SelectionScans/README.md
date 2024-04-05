@@ -120,7 +120,7 @@ rect(cortex[1],-1.5,cortex[2],-1.2,col="grey65", border=NA)
 text(1.42e6,-1,"cortex")
 
 ```
-<b>Question 4:</b> Estimate and plot the same statistics as above for <i>H. h. duckei</i>.
+<b>Question 4:</b> Estimate and plot the same statistics as above for <i>H. h. duckei</i>.<br>
 <b>Question 5:</b> How would you explain the patterns observed? Does it look like the <i>cortex</i> alleles frequent in <i>H. h. vereatta</i> swept to high frequency in the recent past? Explain your reasoning. 
 
 ## Where did these alleles come from? 
@@ -180,9 +180,9 @@ length(fixed)
 fixed_tab=freqs[fixed,]
 write.table(fixed_tab[,1:4], file="polarized_sites.MAF.txt", quote=F, row.names=F, col.names=F)
 ```
-<b>Question 5:<b/> Why don't be pick those with allele frequency equal to zero (but instead use those with maf<0.005>?
+<b>Question 6:</b> Why don't be pick those with allele frequency equal to zero (but instead use those with maf<0.005>?
 
-Now we-re ready to estimate allele frequencies at each of our focal populations. 
+Before continue don't forget to index the new sites file. Now we-re ready to estimate allele frequencies at each of our focal populations. 
 
 ```bash 
 angsd -P 12 -b  $listDir/duckei.filelist -r Hmel215003o -sites polarized_sites.MAF.txt -ref $ref -GL 1 -out duckei -doMajorMinor 3 -doMaf 1 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
@@ -190,7 +190,7 @@ angsd -P 12 -b  $listDir/vereatta.filelist -r Hmel215003o -sites polarized_sites
 angsd -P 12 -b  $listDir/erato.filelist -r Hmel215003o -sites polarized_sites.MAF.txt -ref $ref -GL 1 -out erato -doMajorMinor 3 -doMaf 1 -uniqueOnly 1 -remove_bads 1 -only_proper_pairs 1 -minMapQ 20 -minQ 20
 ```
 
-Download the resulting three files (`duckei.mafs.gz`, `vereatta.mafs.gz`, `erato.mafs.gz`) to your local computer to work in R. We'll be drawing plots, so working directly on the cluster is not optimal in this case. 
+Download the resulting three files (`duckei.mafs.gz`, `vereatta.mafs.gz`, `erato.mafs.gz`) to your local computer to work in R.
 
 ## Genome-wide levels of gene flow
 
@@ -202,6 +202,18 @@ duckei=read.table("duckei.mafs.gz", h=T)
 vereatta=read.table("vereatta.mafs.gz", h=T)
 erato=read.table("erato.mafs.gz", h=T)
 
+## Extract common sites
+rownames(duckei)=paste(duckei$chromo,duckei$position, sep="_")
+rownames(vereatta)=paste(vereatta$chromo,vereatta$position, sep="_")
+rownames(erato)=paste(erato$chromo,erato$position, sep="_")
+
+common_sites=Reduce(intersect, list(rownames(duckei),rownames(vereatta),rownames(erato)))
+
+## Reduce each table to the comon sites
+duckei=duckei[common_sites,]
+vereatta=vereatta[common_sites,]
+erato=erato[common_sites,]
+
 ## Extract the allele frequencies for easy calculations downstream
 p1=duckei$knownEM
 p2=vereatta$knownEM
@@ -211,29 +223,22 @@ p3=erato$knownEM
 ABBA=((1-p1)*p2*p3)
 BABA=(p1*(1-p2)*p3)
 ```
-In class we defined 
+<b>Question 7:</b>In class we defined 
 $$ABBA=((1-p_1)p_2p_3(1-p_O))$$
 $$BABA=(p_1(1-p_2)p_3(1-p_O))$$
 
 Where $p_O$ is the allele frequency at the outgroup. However, in our code above we did not include $p_O$. Why do you think this is?
-
+<!--
 <details>
 <summary> Click here to see the answer</summary>
 We are liminting our analyses to sites fixed at the outgroup, so $(1-p_O)$ is always equal to 1. 
 </details>
-
+-->
 Having our ABBA and BABA estimates we can now calculate D. 
 ```R
 D=(sum(ABBA)-sum(BABA))/(sum(ABBA)+sum(BABA))
 
-> D
-[1] 0.002422992
-```
-We get a small, yet positive value of D. This is consistent with gene flow between <i> H. erato</i> and <i> H. h. vereatta</i>. Lets now calculate $f_3$.
-
-```R
-
-## Extract the number of samples involved in the calculation of p3
+## Extract the number of samples involved in the calculation of p2
 n2=vereatta$nInd
 
 ## Calculate f3 per site
@@ -242,21 +247,25 @@ f3_sites=((p2-p1)*(p2-p3))-((p2*(1-p2))/(n2-1))
 ## Average across sites 
 f3=mean(f3_sites)
 
-> f3
-[1] -0.0009072305
 ```
-We find a negative value for $f_3$, which is, again, consistent with a more network-like (vs. tree-like) relationship between lineages. Our estimates of both $D$ and $f_3$ are consistent with gene flow between non-sister taxa. However, to evaluate whether we are recovering the signal left by a real evolutionary process and not just noise, we'd need to use a more rigorous statistical test approach to test how much our values depart from zero. This can be done using computational methods suchas jackknifing or bootstrapping. However, in the interest of time we will not do this today. 
+<b>Question 8:</b> Are the obtained values of $D$ and $f_3$ consistent with a scenario of ongoing gene flow between <i>H. h. vereatta</i> and <i>H. erato</i>?
+
+<!--
+We find a negative value for $f_3$, which is, again, consistent with a more network-like (vs. tree-like) relationship between lineages. Our estimates of both $D$ and $f_3$ are consistent with gene flow between non-sister taxa. 
+-->
+To evaluate whether we are recovering the signal left by a real evolutionary process and not just noise, we'd need to use a more rigorous statistical test approach to test how much our values depart from zero. This can be done using computational methods suchas jackknifing or bootstrapping. However, in the interest of time we will not do this today. 
 
 ## Distribution of gene flow along the genome
 
 The results from the previous section suggest that there has been gene flow between species with similar color patterns. Where in the genome is the gene flow signal coming from? The answer to this question can help us understand multiple aspects of the dynamics of our system, such as how much of the genetic material exchanged between populations manages to persist in a new population after introgression, and what kinds of genes are in the regions that do/don't persist. 
 <br><br>
-A common way to visualize variation in statistics across the genome are <i>sliding window</i> analyses, wehre a statistic is calculated at mutiple small, adjacent regions (i.e. "windows") of the genome. This analysis can be easily implemented in R using a loop and the code we used above. Briefly, the algorithm consists of analyzing windows of a given size, and "sliding" a given ammount of base pairs to the next window. The iamge below may help understand the algorithm better. 
+<!---A common way to visualize variation in statistics across the genome are <i>sliding window</i> analyses, wehre a statistic is calculated at mutiple small, adjacent regions (i.e. "windows") of the genome. This analysis can be easily implemented in R using a loop and the code we used above. Briefly, the algorithm consists of analyzing windows of a given size, and "sliding" a given ammount of base pairs to the next window. The iamge below may help understand the algorithm better. 
 
 <img src="../Images/SlidingWindow.png" width="500" class="center">
 
 Now lets implement this algorithm in R (if you've closed your session load the frequency tables again):
-
+--->
+Although `angsd` has a built-in function to calculate $D$ in sliding windows across chromosomes, we will write our own sliding window here, mostly for pedagogical purposes. 
 ```R 
 ## Define the window and step size
 win=10000
@@ -281,7 +290,7 @@ for(i in 1:length(starts)){
 	w_p2=subs_vereatta$knownEM
 	w_p3=subs_erato$knownEM
 
-#Calculate ABBA and BABA for this window
+#Calculate ABBA, and BABA for this window
 	ABBA_w[i]=sum(((1-w_p1)*w_p2*w_p3))
 	BABA_w[i]=sum((w_p1*(1-w_p2)*w_p3))
 
@@ -298,40 +307,44 @@ plot(centers, ABBA_w, type="l", col="navy", xlab="Position (bp)", ylab="Statisti
 lines(centers, BABA_w, type="l", col="coral")
 legend(8.5e6,3.5, c("ABBA", "BABA"), col=c("navy", "coral"), lty=1)
 ```
-How do ABBA and BABA relate along the chromosome? Do they co-vary, show opposite patterns, or are unrelated? Can you think of any reasons that explain the observed pattern? 
-
+<b>Question 9:</b> How do ABBA and BABA relate along the chromosome? Do they co-vary, show opposite patterns, or are unrelated? Can you think of any reasons that explain the observed pattern? 
+<!---
 <details> <summary> Click here to see the plot</summary>
 <img src="../Images/ABBA_and_BABA.png" width="700" class="center">
 From this plot it is clear that a region at around 1Mbp shows a clear excess of ABBA sites. Lets zoom in. 
 </details>
-
+--->
 Key to our goals is identifying sites that have an excess of ABBA vs. BABA sites. Can you spot any on the plot? To better visualize them, we can plot the difference between ABBA and BABA at rach window. 
 
 ```R
 plot(centers, ABBA_w-BABA_w, type="l", col="navy", xlab="Position (bp)", ylab="ABBA-BABA")
 ```
+<!---
 <details> <summary> Click here to see the plot</summary>
 <img src="../Images/ABBA-BABA.png" width="700" class="center">
 Most of the variation in ABBA or BABA sites has flattened out, indicating that at most regions where these deviated from zero the number of each type of discordant site was very similar. The one exception is a single large peak around 1.5 Mbp with an excess of ABBA sites. 
 </details>
-
-Lets zoom in to to get a closer look.
+--->
+Lets zoom into the <i>cortex</i> region to to get a closer look.
 
 ```R 
 plot(centers, ABBA_w-BABA_w, type="l", col="navy", xlab="Position (bp)", ylab="ABBA-BABA", xlim=c(1e6, 2e6))
 
 ## Add a thin line at zero
 abline(h=0, lty=3,lwd=0.5)
+
+## Add Cortex
+rect(cortex[1],-0.7,cortex[2],-0.35,col="grey65", border=NA)
+#Label it
+text(1.42e6,-0.85,"cortex")
 ```
 
-```R
+<b>Question 10:</b> Based on the results of this practical, can you think of an evolutionary scenario through which <i>H. h. vereatta</i> may have obtained its color pattern, as well as the observed patterns of genetic variation across chromosome 15?
 
-```
-
-What do you see? Does this plot give you some ideas about how <i>H. h. vereatta</i> may have evolved its mimetic color pattern? 
-
+<!---
 <details> <summary> Click here to see the plot</summary>
 <img src="../Images/ABBA-BABA_Closeup.png" width="700" class="center">
 	This view confirms that there is a single peak around 1.45Mbp, right on top of <i>cortex</i>, suggesting that this gene, and possibly the darker melanic pattern observed in <i>vereatta</i> got to this subspecies via <i>introgression</i> (also known as horizontal gene transfer), from <i>H. erato<i/> or another closely related species. 
 </details>
 
+--->
