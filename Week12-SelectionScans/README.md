@@ -30,43 +30,97 @@ listDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/helico
 
 Regions of the genome repsonsible for between-group phenotypic differenfes are expected to have a different genetic makeup between these groups. If these phenotypic differences have fitness consequences, then these regions should exhibit higher levels of differentiation than the rest of the genome. With this in mind, our first step will be to conduct an $F_{ST}$ scan, looking for regions of high differentiation between <i>H. h. vereatta</i> and <i>H. h. duckei</i>. In the interest of time, we will be focusing only on data from Chromosome 15, where we already know there are interesting patterns there (see [Massardo et al. 2020](https://bmcbiol.biomedcentral.com/articles/10.1186/s12915-020-00797-1)). However, in real life we would usually want to analyze the entire genome. <br><br>
 
-We have previously estimated $F_{ST}$ by calculating maximum-likelihood allele frequencies and then using those to estimate $F_{ST}$. Although this is a perfectly good way to do so, `angsd` has built-in functions for $F_{ST}$ estimation, which we will be using today. 
+We have previously estimated $F_{ST}$ by calculating maximum-likelihood allele frequencies and then using those to estimate $F_{ST}$. Although this is a perfectly good way to do so, `angsd` has built-in functions for $F_{ST}$ estimation, which we will be using today. Although we will not go into details, $F_ST$ estimators can be easily calculated from the 2D SFS, considering all sites in a given bin of the SFS contribute equally to the allele frequency differences between populations. Therefore, our first step will be to generate derived allele counts at our two focal populations. Since $F_{ST}$ only depends in the allele frequency diffrence, our estimates will not be affected by the polarity of alleles (i.e. whether they are ancestral or derived), so we can use the reference as the "ancestral" allele. 
 
 ```bash
-aa
+angsd -b "$listDir"/vereatta.filelist -P 12 -r Hmel215003o -GL 1 -anc $ref -ref $ref -dosaf 1 -out vereatta -baq 1 -minMapQ 20 -minQ 20
+angsd -b "$listDir"/duckei.filelist -P 12 -r Hmel215003o -GL 1 -anc $ref -ref $ref -dosaf 1 -out duckei -baq 1 -minMapQ 20 -minQ 20
 ```
+Since estimating the SFS for a large number small (e.g. 10Kb) window of the chromosome from genotype likelihoods may be challenging, and can take a very long time, Angsd uses the genome-wide SFS (or chromosome-wide in this case) to guide its inferences (see more in [Korneliussen et al. 2013](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-289)). Lets quickly estimate it:
+```bash
+realSFS -P 12 -maxIter 1000 vereatta.saf.idx duckei.saf.idx > vereatta_duckei.ml.sfs
+```
+This will take a while, (as we add more populations to our SFS the number of bins grows exponentially, so estimating it can be computationally demanding), so feel free to copy the file `$listDir/vereatta_duckei.ml.sfs` to your working directory.<br><br>
+Finally, we can use our per-site counts and global SFS to 1. calculate per-site $F_{ST}$, and 2. run a sliding window over chromosome 15 to and calculate the average $F_{ST} at each window.
+```bash
+realSFS fst index vereatta.saf.idx duckei.saf.idx -sfs vereatta_duckei.ml.sfs -fstout vereatta_duckei
+realSFS fst stats2 vereatta_duckei.fst.idx -win 10000 -step 5000 > vereatta_duckei.fst.txt
+```
+<b>Question 1:</b> Birefly explain what a sliding window analysis consists of. Can you tell what the window size and step length are in the code above?
+
+Once the sliding window finishes running download `vereatta_duckei.fst.txt` to your local computer for plotting. Then in R:
+
+```R
+Fst=read.table("vereatta_duckei.fst.txt", h=F, skip=1)
+colnames(Fst)=c("region","chr","midPos","nSites","Fst")
+
+# Plot
+plot(Fst$midPos, Fst$Fst, xlab="Position on Chr 15 (bp)", pch=16, ylab=expression(F[ST]))
+```
+<b>Question 2:</b> Can you see any obvious $F_{ST}$ peaks? 
+
 ## Signatures of selection within populations
 
 In lecture we elaborated on several predictions regarding variation at several within-population statistics, such as $\pi$, Tajima's $D$ and Fay and Wu's $H$ across a stretch of DNA that has experienced a recent selective sweep. To evaluate whether the allele frequency differences observed between color morphs are the product of recent selection, we can calculate these statistics across Crh. 15 for our <i>H. h. vereatta</i> and <i>H. h. duckei</i> samples.<br><br>
 
-All of the statistics we will be exploring today can be derived from the site frequency spectrum (SFS). Most of them can be calculated from either folded or unfolded SFS, except for Fay and Wu's $H$. Considering the advantages of this specific statistic for detecting selective sweeps, it is worth using an unfolded SFS. Therefore, our first step will be to generate an ancestral pseudoreference using our outgroup samples.
+All of the statistics we will be exploring today can be derived from 1D SFS. Most of them can be calculated from either folded or unfolded SFS, except for Fay and Wu's $H$. Considering the advantages of this specific statistic for detecting selective sweeps, it is worth using an unfolded SFS. Therefore, our first step will be to generate an ancestral pseudoreference using our outgroup samples.
 
 ```
 angsd -b "$listDir"/outgroup.filelist -ref $ref -doCounts 1 -doFasta 2 -out ancestral -P 12
 samtools faidx ancestral.fa
 ```
-<b>Question 1:</b> Why do we need an unfolded SFS to calculate Fay and Wu's $H$?
+<b>Question 3:</b> Why do we need an unfolded SFS to calculate Fay and Wu's $H$?
 
-Now that we have our ancestral reference, we can go ahead and generate per-site allele counts. 
-
-```
-angsd -b "$listDir"/vereatta.filelist -r Hmel215003o -GL 1 -anc ancestral.fa -ref $ref -dosaf 1 -out vereatta -baq 1 -minMapQ 20 -minQ 20
-```
-Since estimating the SFS for a large number small (e.g. 10Kb) window of the chromosome from genotype likelihoods may be challenging, and take a very long time, Angsd uses the genome-wide SFS (or chromosome-wide in this case) to guide its inferences (see more in [Korneliussen et al. 2013](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-289)). Lets quickly estimate it:
+Similar to $F_{ST}$, `angsd` uses a global SFS to estimate localized statistics along genomic windows. We can tehrefore repeat the same procedure as above (but within each population) to calculate the various $\theta$ estimators and their derived statistics.
 
 ```
+# Per-site counts
+angsd -b "$listDir"/vereatta.filelist  -P 12 -r Hmel215003o -GL 1 -anc ancestral.fa -ref $ref -dosaf 1 -out vereatta -baq 1 -minMapQ 20 -minQ 20
+
+#Global SFS
 realSFS -P 12 vereatta.saf.idx > vereatta.ml.sfs
-```
-Finally, lets use our per-site counts and global SFS to 1. calculate per-site probabilities for each $\theta$ estimator, and 2. run a sliding window over chromosome 15 to and calculate the various $\theta$ estimators and their derived statistics. 
 
-```
-realSFS saf2theta vereatta.saf.idx -sfs vereatta.ml.sfs -outname vereatta
+#Per-site statistics
+realSFS saf2theta -P 12 vereatta.saf.idx -sfs vereatta.ml.sfs -outname vereatta
+
+#Sliding Window
 thetaStat do_stat vereatta.thetas.idx  -win 10000 -step 5000  -outnames vereatta.thetasWindow
 ```
-<b>Question 2:</b> Birefly explain what a sliding window analysis consists of. Can you tell what the window size and step length are in the code above?
 
 Once this is done, download the files with extension `.pestPG` to your computer for plotting using the R code below:
 
+```R
+# Load data
+vereatta=read.table("vereatta.thetasWindow.pestPG")
+colnames(vereatta)=c("region", "Chr", "WinCenter", "tW", "tP", "tF", "tH", "tL", "Tajima", "fuf","fud", "fayh", "zeng", "nSites")
+
+## Plot vereatta (note we are plotting pi per base-pair)
+par(mfrow=c(3,1), mar=c(4.1, 4.1, 1, 2.1))
+plot(vereatta$WinCenter,vereatta$tP/vereatta$nSites, type="l", lwd=0.5, ylab=expression(pi), xlab="")
+plot(vereatta$WinCenter,vereatta$Tajima, type="l", col="blue", lwd=0.5, ylab="Tajima's D", xlab="")
+plot(vereatta$WinCenter,vereatta$fayh, type="l", col="coral", lwd=0.5, xlab="Position on Chr 15 (bp)", ylab="Fay and Wu's H")
+```
+
+An online portal named [lepbase](www.lepbase.org) contains a wide array for genomic resources for several species of Lepidoptera (butterflies and moths). If we look at what genes are in our regions of interest, we will find, among others, the gene <i>cortex</i>, which sits roughly 1.5Mb from the start of the chromosome. This gene has recently been found to underlie variation in melanic color pattern elements in a few species of lepidopterans, including famous Pepperd moth, and some species of <i>Heliconius</i> and <i>Papilio</i>. Lets zoom into the region where <i>cortex</i> occurs on our plot.
+
+```R
+par(mfrow=c(4,1), mar=c(4.1, 4.1, 1, 2.1))
+plot(Fst$midPos, Fst$Fst, xlab="Position on Chr 15 (bp)", pch=16, ylab=expression(F[ST]), xlim=c(1e6,2e6))
+plot(vereatta$WinCenter,vereatta$tP/vereatta$nSites, type="l", col="magenta", lwd=0.5, ylab=expression(pi), xlab="", xlim=c(1e6,2e6))
+plot(vereatta$WinCenter,vereatta$Tajima, type="l", col="blue", lwd=0.5, ylab="Tajima's D", xlab="", xlim=c(1e6,2e6))
+plot(vereatta$WinCenter,vereatta$fayh, type="l", col="coral", lwd=0.5, xlab="Position on Chr 15 (bp)", ylab="Fay and Wu's H", xlim=c(1e6,2e6))
+
+#Create an object with the begining and end of Cortex obtained from Lepbase
+cortex=c(1413804,1424719)
+
+#Plot a tiny gray rectangle to highlight this region
+rect(cortex[1],-1.5,cortex[2],-1.2,col="grey65", border=NA)
+
+#Label it
+text(1.42e6,-1,"cortex")
+
+```
+<b>Question 4:</b> How would you explain the patterns observed? Does it look like the <i>cortex</i> alleles frequent in <i>H. h. vereatta</i> sweep to high frequency in the recent past? Explain your reasoning. 
 
 ## Where did these alleles come from? 
 
@@ -268,14 +322,8 @@ plot(centers, ABBA_w-BABA_w, type="l", col="navy", xlab="Position (bp)", ylab="A
 abline(h=0, lty=3,lwd=0.5)
 ```
 
-An online portal named [lepbase](www.lepbase.org) contains a wide array for genomic resources for several species of Lepidoptera (butterflies and moths). If we look at what genes are in our region of interest, we will find, among others, the gene <i>cortex</i>, which has recently been found to underlie variation in melanic color pattern elements in a few species of lepidopterans, such as the famous Pepperd moth, and some species of <i>Heliconius</i> and <i>Papilio</i>. Lets highlight the region where <i>cortex</i> occurs on our plot.
-
 ```R
-#Create an object with the begining and end of Cortex obtained from Lepbase
-cortex=c(1413804,1424719)
 
-#Plot a tiny gray rectangle to highlight this region
-rect(cortex[1],-0.7,cortex[2],-0.35,col="grey65", border=NA)
 ```
 
 What do you see? Does this plot give you some ideas about how <i>H. h. vereatta</i> may have evolved its mimetic color pattern? 
