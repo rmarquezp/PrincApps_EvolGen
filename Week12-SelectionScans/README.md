@@ -25,9 +25,17 @@ ref=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/RefGenomes
 listDir=/scratch/eeb401s002f22_class_root/eeb401s002f22_class/shared_data/heliconius_bams
 ```
 
-## Signatures of selection within a population
+## Signatures of selection between populations
 
-In lecture we elaborated on several predictions regarding variation at several within-population statistics, such as $\pi$, Tajima's $D$ and Fay and Wu's $H$ across a stretch of DNA that has experienced a recent selective sweep. We will start by examining these statistics between our <i>H. h. vereatta</i> and <i>H. h. duckei</i> samples.<br><br>
+Regions of the genome repsonsible for between-group phenotypic differenfes are expected to have a different genetic makeup between these groups. If these phenotypic differences have fitness consequences, then these regions should exhibit higher levels of differentiation than the rest of the genome. With this in mind, our first step will be to conduct an $F_{ST}$ scan, looking for regions of high differentiation between <i>H. h. vereatta</i> and <i>H. h. duckei</i>. In the interest of time, we will be focusing only on data from Chromosome 15, where we already know there are interesting patterns there (see [Massardo et al. 2020](https://bmcbiol.biomedcentral.com/articles/10.1186/s12915-020-00797-1)). However, in real life we would usually want to analyze the entire genome. <br><br>
+
+We have previously estimated $F_{ST}$ by calculating maximum-likelihood allele frequencies and then using those to estimate $F_{ST}$. Although this is a perfectly good way to do so, `angsd` has built-in functions for $F_{ST}$ estimation, which we will be using today. 
+
+```
+
+## Signatures of selection within populations
+
+In lecture we elaborated on several predictions regarding variation at several within-population statistics, such as $\pi$, Tajima's $D$ and Fay and Wu's $H$ across a stretch of DNA that has experienced a recent selective sweep. To evaluate whether the allele frequency differences observed between color morphs are the product of recent selection, we can calculate these statistics across Crh. 15 for our <i>H. h. vereatta</i> and <i>H. h. duckei</i> samples.<br><br>
 
 All of the statistics we will be exploring today can be derived from the site frequency spectrum (SFS). Most of them can be calculated from either folded or unfolded SFS, except for Fay and Wu's $H$. Considering the advantages of this specific statistic for detecting selective sweeps, it is worth using an unfolded SFS. Therefore, our first step will be to generate an ancestral pseudoreference using our outgroup samples.
 
@@ -37,7 +45,7 @@ samtools faidx ancestral.fa
 ```
 <b>Question 1:</b> Why do we need an unfolded SFS to calculate Fay and Wu's $H$?
 
-Now that we have our ancestral reference, we can go ahead and generate per-site allele counts. In the interest of time, we will be focusing only on data from Chromosome 15, where we already know there are interesting patterns (see [Massardo et al. 2020](https://bmcbiol.biomedcentral.com/articles/10.1186/s12915-020-00797-1)). However, in real life we would usually want to analyze the entire genome. 
+Now that we have our ancestral reference, we can go ahead and generate per-site allele counts. 
 
 ```
 angsd -b "$listDir"/vereatta.filelist -r Hmel215003o -GL 1 -anc ancestral.fa -ref $ref -dosaf 1 -out vereatta -baq 1 -minMapQ 20 -minQ 20
@@ -57,12 +65,6 @@ thetaStat do_stat vereatta.thetas.idx  -win 10000 -step 5000  -outnames vereatta
 
 Once this is done, download the files with extension `.pestPG` to your computer for plotting using the R code below:
 
-
-
-
-## Signatures of selection between populations
-
-Fst from the SFS as well. 
 
 ## Where did these alleles come from? 
 
