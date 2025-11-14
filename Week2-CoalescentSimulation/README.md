@@ -13,12 +13,12 @@ The basic algorithm for a coalescent simulation ca be written as follows:
 
 ## Required packages
 
-The goal of today's lab is learning how coalescent simulation is written "from scratch", so most of the code we will be using here does not require any additional packages to be loaded onto our R environment. However, we will be using the packages <i>ape</i> and <i>phangorn</i>to visualize and manipulate our genealogies. Before you begin, please load these packages:
+The goal of today's lab is learning how coalescent simulation is written "from scratch", so most of the code we will be using here does not require any additional packages to be loaded onto our R environment. However, we will be using the packages <i>ape</i> and <i>phangorn</i> to visualize and manipulate our genealogies. Before you begin, please load these packages:
 ```R
 library(ape)
 library(phangorn)
 ```
-If you get an error message saying there is no such package, it is probably due to ape not being installed on your machine. If this is the case please install it:
+If you get an error message saying there is no such package, it is probably due to that package not being installed on your machine. If this is the case please install it:
 ```R
 install.packages("ape")
 install.packages("phangorn")
